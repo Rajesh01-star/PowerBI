@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power BI Report Viewer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f2f1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #f2c811; /* Power BI Yellow */
+            width: 100%;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            margin: 0;
+            color: #333;
+        }
+
+        .report-container {
+            width: 90%;
+            max-width: 1200px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The iframe will fit within this container */
+        .report-container iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .instructions {
+            margin-top: 2rem;
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .instructions h2 {
+            margin-top: 0;
+            color: #d83b01;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Campaign Performance Marketing Report</h1>
+    </header>
+
+    <div class="report-container">
+        <!-- 
+          REPLACE the iframe below with the Embed Code generated from Power BI Service.
+        -->
+        <iframe title="Campaign Performance Marketing" width="1140" height="541.25" src="about:blank" frameborder="0" allowFullScreen="true"></iframe>
+    </div>
+
+    <div class="instructions">
+        <h2>⚠️ How to render your local .pbix file</h2>
+        <p>A <code>.pbix</code> file cannot be read directly by an HTML file. You must host it first. Follow these steps:</p>
+        <ol>
+            <li>Open your file <strong>Campaign Performance Marketing_Power BI project by Mohit Bhardwaj_April 25, 2026 (1).pbix</strong> in the Power BI Desktop application.</li>
+            <li>Click <strong>Publish</strong> on the Home ribbon to upload it to the Power BI Service (Workspace).</li>
+            <li>Go to <a href="https://app.powerbi.com" target="_blank">app.powerbi.com</a> and open the report.</li>
+            <li>Go to <strong>File &gt; Embed report &gt; Publish to web (public)</strong> (or Website/Portal for secure access).</li>
+            <li>Copy the generated HTML <code>&lt;iframe&gt;</code> code.</li>
+            <li>Replace the placeholder <code>&lt;iframe&gt;</code> in this <code>index.html</code> file with your code.</li>
+        </ol>
+    </div>
+
+</body>
+</html>
