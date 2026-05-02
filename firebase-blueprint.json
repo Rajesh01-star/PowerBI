@@ -1,0 +1,36 @@
+{
+  "rules": {
+    ".read": "now < 1735689600000",
+    ".write": "now < 1735689600000"
+  },
+  "collections": {
+    "templates": {
+      "schema": {
+        "id": "string",
+        "title": "string",
+        "price": "number",
+        "category": "string",
+        "features": "array",
+        "fileUrl": "string"
+      }
+    },
+    "users": {
+      "schema": {
+        "uid": "string",
+        "email": "string",
+        "inventory": "array",
+        "purchaseHistory": "array"
+      }
+    },
+    "orders": {
+      "schema": {
+        "orderId": "string",
+        "userId": "string",
+        "guestEmail": "string",
+        "templateId": "string",
+        "amount": "number",
+        "timestamp": "timestamp"
+      }
+    }
+  }
+}
