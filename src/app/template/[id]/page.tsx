@@ -12,15 +12,19 @@ export default function TemplateDetail() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const isCampaign = params.id === 'campaign-performance';
+  const isKoffee = params.id === 'gen-koffee-infographics';
+  const isLivePreview = isCampaign || isKoffee;
 
   // In a real app, fetch template details based on params.id
   const template = {
     id: params.id,
-    title: isCampaign ? "Campaign Performance Marketing" : "Finance Pro Exec Dashboard",
-    category: isCampaign ? "Marketing" : "Finance",
+    title: isCampaign ? "Campaign Performance Marketing" : isKoffee ? "Gen Koffee Infographics" : "Finance Pro Exec Dashboard",
+    category: isCampaign ? "Marketing" : isKoffee ? "Sales" : "Finance",
     price: "$149",
     description: isCampaign 
       ? "Interactive Power BI Dashboard to analyze your key campaign metrics and ROI in real-time. Built for marketing executives to track cross-channel performance." 
+      : isKoffee 
+      ? "A visually stunning infographic dashboard designed for coffee shop chains to track daily sales, customer demographics, and regional performance with dynamic maps and charts."
       : "A comprehensive executive financial dashboard designed to provide CFOs and finance teams with real-time insights into revenue, expenses, and profitability margins. Connects directly to ERPs and SQL databases.",
     features: [
       "Real-time General Ledger integration",
@@ -64,17 +68,20 @@ export default function TemplateDetail() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-heading font-semibold flex items-center gap-2">
-                  <LayoutDashboard className="w-5 h-5 text-indigo-500" /> {isCampaign ? "Interactive Dashboard Preview" : "Live Preview Simulation"}
+                  <LayoutDashboard className="w-5 h-5 text-indigo-500" /> {isLivePreview ? "Interactive Dashboard Preview" : "Live Preview Simulation"}
                 </h2>
-                <span className="text-sm text-white/40">{isCampaign ? "Live Power BI Embed" : "Interactive Data Mockup"}</span>
+                <span className="text-sm text-white/40">{isLivePreview ? "Live Power BI Embed" : "Interactive Data Mockup"}</span>
               </div>
               
-              {isCampaign ? (
-                <div className="relative w-full aspect-[16/9] bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_30px_-10px_rgba(99,102,241,0.2)]">
+              {isLivePreview ? (
+                <div 
+                  className={`relative w-full overflow-hidden border border-white/10 shadow-[0_0_30px_-10px_rgba(99,102,241,0.2)] rounded-2xl bg-white/5 backdrop-blur-xl ${isKoffee ? 'max-w-[600px] mx-auto' : ''}`}
+                  style={{ aspectRatio: isKoffee ? '600 / 373.5' : '16 / 9' }}
+                >
                   <iframe 
-                    title="Campaign Performance Marketing Dashboard" 
+                    title={template.title}
                     className="w-full h-full border-0 absolute inset-0 z-0"
-                    src="https://app.powerbi.com/view?r=eyJrIjoiMzNhODIyNDQtNjM5Ny00ZThhLTg1MjktOTc0ZDI1NWZiNWM3IiwidCI6ImI5ZjU1ZTRjLTRhNzEtNDg0ZS1iZWJiLTA3NThlYjRjZTUyNyJ9" 
+                    src={isCampaign ? "https://app.powerbi.com/view?r=eyJrIjoiMzNhODIyNDQtNjM5Ny00ZThhLTg1MjktOTc0ZDI1NWZiNWM3IiwidCI6ImI5ZjU1ZTRjLTRhNzEtNDg0ZS1iZWJiLTA3NThlYjRjZTUyNyJ9" : "https://app.powerbi.com/view?r=eyJrIjoiZTRmYjI0NTMtZjk3MS00NzczLTlmZDItNTA2NTQyNzA5NWRiIiwidCI6ImI5ZjU1ZTRjLTRhNzEtNDg0ZS1iZWJiLTA3NThlYjRjZTUyNyJ9"}
                     allowFullScreen={true}>
                   </iframe>
                 </div>
