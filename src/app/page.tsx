@@ -5,18 +5,40 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Shield, Zap, Cloud, BarChart3, Star } from 'lucide-react';
 import Link from 'next/link';
+import { authClient } from "@/lib/auth-client";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const { data: sessionData, isPending } = authClient.useSession();
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [isPostsLoading, setIsPostsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTemplates() {
+      try {
+        const res = await fetch("/api/posts");
+        const json = await res.json();
+        if (json.success) {
+          setTemplates(json.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch templates:", error);
+      } finally {
+        setIsPostsLoading(false);
+      }
+    }
+    fetchTemplates();
+  }, []);
+
+  const handleLogout = async () => {
+      await authClient.signOut();
+      window.location.reload();
+  };
+
   const benefits = [
     { icon: <Zap className="w-6 h-6 text-indigo-400" />, title: "Instant Workflow", desc: "Download and deploy premium dashboards in minutes, not months." },
     { icon: <Shield className="w-6 h-6 text-indigo-400" />, title: "Enterprise Secure", desc: "Built with best practices for data governance and security." },
     { icon: <Cloud className="w-6 h-6 text-indigo-400" />, title: "Cloud Ready", desc: "Seamless integration with Power BI Service and Office 365." },
-  ];
-
-  const featuredTemplates = [
-    { id: 'finance-pro', title: "Finance Pro Exec", category: "Finance", price: "$149", rating: 4.9, img: "bg-gradient-to-br from-emerald-900 to-slate-900" },
-    { id: 'sales-command', title: "Sales Command Center", category: "Sales", price: "$129", rating: 4.8, img: "bg-gradient-to-br from-blue-900 to-slate-900" },
-    { id: 'hr-analytics', title: "HR People Analytics", category: "HR", price: "$99", rating: 4.7, img: "bg-gradient-to-br from-purple-900 to-slate-900" },
   ];
 
   return (
@@ -34,9 +56,21 @@ export default function Home() {
         <div className="flex gap-6 items-center">
           <Link href="/marketplace" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Marketplace</Link>
           <Link href="/dashboard" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Dashboard</Link>
-          <Link href="/login" className="px-5 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-sm font-medium transition-all">
-            Sign In
-          </Link>
+          {sessionData?.user?.isAdmin && (
+             <Link href="/admin" className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">Admin Portal</Link>
+          )}
+          
+          {isPending ? (
+             <div className="w-20 h-9 rounded-full bg-white/5 animate-pulse" />
+          ) : sessionData ? (
+             <button onClick={handleLogout} className="px-5 py-2 rounded-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 text-sm font-medium transition-all">
+               Logout
+             </button>
+          ) : (
+             <Link href="/login" className="px-5 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-sm font-medium transition-all">
+               Sign In
+             </Link>
+          )}
         </div>
       </nav>
 
@@ -154,7 +188,25 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredTemplates.map((template, i) => (
+            {isPostsLoading ? (
+                Array(3).fill(0).map((_, i) => (
+                    <div key={i} className="glass-card rounded-3xl overflow-hidden h-[350px] animate-pulse bg-white/[0.03]" />
+                ))
+            ) : templates.length === 0 ? (
+                <div className="col-span-1 md:col-span-3 text-center py-12 text-white/50">
+                    No templates available yet. Check back soon!
+                </div>
+            ) : templates.slice(0, 3).map((template, i) => {
+              const bgGradients = [
+                "bg-gradient-to-br from-emerald-900 to-slate-900",
+                "bg-gradient-to-br from-blue-900 to-slate-900",
+                "bg-gradient-to-br from-purple-900 to-slate-900",
+                "bg-gradient-to-br from-indigo-900 to-slate-900",
+                "bg-gradient-to-br from-rose-900 to-slate-900"
+              ];
+              const bgClass = bgGradients[i % bgGradients.length];
+
+              return (
               <motion.div
                 key={template.id}
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -163,26 +215,26 @@ export default function Home() {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
                 <Link href={`/template/${template.id}`} className="block glass-card rounded-3xl overflow-hidden group">
-                  <div className={`w-full aspect-[4/3] ${template.img} relative flex items-center justify-center`}>
+                  <div className={`w-full aspect-[4/3] ${bgClass} relative flex items-center justify-center`}>
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
                     <BarChart3 className="w-16 h-16 text-white/20" />
                     <div className="absolute top-4 right-4 px-3 py-1 rounded-full glass text-xs font-medium">
-                      {template.category}
+                      Premium
                     </div>
                   </div>
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-lg font-heading font-semibold">{template.title}</h3>
-                      <span className="font-mono font-medium text-indigo-400">{template.price}</span>
+                      <span className="font-mono font-medium text-indigo-400">${template.price || 'Free'}</span>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-white/50">
                       <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                      {template.rating} • Premium Support
+                      5.0 • Premium Support
                     </div>
                   </div>
                 </Link>
               </motion.div>
-            ))}
+            )})}
           </div>
         </div>
       </section>

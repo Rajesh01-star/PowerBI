@@ -13,6 +13,15 @@ export const auth = betterAuth({
             verification
         }
     }),
+    user: {
+        additionalFields: {
+            isAdmin: {
+                type: "boolean",
+                required: false,
+                defaultValue: false
+            }
+        }
+    },
     emailAndPassword: {
         enabled: true,
     },
