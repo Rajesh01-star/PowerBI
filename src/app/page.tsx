@@ -9,7 +9,6 @@ import { authClient } from "@/lib/auth-client";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { data: sessionData, isPending } = authClient.useSession();
   const [templates, setTemplates] = useState<any[]>([]);
   const [isPostsLoading, setIsPostsLoading] = useState(true);
 
@@ -30,11 +29,6 @@ export default function Home() {
     fetchTemplates();
   }, []);
 
-  const handleLogout = async () => {
-      await authClient.signOut();
-      window.location.reload();
-  };
-
   const benefits = [
     { icon: <Zap className="w-6 h-6 text-indigo-400" />, title: "Instant Workflow", desc: "Download and deploy premium dashboards in minutes, not months." },
     { icon: <Shield className="w-6 h-6 text-indigo-400" />, title: "Enterprise Secure", desc: "Built with best practices for data governance and security." },
@@ -47,32 +41,7 @@ export default function Home() {
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute top-[40%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[100px] rounded-full pointer-events-none" />
 
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 glass border-b-0 border-white/5 py-4 px-8 flex justify-between items-center">
-        <div className="font-heading font-bold text-2xl tracking-tight flex items-center gap-2">
-          <BarChart3 className="w-6 h-6 text-indigo-500" />
-          Lumina
-        </div>
-        <div className="flex gap-6 items-center">
-          <Link href="/marketplace" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Marketplace</Link>
-          <Link href="/dashboard" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Dashboard</Link>
-          {sessionData?.user?.isAdmin && (
-             <Link href="/admin" className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">Admin Portal</Link>
-          )}
-          
-          {isPending ? (
-             <div className="w-20 h-9 rounded-full bg-white/5 animate-pulse" />
-          ) : sessionData ? (
-             <button onClick={handleLogout} className="px-5 py-2 rounded-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 text-sm font-medium transition-all">
-               Logout
-             </button>
-          ) : (
-             <Link href="/login" className="px-5 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-sm font-medium transition-all">
-               Sign In
-             </Link>
-          )}
-        </div>
-      </nav>
+
 
       {/* Hero Section */}
       <main className="pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto relative z-10 flex flex-col items-center text-center">
