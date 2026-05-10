@@ -4,8 +4,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Shield, Zap, Cloud, BarChart3, Star } from 'lucide-react';
+import { ArrowRight, Shield, Zap, Cloud, BarChart3, Star, Command, Maximize } from 'lucide-react';
 import Link from 'next/link';
+import { OrbitingCircles } from '@/components/ui/orbiting-circles';
 
 export default function Home() {
   const benefits = [
@@ -27,64 +28,129 @@ export default function Home() {
       <div className="absolute top-[40%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[100px] rounded-full pointer-events-none" />
 
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 glass border-b-0 border-white/5 py-4 px-8 flex justify-between items-center">
-        <div className="font-heading font-bold text-2xl tracking-tight flex items-center gap-2">
-          <BarChart3 className="w-6 h-6 text-indigo-500" />
-          Lumina
-        </div>
-        <div className="flex gap-6 items-center">
-          <Link href="/marketplace" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Marketplace</Link>
-          <Link href="/dashboard" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Dashboard</Link>
-          <button className="px-5 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-sm font-medium transition-all">
-            Sign In
-          </button>
-        </div>
-      </nav>
+      <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
+        <nav className="w-full max-w-3xl bg-[#111111]/80 backdrop-blur-xl border border-white/10 rounded-full py-2.5 px-3 flex justify-between items-center shadow-2xl">
+          <div className="font-heading font-bold text-[14px] tracking-wide flex items-center gap-3 pl-3">
+            <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 shadow-inner" />
+            SKIPER-UI
+          </div>
+          <div className="flex gap-1 items-center">
+            <Link href="/pricing" className="px-4 py-2 text-[13px] font-medium text-white/60 hover:text-white transition-colors">Pricing</Link>
+            <Link href="/components" className="px-4 py-2 text-[13px] font-medium text-white/60 hover:text-white transition-colors">Components</Link>
+            <div className="flex gap-2 ml-2">
+              <button className="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-white/70 transition-all">
+                <Command className="w-4 h-4" />
+              </button>
+              <button className="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-white/70 transition-all">
+                <Maximize className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </nav>
+      </div>
 
       {/* Hero Section */}
-      <main className="pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto relative z-10 flex flex-col items-center text-center">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 mb-8"
-        >
-          <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
-          <span className="text-xs font-medium text-indigo-200 tracking-wide uppercase">Premium Power BI Templates</span>
-        </motion.div>
+      <main className="pt-20 lg:pt-28 pb-20 px-4 md:px-8 max-w-[1300px] mx-auto relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch min-h-[600px] lg:min-h-[700px] mb-24">
+          
+          {/* Left Column: Text & Stacks */}
+          <div className="flex flex-col justify-center order-2 lg:order-1 pt-4 lg:pt-0 z-20">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#25D366]/30 bg-transparent mb-6 self-start">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#25D366]" />
+                <span className="text-sm font-medium text-white/90">Available for Projects</span>
+              </div>
+            </motion.div>
 
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-5xl md:text-7xl font-heading font-bold tracking-tight mb-6 max-w-4xl leading-tight"
-        >
-          Elevate Your Data with <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400 text-glow">Executive Grade</span> Dashboards.
-        </motion.h1>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-5xl lg:text-[4.5rem] font-sans font-medium tracking-tight mb-8 leading-[1.1] text-white"
+            >
+              Meet the Expert <br />
+              Power BI Creator
+            </motion.h1>
 
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-lg md:text-xl text-white/60 max-w-2xl mb-10 font-light"
-        >
-          Skip the endless development cycles. Access an exclusive marketplace of highly-engineered, beautiful Power BI templates ready for the boardroom.
-        </motion.p>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <div className="flex items-center gap-4 px-6 py-3.5 rounded-full bg-transparent border border-white/10 w-fit">
+                <span className="text-sm font-medium text-white/80">My Fav Stacks</span>
+                <div className="flex items-center gap-4 border-l border-white/20 pl-4">
+                  <BarChart3 className="w-4 h-4 text-white/70" />
+                  <Cloud className="w-4 h-4 text-white/70" />
+                  <Zap className="w-4 h-4 text-white/70" />
+                  <Shield className="w-4 h-4 text-white/70" />
+                </div>
+              </div>
+            </motion.div>
+          </div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4 mb-16"
-        >
-          <Link href="/marketplace" className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-full overflow-hidden transition-all">
-            Explore Collection
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <a href="#live-demo" className="px-8 py-4 rounded-full glass hover:bg-white/10 text-white font-medium transition-all flex items-center justify-center">
-            View Live Demo
-          </a>
-        </motion.div>
+          {/* Center Column: Subject Image */}
+          <div className="flex flex-col items-center justify-end relative order-1 lg:order-2 h-[400px] lg:h-auto overflow-visible mt-6 lg:mt-0">
+            {/* The Person Picture */}
+            <div className="absolute inset-x-0 bottom-[-20px] lg:bottom-[-40px] z-10 flex justify-center pointer-events-none">
+              <img 
+                src="/images/sample_nobg.png" 
+                alt="Leo Adam" 
+                className="w-full max-w-[450px] md:max-w-[550px] lg:max-w-[850px] object-contain object-bottom pointer-events-auto"
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Text & Spinning Badge */}
+          <div className="flex flex-col justify-end lg:justify-center items-center lg:items-start order-3 relative lg:pl-16 pt-16 lg:pt-0 z-20">
+            {/* Spinning Badge - Top Right */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="absolute top-10 right-0 hidden lg:flex items-center justify-center"
+            >
+               <div className="relative w-[140px] h-[140px] animate-[spin_10s_linear_infinite]">
+                 <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
+                   <path id="circlePath" d="M 50, 50 m -38, 0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" fill="transparent" />
+                   <text className="text-[12px] font-bold tracking-widest fill-white uppercase">
+                     <textPath href="#circlePath" startOffset="0%">POWER BI EXPERT CREATOR •</textPath>
+                   </text>
+                 </svg>
+               </div>
+               <div className="absolute w-12 h-12 rounded-xl flex items-center justify-center">
+                 <BarChart3 className="w-8 h-8 text-white" />
+               </div>
+            </motion.div>
+
+            {/* Bottom Right Text and Button */}
+            <div className="mt-auto lg:mt-64 text-center lg:text-left">
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="text-white/70 text-[15px] leading-relaxed mb-8 max-w-[280px] mx-auto lg:mx-0 font-light"
+              >
+                As a professional Power BI developer, I rely on top-notch tools to create stunning executive dashboards that captivate and engage. Skip the endless development cycles and get premium access.
+              </motion.p>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <button className="px-8 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#25D366]/90 text-black font-semibold transition-all">
+                  Explore Services
+                </button>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+
 
         {/* Live Demo Iframes */}
         <div id="live-demo" className="w-full flex flex-col gap-16 mt-4">
