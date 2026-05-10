@@ -23,7 +23,7 @@ export default function RootLayout({
       lang="en"
       className={cn("h-full", "antialiased", "dark", inter.variable, outfit.variable, "font-sans", geist.variable)}
     >
-      <body className="min-h-full flex flex-col bg-[#050505] text-white font-sans">
+      <body className="min-h-full flex flex-col bg-[#050505] text-white font-sans overflow-x-hidden">
         {children}
       </body>
     </html>
