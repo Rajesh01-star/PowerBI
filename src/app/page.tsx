@@ -50,17 +50,17 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <main className="pt-20 lg:pt-28 pb-20 px-4 md:px-8 max-w-[1300px] mx-auto relative z-10">
+      <main className="pt-12 lg:pt-16 pb-20 px-4 md:px-8 max-w-[1300px] mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch min-h-[600px] lg:min-h-[700px] mb-24">
           
           {/* Left Column: Text & Stacks */}
-          <div className="flex flex-col justify-center order-2 lg:order-1 pt-4 lg:pt-0 z-20">
+          <div className="flex flex-col justify-center order-2 lg:order-1 pt-0 z-20">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#25D366]/30 bg-transparent mb-6 self-start">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#25D366]/30 bg-transparent mb-4 self-start">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#25D366]" />
                 <span className="text-sm font-medium text-white/90">Available for Projects</span>
               </div>
@@ -70,7 +70,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl lg:text-[4.5rem] font-sans font-medium tracking-tight mb-8 leading-[1.1] text-white"
+              className="text-3xl lg:text-4xl font-sans font-medium tracking-tight mb-4 leading-[1.1] text-white"
             >
               Meet the Expert <br />
               Power BI Creator
@@ -81,7 +81,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="flex items-center gap-4 px-6 py-3.5 rounded-full bg-transparent border border-white/10 w-fit">
+              <div className="flex items-center gap-4 px-6 py-2.5 rounded-full bg-transparent border border-white/10 w-fit">
                 <span className="text-sm font-medium text-white/80">My Fav Stacks</span>
                 <div className="flex items-center gap-4 border-l border-white/20 pl-4">
                   <BarChart3 className="w-4 h-4 text-white/70" />
@@ -94,15 +94,48 @@ export default function Home() {
           </div>
 
           {/* Center Column: Subject Image */}
-          <div className="flex flex-col items-center justify-end relative order-1 lg:order-2 h-[400px] lg:h-auto overflow-visible mt-6 lg:mt-0">
+          <div className="flex flex-col items-start justify-center relative order-1 lg:order-2 h-[400px] lg:h-auto overflow-visible mt-6 lg:mt-40">
+            {/* Orbiting Circles Background */}
+            <div className="absolute inset-0 flex mt-[-15rem] items-center justify-center pointer-events-none z-0">
+              <OrbitingCircles
+                className="border-none bg-transparent"
+                duration={25}
+                radius={160}
+                iconSize={40}
+                // path={false}
+              >
+                <div className="text-[#25D366] flex items-center justify-center w-full h-full"><BarChart3 className="w-8 h-8" /></div>
+                <div className="text-white/80 flex items-center justify-center w-full h-full"><Cloud className="w-8 h-8" /></div>
+                <div className="text-white flex items-center justify-center w-full h-full"><Shield className="w-8 h-8" /></div>
+                <div className="text-[#25D366] flex items-center justify-center w-full h-full"><Zap className="w-8 h-8" /></div>
+              </OrbitingCircles>
+
+              <OrbitingCircles
+                className="border-none bg-transparent"
+                radius={240}
+                duration={35}
+                reverse
+                iconSize={48}
+                // path={false}
+              >
+                <div className="text-white/80 flex items-center justify-center w-full h-full"><Star className="w-10 h-10" /></div>
+                <div className="text-[#25D366] flex items-center justify-center w-full h-full"><Command className="w-10 h-10" /></div>
+                <div className="text-white flex items-center justify-center w-full h-full"><Maximize className="w-10 h-10" /></div>
+                <div className="text-[#25D366] flex items-center justify-center w-full h-full"><BarChart3 className="w-10 h-10" /></div>
+              </OrbitingCircles>
+            </div>
+
             {/* The Person Picture */}
-            <div className="absolute inset-x-0 bottom-[-20px] lg:bottom-[-40px] z-10 flex justify-center pointer-events-none">
+            <div className="absolute inset-x-0 z-10 flex justify-center pointer-events-none">
               <img 
                 src="/images/sample_nobg.png" 
                 alt="Leo Adam" 
-                className="w-full max-w-[450px] md:max-w-[550px] lg:max-w-[850px] object-contain object-bottom pointer-events-auto"
+                className="w-full max-w-[550px] md:max-w-[650px] lg:max-w-[1050px] object-contain object-bottom pointer-events-auto transform scale-[1.1] origin-bottom"
               />
             </div>
+            
+            {/* Fade overlay to blend the hard image cut and lower orbit paths */}
+            <div className="absolute inset-x-[-50vw] bottom-[-60px] h-[200px] bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent z-20 pointer-events-none" />
           </div>
 
           {/* Right Column: Text & Spinning Badge */}
@@ -112,7 +145,7 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="absolute top-10 right-0 hidden lg:flex items-center justify-center"
+              className="absolute top-0 right-0 hidden lg:flex items-center justify-center"
             >
                <div className="relative w-[140px] h-[140px] animate-[spin_10s_linear_infinite]">
                  <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
