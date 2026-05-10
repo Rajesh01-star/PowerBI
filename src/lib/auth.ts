@@ -1,0 +1,28 @@
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { db } from "@/db/drizzle";
+import { user, session, account, verification } from "@/db/schema";
+
+export const auth = betterAuth({
+    database: drizzleAdapter(db, {
+        provider: "pg",
+        schema: {
+            user,
+            session,
+            account,
+            verification
+        }
+    }),
+    emailAndPassword: {
+        enabled: true,
+    },
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID as string,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+            scope: ["email", "profile", "https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/gmail.modify", "https://www.googleapis.com/auth/tasks"],
+            accessType: "offline" as const,
+            prompt: "consent" as const,
+        },
+    },
+});
