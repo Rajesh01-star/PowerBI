@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import { Cloud, Shield, Zap, BarChart3, Star, Command, Maximize } from 'lucide-react';
 import { OrbitingCircles } from '@/components/ui/orbiting-circles';
-import GradualBlur from './GradualBlur';
 export function Hero() {
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center pt-20 lg:pt-0">
@@ -141,15 +140,6 @@ export function Hero() {
           </div>
         </div>
       </div>
-      <GradualBlur
-        position="bottom"
-        height="10rem"
-        strength={10}
-        divCount={10}
-        curve="bezier"
-        exponential
-        opacity={1}
-      />
       <div className="absolute w-[200vw] left-[-50vw] bottom-[-10px] h-[350px] bg-gradient-to-t from-[#050505] via-[#050505]/90 to-transparent pointer-events-none z-10" />
     </div>
   );
