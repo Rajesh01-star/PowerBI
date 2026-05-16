@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Shield, Upload, FileText, Link as LinkIcon, DollarSign, Layout, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { createPostAction, getPostsAction, updatePostAction } from "./actions";
@@ -19,6 +19,7 @@ export default function AdminPage() {
 
     const [posts, setPosts] = useState<any[]>([]);
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Form states
     const [title, setTitle] = useState("");
@@ -82,6 +83,9 @@ export default function AdminPage() {
         e.preventDefault();
         setIsLoading(true);
         setStatus(null);
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
 
         const formData = new FormData();
         formData.append("title", title);
@@ -109,6 +113,10 @@ export default function AdminPage() {
             const currentStatus = { type: 'success', message: editingPostId ? 'Template successfully updated!' : 'Template successfully published!' };
             clearForm();
             setStatus(currentStatus as { type: 'success', message: string });
+            
+            timeoutRef.current = setTimeout(() => {
+                setStatus(null);
+            }, 2000);
             
         } catch (error: any) {
             setStatus({ type: 'error', message: error.message || 'Failed to process request' });
