@@ -7,10 +7,10 @@ export function Hero() {
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center pt-20 lg:pt-0">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-center w-full max-w-7xl mx-auto px-4 lg:px-8">
-        
+
         {/* Left Column: Text & Stacks */}
         <div className="flex flex-col justify-center order-2 lg:order-1 z-20 ">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -21,7 +21,7 @@ export function Hero() {
             </div>
           </motion.div>
 
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -36,6 +36,8 @@ export function Hero() {
         <div className="relative order-1 lg:order-2 flex items-center justify-center min-h-[550px] lg:min-h-[750px]">
           {/* Orbiting Circles Container */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+
+            {/* Inner Orbit */}
             <OrbitingCircles
               className="border-none bg-transparent"
               duration={25}
@@ -43,19 +45,39 @@ export function Hero() {
               iconSize={40}
             >
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://cdn.simpleicons.org/sap/sap" alt="SAP" className="w-8 h-8 object-contain" />
+                <img
+                  src="https://cdn.simpleicons.org/powerbi/F2C811"
+                  alt="Power BI"
+                  className="w-8 h-8 object-contain"
+                />
               </div>
+
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://cdn.simpleicons.org/steam/steam" alt="steam" className="w-8 h-8 object-contain" />
+                <img
+                  src="https://cdn.simpleicons.org/tableau/E97627"
+                  alt="Tableau"
+                  className="w-8 h-8 object-contain"
+                />
               </div>
+
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://cdn.simpleicons.org/firefox/firefox" alt="Firefox" className="w-8 h-8 object-contain" />
+                <img
+                  src="https://cdn.simpleicons.org/jira/0052CC"
+                  alt="Jira"
+                  className="w-8 h-8 object-contain"
+                />
               </div>
+
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://cdn.simpleicons.org/swift/swift" alt="swift" className="w-8 h-8 object-contain" />
+                <img
+                  src="https://cdn.simpleicons.org/microsoftexcel/217346"
+                  alt="Microsoft Excel"
+                  className="w-8 h-8 object-contain"
+                />
               </div>
             </OrbitingCircles>
 
+            {/* Outer Orbit */}
             <OrbitingCircles
               className="border-none bg-transparent"
               radius={240}
@@ -64,31 +86,60 @@ export function Hero() {
               iconSize={48}
             >
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://cdn.simpleicons.org/figma/figma" alt="Figma" className="w-10 h-10 object-contain" />
+                <img
+                  src="https://cdn.simpleicons.org/airtable/18BFFF"
+                  alt="Airtable"
+                  className="w-10 h-10 object-contain"
+                />
               </div>
+
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://cdn.simpleicons.org/simpleanalytics/simpleanalytics" alt="simpleanalytics" className="w-10 h-10 object-contain" />
+                <img
+                  src="https://cdn.simpleicons.org/mysql/4479A1"
+                  alt="SQL"
+                  className="w-10 h-10 object-contain"
+                />
               </div>
+
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://cdn.simpleicons.org/snapcraft/snapcraft" alt="snapcraft" className="w-10 h-10 object-contain" />
+                <img
+                  src="https://cdn.simpleicons.org/adobephotoshop/31A8FF"
+                  alt="Adobe Photoshop"
+                  className="w-10 h-10 object-contain"
+                />
               </div>
+
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://cdn.simpleicons.org/python/python" alt="Python" className="w-10 h-10 object-contain" />
+                <img
+                  src="https://cdn.simpleicons.org/adobeexpress/FF0000"
+                  alt="Adobe Express"
+                  className="w-10 h-10 object-contain"
+                />
               </div>
+
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://cdn.simpleicons.org/postgresql/postgresql" alt="PostgreSQL" className="w-10 h-10 object-contain" />
+                <img
+                  src="https://cdn.simpleicons.org/adobeanimate/FF9A00"
+                  alt="Adobe Animate"
+                  className="w-10 h-10 object-contain"
+                />
               </div>
+
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://cdn.simpleicons.org/googlesheets/googlesheets" alt="google sheets" className="w-10 h-10 object-contain" />
+                <img
+                  src="https://cdn.simpleicons.org/figma/F24E1E"
+                  alt="Figma"
+                  className="w-10 h-10 object-contain"
+                />
               </div>
             </OrbitingCircles>
           </div>
 
           {/* Person Image */}
           <div className="relative z-10 flex items-end justify-center w-full h-full">
-            <img 
-              src="/images/sample_nobg.png" 
-              alt="Power BI Creator" 
+            <img
+              src="/images/sample_nobg.png"
+              alt="Power BI Creator"
               className="w-full max-w-[450px] lg:max-w-[580px] object-contain object-bottom relative z-10"
             />
             {/* Fade overlay specifically for the image cutoff */}
@@ -98,7 +149,7 @@ export function Hero() {
         {/* Right Column: Text & Spinning Badge */}
         <div className="flex flex-col justify-center items-end order-3 relative z-20">
           {/* Spinning Badge */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.5 }}
@@ -119,7 +170,7 @@ export function Hero() {
 
           {/* Description and Button */}
           <div className="mt-32 lg:mt-20 text-left">
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
@@ -127,7 +178,7 @@ export function Hero() {
             >
               As a professional Power BI developer, I rely on top-notch tools to create stunning executive dashboards that captivate and engage. Skip the endless development cycles and get premium access.
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

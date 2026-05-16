@@ -89,3 +89,13 @@ export async function getPostsAction() {
     const posts = await db.select().from(postsTable).orderBy(desc(postsTable.createdAt));
     return posts;
 }
+
+export async function getPublicPostsAction() {
+    const posts = await db.select().from(postsTable).orderBy(desc(postsTable.createdAt));
+    return posts;
+}
+
+export async function getPublicPostByIdAction(id: string) {
+    const posts = await db.select().from(postsTable).where(eq(postsTable.id, id));
+    return posts[0] || null;
+}

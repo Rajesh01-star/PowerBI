@@ -1,31 +1,57 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Check, DownloadCloud, Server, ShieldCheck, Database, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import InteractivePBI from '@/components/InteractivePBI';
 import CheckoutModal from '@/components/CheckoutModal';
+import { getPublicPostByIdAction } from '@/app/admin/actions';
 
 export default function TemplateDetail() {
   const params = useParams();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [post, setPost] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const isCampaign = params.id === 'campaign-performance';
-  const isKoffee = params.id === 'gen-koffee-infographics';
-  const isLivePreview = isCampaign || isKoffee;
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (typeof params.id === 'string') {
+        try {
+          const data = await getPublicPostByIdAction(params.id);
+          setPost(data);
+        } catch (error) {
+          console.error("Failed to fetch post:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchPost();
+  }, [params.id]);
 
-  // In a real app, fetch template details based on params.id
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
+        <div className="text-xl text-white/50">Loading template details...</div>
+      </div>
+    );
+  }
+
+  if (!loading && !post) {
+    return (
+      <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
+        <div className="text-xl text-white/50">Template not found.</div>
+      </div>
+    );
+  }
+
   const template = {
     id: params.id,
-    title: isCampaign ? "Campaign Performance Marketing" : isKoffee ? "Gen Koffee Infographics" : "Finance Pro Exec Dashboard",
-    category: isCampaign ? "Marketing" : isKoffee ? "Sales" : "Finance",
-    price: "$149",
-    description: isCampaign 
-      ? "Interactive Power BI Dashboard to analyze your key campaign metrics and ROI in real-time. Built for marketing executives to track cross-channel performance." 
-      : isKoffee 
-      ? "A visually stunning infographic dashboard designed for coffee shop chains to track daily sales, customer demographics, and regional performance with dynamic maps and charts."
-      : "A comprehensive executive financial dashboard designed to provide CFOs and finance teams with real-time insights into revenue, expenses, and profitability margins. Connects directly to ERPs and SQL databases.",
+    title: post?.title || "Template",
+    category: "Analytics", // Fallback if category is not in post
+    price: post?.price ? `$${post.price}` : "$149",
+    description: post?.description || "No description available.",
     features: [
       "Real-time General Ledger integration",
       "Dynamic P&L and Balance Sheet visualizations",
@@ -68,20 +94,20 @@ export default function TemplateDetail() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-heading font-semibold flex items-center gap-2">
-                  <LayoutDashboard className="w-5 h-5 text-indigo-500" /> {isLivePreview ? "Interactive Dashboard Preview" : "Live Preview Simulation"}
+                  <LayoutDashboard className="w-5 h-5 text-indigo-500" /> {post?.url ? "Interactive Dashboard Preview" : "Live Preview Simulation"}
                 </h2>
-                <span className="text-sm text-white/40">{isLivePreview ? "Live Power BI Embed" : "Interactive Data Mockup"}</span>
+                <span className="text-sm text-white/40">{post?.url ? "Live Power BI Embed" : "Interactive Data Mockup"}</span>
               </div>
               
-              {isLivePreview ? (
+              {post?.url ? (
                 <div 
-                  className={`relative w-full overflow-hidden border border-white/10 shadow-[0_0_30px_-10px_rgba(99,102,241,0.2)] rounded-2xl bg-white/5 backdrop-blur-xl ${isKoffee ? 'max-w-[600px] mx-auto' : ''}`}
-                  style={{ aspectRatio: isKoffee ? '600 / 373.5' : '16 / 9' }}
+                  className={`relative w-full overflow-hidden border border-white/10 shadow-[0_0_30px_-10px_rgba(99,102,241,0.2)] rounded-2xl bg-white/5 backdrop-blur-xl ${post.aspect !== 'horizontal' ? 'max-w-[600px] mx-auto' : ''}`}
+                  style={{ aspectRatio: post.aspect !== 'horizontal' ? '600 / 373.5' : '16 / 9' }}
                 >
                   <iframe 
                     title={template.title}
                     className="w-full h-full border-0 absolute inset-0 z-0"
-                    src={isCampaign ? "https://app.powerbi.com/view?r=eyJrIjoiMzNhODIyNDQtNjM5Ny00ZThhLTg1MjktOTc0ZDI1NWZiNWM3IiwidCI6ImI5ZjU1ZTRjLTRhNzEtNDg0ZS1iZWJiLTA3NThlYjRjZTUyNyJ9" : "https://app.powerbi.com/view?r=eyJrIjoiZTRmYjI0NTMtZjk3MS00NzczLTlmZDItNTA2NTQyNzA5NWRiIiwidCI6ImI5ZjU1ZTRjLTRhNzEtNDg0ZS1iZWJiLTA3NThlYjRjZTUyNyJ9"}
+                    src={post.url}
                     allowFullScreen={true}>
                   </iframe>
                 </div>
