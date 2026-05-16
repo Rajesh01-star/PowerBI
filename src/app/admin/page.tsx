@@ -232,7 +232,9 @@ export default function AdminPage() {
                                     name="aspect" 
                                     required 
                                     value={aspect} 
-                                    onValueChange={(val: "horizontal" | "vertical") => setAspect(val)}
+                                    onValueChange={(val) => {
+                                        if (val) setAspect(val as "horizontal" | "vertical");
+                                    }}
                                 >
                                     <SelectTrigger className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
                                         <SelectValue placeholder="Select aspect ratio" />
