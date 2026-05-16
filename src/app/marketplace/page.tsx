@@ -1,6 +1,4 @@
 "use client";
-
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Star, BarChart3, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
