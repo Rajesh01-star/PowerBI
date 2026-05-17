@@ -35,4 +35,13 @@ export const auth = betterAuth({
             prompt: "consent" as const,
         },
     },
+    advanced: {
+        defaultCookieAttributes: {
+            sameSite: process.env.NODE_ENV === "production" ? "lax" : "lax",
+            secure: process.env.NODE_ENV === "production",
+        },
+        crossSubDomainCookies: {
+            enabled: process.env.NODE_ENV === "production",
+        }
+    }
 });
