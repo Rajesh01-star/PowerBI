@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 import { Navbar } from "@/components/Navbar";
+import { Providers } from "@/components/Providers";
 
 export default function RootLayout({
   children,
@@ -25,8 +26,10 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", "dark", inter.variable, geist.variable, outfit.variable, "font-sans", inter.variable)}
     >
       <body className="min-h-full flex flex-col bg-[#050505] text-white font-sans overflow-x-hidden">
-        <Navbar />
-        {children}
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );
