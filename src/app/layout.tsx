@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Inter, Outfit, Geist } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-
+import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
@@ -26,10 +26,12 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", "dark", inter.variable, geist.variable, outfit.variable, "font-sans", inter.variable)}
     >
       <body className="min-h-full flex flex-col bg-[#050505] text-white font-sans overflow-x-hidden">
-        <Providers>
-          <Navbar />
-          {children}
-        </Providers>
+        <ThemeProvider>
+          <Providers>
+            <Navbar />
+            {children}
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

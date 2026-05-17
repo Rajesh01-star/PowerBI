@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Command, User as UserIcon, LogOut, Search } from 'lucide-react';
+import { User as UserIcon, LogOut, Search } from 'lucide-react';
 import { RegisterDialog } from './RegisterDialog';
 import { authClient } from '@/lib/auth-client';
 import { cn } from "@/lib/utils";
+import { ModeToggle } from './ModeToggle';
 
 export function Navbar() {
   const { data: sessionData, isPending } = authClient.useSession();
@@ -50,7 +51,7 @@ export function Navbar() {
   };
 
   const avatarIndex = sessionData?.user ? getAvatarHash(sessionData.user.id) % 5 : 0;
-  
+
   const gradients = [
     "from-neutral-800 to-neutral-900",
     "from-indigo-900/50 to-neutral-900",
@@ -58,7 +59,7 @@ export function Navbar() {
     "from-slate-800 to-slate-950",
     "from-stone-800 to-stone-950"
   ];
-  
+
   const currentGradient = gradients[avatarIndex];
 
   return (
@@ -109,6 +110,7 @@ export function Navbar() {
                 <span className="text-xs">⌘</span>K
               </kbd>
             </button>
+            <ModeToggle />
 
             <div className="w-px h-6 bg-white/10" />
 
@@ -118,13 +120,13 @@ export function Navbar() {
             {!isPending && sessionData?.user && (
               <div className="relative" ref={dropdownRef}>
                 {/* Avatar Button */}
-                <button 
+                <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className={`relative h-7 w-7 rounded-full border border-white/[0.08] bg-gradient-to-br ${currentGradient} flex items-center justify-center text-[10px] font-medium text-white/90 hover:border-white/[0.15] transition-colors cursor-pointer overflow-hidden`}
                 >
-                  <img 
-                    src={`/avatars/${String((avatarIndex % 5) + 1).padStart(2, '0')}.webp`} 
-                    alt="Avatar" 
+                  <img
+                    src={`/avatars/${String((avatarIndex % 5) + 1).padStart(2, '0')}.webp`}
+                    alt="Avatar"
                     className="absolute inset-0 w-full h-full object-cover z-20"
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
@@ -157,8 +159,8 @@ export function Navbar() {
                     <div className="h-px bg-white/[0.04] my-1" />
 
                     {/* Footer */}
-                    <button 
-                      onClick={handleLogout} 
+                    <button
+                      onClick={handleLogout}
                       className="w-full flex items-center px-3 py-1.5 text-xs text-white/60 hover:text-red-400 hover:bg-white/[0.04] rounded-lg transition-colors cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5 mr-2" />
