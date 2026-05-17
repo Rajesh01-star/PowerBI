@@ -43,34 +43,39 @@ export function Hero() {
               duration={25}
               radius={160}
               iconSize={40}
+              path={false}
             >
+              {/* Power BI - Official Multi-color */}
               <div className="flex items-center justify-center w-full h-full">
                 <img
-                  src="https://cdn.simpleicons.org/powerbi/F2C811"
+                  src="/icons/power-bi-icon.svg"
                   alt="Power BI"
                   className="w-8 h-8 object-contain"
                 />
               </div>
 
+              {/* Tableau - Official Multi-color */}
               <div className="flex items-center justify-center w-full h-full">
                 <img
-                  src="https://cdn.simpleicons.org/tableau/E97627"
+                  src="/icons/tableau.svg"
                   alt="Tableau"
                   className="w-8 h-8 object-contain"
                 />
               </div>
 
+              {/* Jira - Official Multi-color */}
               <div className="flex items-center justify-center w-full h-full">
                 <img
-                  src="https://cdn.simpleicons.org/jira/0052CC"
+                  src="https://api.iconify.design/logos:jira.svg"
                   alt="Jira"
                   className="w-8 h-8 object-contain"
                 />
               </div>
 
+              {/* Microsoft Excel - Modern Fluent Color */}
               <div className="flex items-center justify-center w-full h-full">
                 <img
-                  src="https://cdn.simpleicons.org/microsoftexcel/217346"
+                  src="https://api.iconify.design/vscode-icons:file-type-excel.svg"
                   alt="Microsoft Excel"
                   className="w-8 h-8 object-contain"
                 />
@@ -84,50 +89,57 @@ export function Hero() {
               duration={35}
               reverse
               iconSize={48}
+              path={false}
             >
+              {/* Airtable - Official Multi-color */}
               <div className="flex items-center justify-center w-full h-full">
                 <img
-                  src="https://cdn.simpleicons.org/airtable/18BFFF"
+                  src="https://api.iconify.design/logos:airtable.svg"
                   alt="Airtable"
                   className="w-10 h-10 object-contain"
                 />
               </div>
 
+              {/* SQL - Clean Vector Database Icon */}
               <div className="flex items-center justify-center w-full h-full">
                 <img
-                  src="https://cdn.simpleicons.org/mysql/4479A1"
+                  src="/icons/sql.svg"
                   alt="SQL"
                   className="w-10 h-10 object-contain"
                 />
               </div>
 
+              {/* Adobe Photoshop - Official Multi-color */}
               <div className="flex items-center justify-center w-full h-full">
                 <img
-                  src="https://cdn.simpleicons.org/adobephotoshop/31A8FF"
+                  src="https://api.iconify.design/logos:adobe-photoshop.svg"
                   alt="Adobe Photoshop"
                   className="w-10 h-10 object-contain"
                 />
               </div>
 
+              {/* Adobe Express - Official Multi-color */}
               <div className="flex items-center justify-center w-full h-full">
                 <img
-                  src="https://cdn.simpleicons.org/adobeexpress/FF0000"
+                  src="/icons/adobe-express-icon.svg"
                   alt="Adobe Express"
                   className="w-10 h-10 object-contain"
                 />
               </div>
 
+              {/* Adobe Animate - Clean Vector Logo */}
               <div className="flex items-center justify-center w-full h-full">
                 <img
-                  src="https://cdn.simpleicons.org/adobeanimate/FF9A00"
+                  src="/icons/adobe-animate-icon.svg"
                   alt="Adobe Animate"
                   className="w-10 h-10 object-contain"
                 />
               </div>
 
+              {/* Figma - Official Multi-color */}
               <div className="flex items-center justify-center w-full h-full">
                 <img
-                  src="https://cdn.simpleicons.org/figma/F24E1E"
+                  src="https://api.iconify.design/logos:figma.svg"
                   alt="Figma"
                   className="w-10 h-10 object-contain"
                 />
