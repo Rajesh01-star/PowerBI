@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Check, DownloadCloud, Server, ShieldCheck, Database, LayoutDashboard } from 'lucide-react';
+import { ChevronLeft, Check, DownloadCloud, Server, ShieldCheck, Database, LayoutDashboard, Smartphone, Monitor, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import InteractivePBI from '@/components/InteractivePBI';
@@ -33,153 +33,158 @@ export default function TemplateDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
-        <div className="text-xl text-white/50">Loading template details...</div>
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
+          <p className="text-xs text-white/40 font-mono">RETRIEVING BLUEPRINT ARCHITECTURE...</p>
+        </div>
       </div>
     );
   }
 
-  if (!loading && !post) {
+  if (!post) {
     return (
       <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
-        <div className="text-xl text-white/50">Template not found.</div>
+        <div className="text-center p-4 border border-white/5 bg-white/[0.01] rounded-xl max-w-xs">
+          <p className="text-xs text-white/50">Specified blueprint framework could not be located.</p>
+          <Link href="/" className="mt-3 inline-flex text-xs text-indigo-400 hover:underline">Return Home</Link>
+        </div>
       </div>
     );
   }
 
-  const template = {
-    id: params.id,
-    title: post?.title || "Template",
-    category: "Analytics", // Fallback if category is not in post
-    price: post?.price ? `$${post.price}` : "$149",
-    description: post?.description || "No description available.",
-    features: [
-      "Real-time General Ledger integration",
-      "Dynamic P&L and Balance Sheet visualizations",
-      "Automated cash flow forecasting",
-      "Multi-currency support",
-      "Row-level security ready"
-    ],
-    specs: [
-      { label: "Compatibility", value: "Power BI Desktop & Service" },
-      { label: "Data Sources", value: "SQL, Excel, Dynamics 365" },
-      { label: "Theme", value: "Dark/Light (Configurable)" },
-      { label: "Version", value: "2.4.1" },
-    ]
-  };
+  const isVertical = post.aspect === 'vertical';
+  const displayPrice = post.price ? `$${parseFloat(post.price).toFixed(2)}` : "Free";
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white pt-8 pb-20">
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
+    <div className="min-h-screen bg-[#050505] text-white pb-16 selection:bg-indigo-500/30">
+      <div className="max-w-7xl mx-auto px-6 pt-28 pb-6 space-y-6">
         
-        {/* Breadcrumb */}
-        <Link href="/" className="inline-flex items-center gap-2 text-white/50 hover:text-white mb-8 text-sm transition-colors">
-          <ChevronLeft className="w-4 h-4" /> Back to Home
+        {/* Breadcrumb Navigation anchor */}
+        <Link href="/" className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-xs font-medium transition-colors">
+          <ChevronLeft className="w-3.5 h-3.5" /> Back to Workspace Portfolio
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        {/* Global Split Detail Architecture Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Main Content (Preview + Specs) */}
-          <div className="lg:col-span-2 space-y-12">
-            <div>
-              <div className="inline-flex px-3 py-1 rounded-full glass text-xs font-medium text-indigo-400 mb-4">
-                {template.category}
+          {/* Main Presentational Layout Container Left */}
+          <div className="lg:col-span-8 space-y-8">
+            
+            {/* Context Identification Headers */}
+            <div className="space-y-2 border-b border-white/5 pb-4">
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-0.5 rounded bg-white/5 border border-white/5 text-[9px] font-mono text-white/40 uppercase tracking-wider flex items-center gap-1">
+                  {isVertical ? <Smartphone className="w-2.5 h-2.5" /> : <Monitor className="w-2.5 h-2.5" />}
+                  {post.aspect} Target
+                </span>
+                <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/10 text-[9px] font-mono text-indigo-300 uppercase tracking-wider">Analytics</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">{template.title}</h1>
-              <p className="text-lg text-white/60 leading-relaxed max-w-2xl">
-                {template.description}
-              </p>
-            </div>
-
-            {/* Live Preview Simulation */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-heading font-semibold flex items-center gap-2">
-                  <LayoutDashboard className="w-5 h-5 text-indigo-500" /> {post?.url ? "Interactive Dashboard Preview" : "Live Preview Simulation"}
-                </h2>
-                <span className="text-sm text-white/40">{post?.url ? "Live Power BI Embed" : "Interactive Data Mockup"}</span>
-              </div>
-              
-              {post?.url ? (
-                <div 
-                  className={`relative w-full overflow-hidden border border-white/10 shadow-[0_0_30px_-10px_rgba(99,102,241,0.2)] rounded-2xl bg-white/5 backdrop-blur-xl ${post.aspect !== 'horizontal' ? 'max-w-[600px] mx-auto' : ''}`}
-                  style={{ aspectRatio: post.aspect !== 'horizontal' ? '600 / 373.5' : '16 / 9' }}
-                >
-                  <iframe 
-                    title={template.title}
-                    className="w-full h-full border-0 absolute inset-0 z-0"
-                    src={post.url}
-                    allowFullScreen={true}>
-                  </iframe>
-                </div>
-              ) : (
-                <InteractivePBI />
+              <h1 className="text-lg font-bold tracking-tight text-white/90">{post.title}</h1>
+              {post.description && (
+                <p className="text-xs text-white/50 leading-relaxed max-w-3xl">{post.description}</p>
               )}
             </div>
 
-            {/* Technical Specs & Features */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="glass-card p-6 rounded-2xl">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Server className="w-5 h-5 text-indigo-400" /> Technical Specs
+            {/* Micro Dynamic Sandbox Aspect Ratio Iframe Frame Node */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-1.5 text-[10px] text-white/40 uppercase font-bold tracking-wider">
+                  <LayoutDashboard className="w-3.5 h-3.5" /> Sandbox Production View
+                </div>
+                <span className="text-[10px] font-mono text-white/30">{post.url ? "Live Active Frame" : "Static Simulator Mock"}</span>
+              </div>
+              
+              <div className="w-full flex justify-center bg-black/20 p-4 border border-white/5 rounded-2xl">
+                {post.url ? (
+                  <div 
+                    className={`w-full border border-white/10 shadow-2xl bg-black rounded-xl overflow-hidden transition-all duration-300 ${
+                      isVertical ? 'max-w-[340px] aspect-[9/16]' : 'w-full aspect-video'
+                    }`}
+                  >
+                    <iframe 
+                      title={post.title}
+                      className="w-full h-full border-0 bg-transparent"
+                      src={post.url}
+                      allowFullScreen
+                    />
+                  </div>
+                ) : (
+                  <div className={`w-full ${isVertical ? 'max-w-[340px]' : 'w-full'}`}>
+                    <InteractivePBI />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Technical Parameters Ledger */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white/70 flex items-center gap-1.5">
+                  <Server className="w-3.5 h-3.5 text-indigo-400" /> Platform Parameters
                 </h3>
-                <ul className="space-y-3">
-                  {template.specs.map((spec, i) => (
-                    <li key={i} className="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
-                      <span className="text-sm text-white/60">{spec.label}</span>
-                      <span className="text-sm font-medium">{spec.value}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between py-1 border-b border-white/5 text-[11px]">
+                    <span className="text-white/40">Compatibility</span>
+                    <span className="text-white/80 font-medium">Power BI Cloud / Desktop</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-white/5 text-[11px]">
+                    <span className="text-white/40">Canvas Structure</span>
+                    <span className="text-white/80 font-medium uppercase">{post.aspect} layout</span>
+                  </div>
+                  <div className="flex justify-between py-1 text-[11px]">
+                    <span className="text-white/40">Core Version</span>
+                    <span className="text-white/80 font-mono">v1.0.0 (Latest Deployment)</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="glass-card p-6 rounded-2xl">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-indigo-400" /> Enterprise Features
+              <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white/70 flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" /> Integration Checklist
                 </h3>
-                <ul className="space-y-3">
-                  {template.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
-                      <span className="text-sm text-white/80">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-2 text-[11px] text-white/70">
+                  <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Optimized modeling connections setup ready.</div>
+                  <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Native color scheme matrices built in.</div>
+                  <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Custom DAX measures packaged cleanly.</div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Sticky Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 glass-card p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl">
-              <div className="mb-6">
-                <span className="text-4xl font-mono font-bold text-indigo-400">{template.price}</span>
-                <span className="text-white/40 ml-2">/ one-time</span>
+          {/* Sticky Commercial Checklist Sidebar Block Right */}
+          <div className="lg:col-span-4 lg:sticky lg:top-8">
+            <div className="bg-white/[0.01] border border-white/5 p-5 rounded-2xl space-y-5 backdrop-blur-md shadow-xl">
+              <div>
+                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Commercial Transfer License</p>
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className="text-2xl font-mono font-bold text-indigo-400">{displayPrice}</span>
+                  <span className="text-[10px] text-white/30 font-medium">/ persistent download link</span>
+                </div>
               </div>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-2">
                 <button 
                   onClick={() => setIsCheckoutOpen(true)}
-                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all flex items-center justify-center gap-2"
+                  className="w-full h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 text-xs text-white font-medium flex items-center justify-center gap-1.5 transition-all shadow-md shadow-indigo-500/10"
                 >
-                  <DownloadCloud className="w-5 h-5" /> Buy Template Now
+                  <DownloadCloud className="w-4 h-4" /> Initialize Asset Acquisition
                 </button>
-                <button className="w-full py-4 glass hover:bg-white/10 text-white rounded-xl font-medium transition-all">
-                  Request Customization
+                <button className="w-full h-10 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-white/80 border border-white/5 transition-all">
+                  Inquire Custom Integration Support
                 </button>
               </div>
 
-              <div className="space-y-4">
-                <h4 className="text-sm font-medium text-white/80 uppercase tracking-wider mb-2">What's Included</h4>
+              <div className="space-y-2 pt-2 border-t border-white/5">
+                <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-1">Architecture Components Delivery</h4>
                 {[
-                  "Power BI Template (.pbit) File",
-                  "Sample Data Dataset (.csv)",
-                  "Implementation Guide (.pdf)",
-                  "6 Months Premium Support",
-                  "Free Lifetime Updates"
+                  "Power BI Deployment Blueprint Asset (.pbit)",
+                  "Structured Data Schema Matrix Reference",
+                  "Implementation & Onboarding Documentation Guide",
+                  "Comprehensive Lifelong Framework Asset Updates"
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 text-sm text-white/60">
-                    <Database className="w-4 h-4 text-indigo-400/70 shrink-0" />
-                    {item}
+                  <div key={i} className="flex items-start gap-2 text-[11px] text-white/50 leading-tight">
+                    <Database className="w-3.5 h-3.5 text-indigo-400/50 shrink-0 mt-0.5" />
+                    <span>{item}</span>
                   </div>
                 ))}
               </div>
@@ -192,8 +197,8 @@ export default function TemplateDetail() {
       <CheckoutModal 
         isOpen={isCheckoutOpen} 
         onClose={() => setIsCheckoutOpen(false)} 
-        templateName={template.title}
-        price={template.price}
+        templateName={post.title}
+        price={displayPrice}
       />
     </div>
   );
