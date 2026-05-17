@@ -6,6 +6,9 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { eq, desc } from "drizzle-orm";
+import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export async function createPostAction(formData: FormData) {
     const session = await auth.api.getSession({
@@ -21,9 +24,30 @@ export async function createPostAction(formData: FormData) {
     const price = formData.get("price") as string;
     const url = formData.get("url") as string;
     const aspect = formData.get("aspect") as 'horizontal' | 'vertical';
+    const imageFile = formData.get("image") as File | null;
 
     if (!title) {
          throw new Error("Title is required");
+    }
+
+    let imageUrl: string | null = null;
+
+    if (imageFile && imageFile.size > 0) {
+        try {
+            const buffer = Buffer.from(await imageFile.arrayBuffer());
+            const filename = `${uuidv4()}-${imageFile.name}`;
+            const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+            
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+            
+            fs.writeFileSync(path.join(uploadDir, filename), buffer);
+            imageUrl = `/uploads/${filename}`;
+        } catch (error) {
+            console.error("Failed to upload image:", error);
+            throw new Error("Failed to upload image");
+        }
     }
 
     await db.insert(postsTable).values({
@@ -32,6 +56,7 @@ export async function createPostAction(formData: FormData) {
         price: price ? price : null,
         url: url || null,
         aspect: aspect || 'horizontal',
+        imageUrl: imageUrl,
         userId: session.user.id
     });
 
@@ -57,18 +82,39 @@ export async function updatePostAction(formData: FormData) {
     const price = formData.get("price") as string;
     const url = formData.get("url") as string;
     const aspect = formData.get("aspect") as 'horizontal' | 'vertical';
+    const imageFile = formData.get("image") as File | null;
 
     if (!id || !title) {
          throw new Error("ID and Title are required");
     }
 
-    await db.update(postsTable).set({
+    const updateData: any = {
         title,
         description: description || null,
         price: price ? price : null,
         url: url || null,
         aspect: aspect || 'horizontal',
-    }).where(eq(postsTable.id, id));
+    };
+
+    if (imageFile && imageFile.size > 0) {
+        try {
+            const buffer = Buffer.from(await imageFile.arrayBuffer());
+            const filename = `${uuidv4()}-${imageFile.name}`;
+            const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+            
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+            
+            fs.writeFileSync(path.join(uploadDir, filename), buffer);
+            updateData.imageUrl = `/uploads/${filename}`;
+        } catch (error) {
+            console.error("Failed to upload image:", error);
+            throw new Error("Failed to upload image");
+        }
+    }
+
+    await db.update(postsTable).set(updateData).where(eq(postsTable.id, id));
 
     revalidatePath("/");
     revalidatePath("/marketplace");

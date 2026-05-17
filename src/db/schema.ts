@@ -54,6 +54,7 @@ export const postsTable = pgTable('posts', {
     price: numeric('price', { precision: 10, scale: 2 }),
     url: text('url'),
     aspect: text('aspect').$type<'horizontal' | 'vertical'>().default('horizontal').notNull(),
+    imageUrl: text('image_url'),
     userId: text('user_id')
         .notNull()
         .references(() => user.id, { onDelete: 'cascade' }),

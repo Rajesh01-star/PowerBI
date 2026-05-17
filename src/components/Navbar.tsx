@@ -89,11 +89,11 @@ export function Navbar() {
           {/* Left: Logo & Brand */}
           <Link href="/" className="flex items-center gap-2 py-1 text-sm font-semibold cursor-pointer">
             <img src="https://cdn.skiper-ui.com/logos/logo.svg" alt="Logo" className="w-6 h-6" />
-            <span className="text-white tracking-wide hidden xs:block">LUMINA</span>
+            <span className="text-white tracking-wide hidden xs:block">GENGRAPHS & GRAPHICS</span>
           </Link>
 
           {/* Center: Navigation Links */}
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <div className="hidden md:flex items-center gap-6 text-xs font-medium">
             <Link href="/marketplace" className="text-white/70 hover:text-white transition-colors">Marketplace</Link>
             <Link href="/solutions" className="text-white/70 hover:text-white transition-colors">Solutions</Link>
             <Link href="/previews" className="text-white/70 hover:text-white transition-colors">Live Previews</Link>
