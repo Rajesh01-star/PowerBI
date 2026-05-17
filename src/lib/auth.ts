@@ -37,11 +37,12 @@ export const auth = betterAuth({
     },
     advanced: {
         defaultCookieAttributes: {
-            sameSite: process.env.NODE_ENV === "production" ? "lax" : "lax",
+            sameSite: "lax",
             secure: process.env.NODE_ENV === "production",
-        },
-        crossSubDomainCookies: {
-            enabled: process.env.NODE_ENV === "production",
         }
-    }
+    },
+    trustedOrigins: [
+        "https://power-bi-mu.vercel.app", 
+        "http://localhost:3000"
+    ]
 });
