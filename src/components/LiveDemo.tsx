@@ -1,25 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { getPublicPostsAction } from '@/app/admin/actions';
+import { useQuery } from '@tanstack/react-query';
 
 export function LiveDemo() {
-  const [posts, setPosts] = useState<any[]>([]);
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const data = await getPublicPostsAction();
-        setPosts(data);
-      } catch (error) {
-        console.error("Failed to fetch posts:", error);
-      }
-    };
-    fetchPosts();
-  }, []);
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ['public-posts'],
+    queryFn: getPublicPostsAction,
+  });
 
   return (
     <div 
