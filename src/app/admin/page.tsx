@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { Shield, Upload, FileText, Link as LinkIcon, DollarSign, Layout, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Shield, Upload, FileText, Link as LinkIcon, DollarSign, Layout, CheckCircle2, AlertCircle, Loader2, Edit3, Plus, X, Eye, Laptop, ImageIcon } from "lucide-react";
 import { createPostAction, getPostsAction, updatePostAction } from "./actions";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
@@ -19,6 +19,7 @@ export default function AdminPage() {
 
     const [posts, setPosts] = useState<any[]>([]);
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
+    const [showForm, setShowForm] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Form states
@@ -27,6 +28,8 @@ export default function AdminPage() {
     const [price, setPrice] = useState("");
     const [aspect, setAspect] = useState<"horizontal" | "vertical">("horizontal");
     const [url, setUrl] = useState("");
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string>("");
 
     useEffect(() => {
         if (sessionData?.user?.isAdmin) {
@@ -43,27 +46,37 @@ export default function AdminPage() {
         }
     }
 
-    // If loading session
+    // Handles the client-side visual image preview switch
+    function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
     if (isPending) {
         return (
             <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />
+                    <p className="text-xs text-white/50">Loading admin panel...</p>
+                </div>
             </div>
         );
     }
 
-    // If not logged in or not an admin
     if (!sessionData?.user?.isAdmin) {
         return (
             <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-white p-4">
-                <div className="text-center max-w-md w-full glass-card p-10 rounded-3xl border border-red-500/20 bg-red-500/5 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-red-500" />
-                    <Shield className="w-16 h-16 text-red-500 mx-auto mb-6" />
-                    <h1 className="text-3xl font-heading font-bold mb-3">Access Denied</h1>
-                    <p className="text-xs text-white/60 mb-8">You need administrator privileges to view this page. If you believe this is an error, please contact support.</p>
-                    <Link href="/" className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors w-full text-sm font-medium">
-                        Return Home
-                    </Link>
+                <div className="text-center max-w-sm w-full glass-card p-6 rounded-2xl border border-red-500/15 bg-red-500/5">
+                    <Shield className="w-10 h-10 text-red-500 mx-auto mb-4" />
+                    <h1 className="text-sm font-bold mb-1">Access Denied</h1>
+                    <Link href="/" className="inline-flex items-center justify-center h-9 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-xs transition-all w-full border border-white/5">Return Home</Link>
                 </div>
             </div>
         );
@@ -76,16 +89,22 @@ export default function AdminPage() {
         setPrice("");
         setAspect("horizontal");
         setUrl("");
+        setImageFile(null);
+        setImagePreview("");
         setStatus(null);
+        setShowForm(false);
+    }
+
+    function openCreateForm() {
+        clearForm();
+        setShowForm(true);
     }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setIsLoading(true);
         setStatus(null);
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-        }
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
         const formData = new FormData();
         formData.append("title", title);
@@ -93,31 +112,21 @@ export default function AdminPage() {
         formData.append("price", price);
         formData.append("aspect", aspect);
         formData.append("url", url);
-        if (editingPostId) {
-            formData.append("id", editingPostId);
+        if (imageFile) {
+            formData.append("image", imageFile); // Sent directly to Server Action binary router
         }
+        if (editingPostId) formData.append("id", editingPostId);
 
         try {
             if (editingPostId) {
                 await updatePostAction(formData);
-                setStatus({ type: 'success', message: 'Template successfully updated!' });
+                setStatus({ type: 'success', message: '✓ Configuration updated!' });
             } else {
                 await createPostAction(formData);
-                setStatus({ type: 'success', message: 'Template successfully published!' });
+                setStatus({ type: 'success', message: '✓ Configuration published!' });
             }
-            
-            // Refresh list first
-            fetchPosts();
-            
-            // Keep the success status visible but reset form fields
-            const currentStatus = { type: 'success', message: editingPostId ? 'Template successfully updated!' : 'Template successfully published!' };
-            clearForm();
-            setStatus(currentStatus as { type: 'success', message: string });
-            
-            timeoutRef.current = setTimeout(() => {
-                setStatus(null);
-            }, 2000);
-            
+            await fetchPosts();
+            timeoutRef.current = setTimeout(() => { clearForm(); }, 1200);
         } catch (error: any) {
             setStatus({ type: 'error', message: error.message || 'Failed to process request' });
         } finally {
@@ -125,212 +134,215 @@ export default function AdminPage() {
         }
     }
 
-    function handleCardClick(post: any) {
+    function handleEditClick(post: any) {
         setEditingPostId(post.id);
         setTitle(post.title || "");
         setDescription(post.description || "");
         setPrice(post.price ? post.price.toString() : "");
         setAspect(post.aspect || "horizontal");
         setUrl(post.url || "");
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setImagePreview(post.imageUrl || ""); // Read string reference from database schema
+        setShowForm(true);
     }
 
-    return (
-        <div className="min-h-screen bg-[#050505] text-white overflow-hidden py-24 px-4 relative">
-            {/* Background glow effects */}
-            <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full pointer-events-none" />
+    const totalTemplates = posts.length;
+    const totalRevenue = posts.reduce((sum, post) => sum + (parseFloat(post.price) || 0), 0);
 
-            <div className="max-w-3xl mx-auto relative z-10">
-                <div className="mb-10 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div>
-                            <h1 className="text-xl md:text-xl font-heading font-bold">Admin Portal</h1>
-                            <p className="text-sm text-white/60">Upload and manage Power BI templates.</p>
+    return (
+        <div className="min-h-screen bg-[#050505] text-white overflow-x-hidden relative select-none">
+            <div className="max-w-7xl mx-auto px-6 pt-28 pb-8 space-y-8 relative z-10">
+                
+                {/* Metrics */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl border border-white/5 bg-white/[0.01] backdrop-blur-md flex items-center justify-between">
+                        <div className="space-y-0.5">
+                            <p className="text-[10px] text-white/40 uppercase font-medium tracking-wider">Total Assets</p>
+                            <p className="text-xl font-bold tracking-tight">{totalTemplates}</p>
                         </div>
+                        <FileText className="w-4 h-4 text-indigo-400" />
                     </div>
-                    <Link href="/" className="px-4 py-2 rounded-full glass hover:bg-white/10 text-xs font-medium transition-colors">
-                        Exit Admin
-                    </Link>
+                    <div className="p-4 rounded-xl border border-white/5 bg-white/[0.01] backdrop-blur-md flex items-center justify-between">
+                        <div className="space-y-0.5">
+                            <p className="text-[10px] text-white/40 uppercase font-medium tracking-wider">Combined Value</p>
+                            <p className="text-xl font-bold tracking-tight">${totalRevenue.toFixed(2)}</p>
+                        </div>
+                        <DollarSign className="w-4 h-4 text-emerald-400" />
+                    </div>
                 </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="glass-card p-6 md:p-8 rounded-3xl border border-white/10 bg-white/[0.02]"
-                >
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-heading font-semibold flex items-center gap-2">
-                            {editingPostId ? 'Edit Template' : 'Publish New Template'}
-                        </h2>
-                        <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            disabled={isLoading}
-                            className="text-xs h-8 px-3 text-white/60 hover:text-white hover:bg-white/10"
-                            onClick={clearForm}
-                        >
-                            {editingPostId ? 'Cancel Edit' : 'Clear'}
-                        </Button>
+                {/* Sub-header Controls */}
+                <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                    <div className="space-y-0.5">
+                        <h2 className="text-xs font-bold uppercase tracking-wider text-white/80">Active Asset Portfolio</h2>
+                        <p className="text-[11px] text-white/40">{totalTemplates} functional items deployed</p>
                     </div>
+                    {!showForm && (
+                        <button onClick={openCreateForm} className="h-8 px-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 text-[11px] font-medium flex items-center gap-1.5 transition-all">
+                            <Plus className="w-3.5 h-3.5" /> Create New Asset
+                        </button>
+                    )}
+                </div>
 
-                    {status && (
-                        <div className={`p-4 rounded-xl mb-6 flex items-start gap-3 border ${status.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-200' : 'bg-red-500/10 border-red-500/20 text-red-200'}`}>
-                            {status.type === 'success' ? <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" /> : <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />}
-                            <p className="text-xs font-medium">{status.message}</p>
+                {/* Main Configuration Modal Workspace Overlay */}
+                <AnimatePresence>
+                    {showForm && (
+                        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-5">
+                            <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} className="bg-[#09090b] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[85vh] overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 relative">
+                                <button onClick={clearForm} className="absolute top-1 right-1 w-6 h-6 rounded-md flex items-center justify-center hover:bg-white/5 text-white/40 z-10 cursor-pointer">
+                                    <X className="w-3.5 h-3.5" />
+                                </button>
+                                
+                                {/* Form Core Setup Left */}
+                                <div className="lg:col-span-7 space-y-4">
+                                    <div className="flex items-center justify-between pb-2 border-b border-white/5">
+                                        <h3 className="text-xs font-bold uppercase tracking-wider text-white/80">{editingPostId ? 'Edit Configuration' : 'Global Asset Setup'}</h3>
+                                    </div>
+
+                                    <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+                                        <div className="space-y-1">
+                                            <Label className="text-[11px] text-white/60">Template Title *</Label>
+                                            <Input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Executive Business Intelligence Board" className="bg-black/40 border-white/5 text-xs h-9" />
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <Label className="text-[11px] text-white/60">Description</Label>
+                                            <Textarea rows={2} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Summary framework specifications..." className="bg-black/40 border-white/5 text-xs rounded-lg resize-none" />
+                                        </div>
+
+                                        {/* IMAGE UPLOAD SLOT */}
+                                        <div className="space-y-1">
+                                            <div className="flex items-center justify-between">
+                                                <Label className="text-[11px] text-white/60">Static Preview Snapshot Image</Label>
+                                                {imagePreview && (
+                                                    <button type="button" onClick={() => { setImageFile(null); setImagePreview(""); }} className="text-[10px] text-red-400 hover:text-red-300 cursor-pointer">Remove</button>
+                                                )}
+                                            </div>
+                                            <div className="relative border border-dashed border-white/10 hover:border-white/20 rounded-lg p-4 bg-black/20 text-center transition-colors cursor-pointer group">
+                                                <input type="file" accept="image/*" onChange={handleImageChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                                <div className="flex flex-col items-center gap-1 text-white/40 group-hover:text-white/60">
+                                                    <Upload className="w-4 h-4 text-indigo-400" />
+                                                    <p className="text-[10px] font-medium">{imageFile ? imageFile.name : "Click to select dashboard screenshot asset"}</p>
+                                                    <p className="text-[9px] text-white/20">Supports PNG, JPG, WebP formats</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <Label className="text-[11px] text-white/60">Value ($)</Label>
+                                                <Input type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Free" className="bg-black/40 border-white/5 text-xs h-9" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <Label className="text-[11px] text-white/60">Aspect Ratio *</Label>
+                                                <Select value={aspect} onValueChange={(val) => { if (val) setAspect(val as "horizontal" | "vertical"); }}>
+                                                    <SelectTrigger className="bg-black/40 border-white/5 text-xs h-14">
+                                                        <SelectValue placeholder="Format" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-zinc-950 border-white/5 text-white text-xs">
+                                                        <SelectItem value="horizontal">Horizontal (16:9)</SelectItem>
+                                                        <SelectItem value="vertical">Vertical (9:16)</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <Label className="text-[11px] text-white/60">Power BI Live Link</Label>
+                                            <Input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://app.powerbi.com/view?..." className="bg-black/40 border-white/5 text-xs h-9" />
+                                        </div>
+
+                                        <div className="flex gap-2 pt-2 border-t border-white/5">
+                                            <Button type="button" onClick={clearForm} disabled={isLoading} className="flex-1 bg-white/5 text-white/60 h-9">Cancel</Button>
+                                            <Button type="submit" disabled={isLoading} className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-500 text-white h-9">
+                                                {isLoading ? <Loader2 className="w-3 animate-spin" /> : editingPostId ? "Update" : "Save"}
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                {/* Sandbox Card Visualizer Preview Right */}
+                                <div className="lg:col-span-5 space-y-2 bg-black/20 p-4 rounded-xl border border-white/5 flex flex-col justify-between">
+                                    <div className="flex items-center gap-1 text-[10px] text-white/40 uppercase font-bold tracking-wider">
+                                        <Laptop className="w-3 h-3" /> Real-time Asset Canvas Preview
+                                    </div>
+                                    
+                                    <div className="flex-1 flex items-center justify-center p-3">
+                                        <div className="w-full max-w-[240px] rounded-xl border border-white/10 bg-black overflow-hidden shadow-xl">
+                                            <div className={`w-full ${aspect === 'vertical' ? 'aspect-[3/4]' : 'aspect-video'} bg-zinc-900/40 relative flex items-center justify-center border-b border-white/5 overflow-hidden`}>
+                                                {imagePreview ? (
+                                                    /* Dynamic live uploaded thumbnail placeholder graphic */
+                                                    <img src={imagePreview} alt="Snapshot Preview" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="flex flex-col items-center gap-1 text-white/10 font-mono text-[9px]">
+                                                        <ImageIcon className="w-5 h-5" />
+                                                        <span>NO SNAPSHOT TRACKED</span>
+                                                    </div>
+                                                )}
+                                                {url && <span className="absolute top-2 right-2 px-1 rounded bg-blue-500/10 border border-blue-500/20 text-[8px] font-bold text-blue-300 uppercase">Live link</span>}
+                                                <span className="absolute top-2 left-2 px-1 rounded bg-white/5 text-[8px] uppercase tracking-wider text-white/40">{aspect}</span>
+                                            </div>
+                                            <div className="p-3 space-y-1">
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <h4 className="font-semibold text-xs truncate text-white/90">{title || "Untitled Blueprint Asset"}</h4>
+                                                    <span className="text-[10px] font-mono text-emerald-400 font-bold">${price ? parseFloat(price).toFixed(2) : "0.00"}</span>
+                                                </div>
+                                                <p className="text-[10px] text-white/40 line-clamp-2 leading-tight min-h-[24px]">{description || "No supplemental details provided."}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </motion.div>
                         </div>
                     )}
+                </AnimatePresence>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2 md:col-span-2">
-                                <Label className="text-xs font-medium text-white/80 flex items-center gap-2">
-                                    <FileText className="w-3.5 h-3.5 text-white/40" />
-                                    Template Title <span className="text-red-400">*</span>
-                                </Label>
-                                <Input
-                                    type="text"
-                                    name="title"
-                                    required
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    placeholder="e.g., Finance Pro Exec Dashboard"
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
-                                />
-                            </div>
-
-                            <div className="space-y-2 md:col-span-2">
-                                <Label className="text-xs font-medium text-white/80 flex items-center gap-2">
-                                    <FileText className="w-3.5 h-3.5 text-white/40" />
-                                    Description
-                                </Label>
-                                <Textarea
-                                    name="description"
-                                    rows={3}
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    placeholder="Provide a detailed description of the template..."
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all resize-none"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label className="text-xs font-medium text-white/80 flex items-center gap-2">
-                                    <DollarSign className="w-3.5 h-3.5 text-white/40" />
-                                    Price ($)
-                                </Label>
-                                <Input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    name="price"
-                                    value={price}
-                                    onChange={(e) => setPrice(e.target.value)}
-                                    placeholder="0.00"
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label className="text-xs font-medium text-white/80 flex items-center gap-2">
-                                    <Layout className="w-3.5 h-3.5 text-white/40" />
-                                    Aspect Ratio <span className="text-red-400">*</span>
-                                </Label>
-                                <Select 
-                                    name="aspect" 
-                                    required 
-                                    value={aspect} 
-                                    onValueChange={(val) => {
-                                        if (val) setAspect(val as "horizontal" | "vertical");
-                                    }}
-                                >
-                                    <SelectTrigger className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
-                                        <SelectValue placeholder="Select aspect ratio" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="horizontal">Horizontal (16:9)</SelectItem>
-                                        <SelectItem value="vertical">Vertical (9:16)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="space-y-2 md:col-span-2">
-                                <Label className="text-xs font-medium text-white/80 flex items-center gap-2">
-                                    <LinkIcon className="w-3.5 h-3.5 text-white/40" />
-                                    Power BI Embed URL
-                                </Label>
-                                <Input
-                                    type="url"
-                                    name="url"
-                                    value={url}
-                                    onChange={(e) => setUrl(e.target.value)}
-                                    placeholder="https://app.powerbi.com/view?r=..."
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="pt-4 border-t border-white/5">
-                            <Button
-                                type="submit"
-                                size="sm"
-                                disabled={isLoading}
-                                className="w-full"
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        {editingPostId ? 'Updating...' : 'Publishing...'}
-                                    </>
-                                ) : (
-                                    <>
-                                        <Upload className="w-4 h-4 mr-2" />
-                                        {editingPostId ? 'Update Template' : 'Publish Template'}
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                    </form>
-                </motion.div>
-
-                {/* Published Templates List */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="mt-12"
-                >
-                    <h2 className="text-lg font-heading font-semibold mb-6 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-indigo-400" />
-                        Published Templates
-                    </h2>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Portfolio Asset Registry Grid */}
+                {posts.length === 0 ? (
+                    <div className="border border-white/5 bg-white/[0.01] p-10 rounded-xl text-center max-w-md mx-auto">
+                        <FileText className="w-6 h-6 text-white/20 mx-auto mb-2" />
+                        <Button onClick={openCreateForm} className="bg-white/5 text-[11px] h-8 px-3">Add Asset</Button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[280px] gap-4">
                         {posts.map((post) => (
-                            <div 
-                                key={post.id} 
-                                onClick={() => handleCardClick(post)}
-                                className={`glass-card p-5 rounded-2xl border ${editingPostId === post.id ? 'border-indigo-500/50 bg-indigo-500/10' : 'border-white/10 bg-white/[0.02]'} cursor-pointer hover:bg-white/[0.04] transition-all flex flex-col gap-2`}
-                            >
-                                <div className="flex justify-between items-start">
-                                    <h3 className="font-medium text-sm text-white truncate pr-2">{post.title}</h3>
-                                    {post.price && <span className="text-xs font-semibold text-emerald-400">${post.price}</span>}
+                            <div key={post.id} className={`group bg-white/[0.01] rounded-xl border border-white/5 hover:border-white/10 transition-all overflow-hidden flex flex-col relative ${post.aspect === 'vertical' ? 'row-span-2' : 'row-span-1'}`}>
+                                <div className={`w-full ${post.aspect === 'vertical' ? 'flex-1' : 'aspect-video'} bg-zinc-900/60 relative flex items-center justify-center border-b border-white/5 overflow-hidden`}>
+                                    
+                                    {post.imageUrl ? (
+                                        /* Displays the uploaded image directly in the cards portfolio grid */
+                                        <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                                    ) : (
+                                        <FileText className="w-5 h-5 text-white/10" />
+                                    )}
+
+                                    <div className="absolute top-2 left-2 z-10">
+                                        <span className="px-1 py-0.5 rounded bg-black/40 border border-white/5 text-[9px] font-mono text-white/40 uppercase tracking-wider">{post.aspect}</span>
+                                    </div>
+                                    
+                                    <div onClick={() => handleEditClick(post)} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer z-20">
+                                        <div className="w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center backdrop-blur-md">
+                                            <Edit3 className="w-3.5 h-3.5 text-white" />
+                                        </div>
+                                    </div>
                                 </div>
-                                {post.description && (
-                                    <p className="text-xs text-white/50 line-clamp-2">{post.description}</p>
-                                )}
-                                <div className="flex gap-3 mt-2">
-                                    <span className="text-[10px] uppercase tracking-wider px-2 py-1 rounded-md bg-white/5 text-white/60">
-                                        {post.aspect}
-                                    </span>
+
+                                <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
+                                    <div>
+                                        <div className="flex items-center justify-between gap-2">
+                                            <h3 className="font-medium text-xs text-white/90 truncate">{post.title}</h3>
+                                            <span className="text-xs font-mono font-bold text-emerald-400/90">${post.price ? parseFloat(post.price).toFixed(2) : "0.00"}</span>
+                                        </div>
+                                        {post.description && <p className="text-[11px] text-white/40 line-clamp-1 leading-normal">{post.description}</p>}
+                                    </div>
+                                    <div className="pt-2 border-t border-white/5 flex items-center justify-end">
+                                        <button onClick={() => handleEditClick(post)} className="text-[11px] font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 cursor-pointer">Configure Space →</button>
+                                    </div>
                                 </div>
                             </div>
                         ))}
-                        {posts.length === 0 && (
-                            <p className="text-xs text-white/40 col-span-2 text-center py-8">No templates published yet.</p>
-                        )}
                     </div>
-                </motion.div>
+                )}
             </div>
         </div>
     );
