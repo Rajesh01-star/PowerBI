@@ -1,18 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Check, DownloadCloud, Server, ShieldCheck, Database, LayoutDashboard, Smartphone, Monitor, Loader2 } from 'lucide-react';
+import { ChevronLeft, Check, DownloadCloud, Server, ShieldCheck, Database, LayoutDashboard, Smartphone, Monitor, Loader2, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import InteractivePBI from '@/components/InteractivePBI';
-import CheckoutModal from '@/components/CheckoutModal';
+import Script from 'next/script';
 import { getPublicPostByIdAction } from '@/app/admin/actions';
 
 export default function TemplateDetail() {
   const params = useParams();
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [viewCount, setViewCount] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -28,6 +29,28 @@ export default function TemplateDetail() {
       }
     };
     fetchPost();
+  }, [params.id]);
+
+  // Increment view count on page visit
+  useEffect(() => {
+    const incrementViews = async () => {
+      if (typeof params.id === 'string') {
+        try {
+          const res = await fetch('/api/posts/views', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: params.id }),
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            setViewCount(data.views);
+          }
+        } catch (error) {
+          console.error('Failed to increment views:', error);
+        }
+      }
+    };
+    incrementViews();
   }, [params.id]);
 
   if (loading) {
@@ -55,8 +78,78 @@ export default function TemplateDetail() {
   const isVertical = post.aspect === 'vertical';
   const displayPrice = post.price ? `$${parseFloat(post.price).toFixed(2)}` : "Free";
 
+  const handlePurchase = async () => {
+    if (!post || !post.price || parseFloat(post.price) <= 0) {
+      alert("This template is free or invalid price.");
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      const res = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId: post.id }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to create order");
+        setIsProcessing(false);
+        return;
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Use NEXT_PUBLIC_ for client-side
+        amount: data.amount,
+        currency: data.currency,
+        name: "PowerBI Templates",
+        description: post.title,
+        order_id: data.orderId,
+        handler: async function (response: any) {
+          try {
+            const verifyRes = await fetch("/api/razorpay/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+            const verifyData = await verifyRes.json();
+            if (verifyRes.ok && verifyData.success) {
+              alert("Payment successful! You can now access your template.");
+            } else {
+              alert("Payment verification failed.");
+            }
+          } catch (err) {
+            console.error("Verification error", err);
+            alert("Error verifying payment");
+          }
+        },
+        theme: {
+          color: "#6366f1",
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on("payment.failed", function (response: any) {
+        alert(`Payment failed: ${response.error.description}`);
+      });
+      rzp.open();
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred while initializing checkout");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] text-white pb-16 selection:bg-indigo-500/30">
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <div className="max-w-7xl mx-auto px-6 pt-28 pb-6 space-y-6">
         
         {/* Breadcrumb Navigation anchor */}
@@ -78,6 +171,12 @@ export default function TemplateDetail() {
                   {post.aspect} Target
                 </span>
                 <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/10 text-[9px] font-mono text-indigo-300 uppercase tracking-wider">Analytics</span>
+                {viewCount !== null && (
+                  <span className="px-2 py-0.5 rounded bg-white/5 border border-white/5 text-[9px] font-mono text-white/50 uppercase tracking-wider flex items-center gap-1">
+                    <Eye className="w-2.5 h-2.5" />
+                    {viewCount.toLocaleString()} {viewCount === 1 ? 'view' : 'views'}
+                  </span>
+                )}
               </div>
               <h1 className="text-lg font-bold tracking-tight text-white/90">{post.title}</h1>
               {post.description && (
@@ -164,10 +263,12 @@ export default function TemplateDetail() {
 
               <div className="space-y-2">
                 <button 
-                  onClick={() => setIsCheckoutOpen(true)}
-                  className="w-full h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 text-xs text-white font-medium flex items-center justify-center gap-1.5 transition-all shadow-md shadow-indigo-500/10"
+                  onClick={handlePurchase}
+                  disabled={isProcessing}
+                  className="w-full h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 disabled:opacity-50 text-xs text-white font-medium flex items-center justify-center gap-1.5 transition-all shadow-md shadow-indigo-500/10"
                 >
-                  <DownloadCloud className="w-4 h-4" /> Initialize Asset Acquisition
+                  {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <DownloadCloud className="w-4 h-4" />}
+                  {isProcessing ? "Processing..." : "Initialize Asset Acquisition"}
                 </button>
                 <button className="w-full h-10 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-white/80 border border-white/5 transition-all">
                   Inquire Custom Integration Support
@@ -193,13 +294,6 @@ export default function TemplateDetail() {
 
         </div>
       </div>
-
-      <CheckoutModal 
-        isOpen={isCheckoutOpen} 
-        onClose={() => setIsCheckoutOpen(false)} 
-        templateName={post.title}
-        price={displayPrice}
-      />
     </div>
   );
 }

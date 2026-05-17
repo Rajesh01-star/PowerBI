@@ -1,4 +1,4 @@
-import { boolean, numeric, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, integer, numeric, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -58,6 +58,18 @@ export const postsTable = pgTable('posts', {
     userId: text('user_id')
         .notNull()
         .references(() => user.id, { onDelete: 'cascade' }),
+    views: integer('views').default(0).notNull(),
+    createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { mode: 'date' }).$onUpdate(() => new Date()),
+});
+
+export const ordersTable = pgTable('orders', {
+    id: text('id').primaryKey(), // Razorpay order id
+    userId: text('user_id').references(() => user.id),
+    postId: uuid('post_id').notNull().references(() => postsTable.id),
+    amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+    status: text('status').default('created').notNull(),
+    paymentId: text('payment_id'),
     createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { mode: 'date' }).$onUpdate(() => new Date()),
 });
@@ -77,3 +89,6 @@ export type SelectVerification = typeof verification.$inferSelect;
 
 export type InsertPost = typeof postsTable.$inferInsert;
 export type SelectPost = typeof postsTable.$inferSelect;
+
+export type InsertOrder = typeof ordersTable.$inferInsert;
+export type SelectOrder = typeof ordersTable.$inferSelect;

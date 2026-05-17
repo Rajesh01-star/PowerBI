@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, BarChart3, Sparkles, Monitor, Smartphone } from 'lucide-react';
+import { ArrowRight, BarChart3, Sparkles, Monitor, Smartphone, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { getPublicPostsAction } from '@/app/admin/actions';
 import { useQuery } from '@tanstack/react-query';
@@ -10,7 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 export function FeaturedTemplates() {
   const { data: posts = [] } = useQuery({
     queryKey: ['public-posts'],
-    queryFn: getPublicPostsAction,
+    queryFn: () => getPublicPostsAction(),
   });
 
   // Pull top 3 high-value template configurations dynamically from DB rows
@@ -62,7 +62,8 @@ export function FeaturedTemplates() {
                     <div className="space-y-0.5 truncate">
                       <h3 className="text-xs font-semibold text-white/90 truncate">{post.title}</h3>
                       <p className="text-[10px] text-white/40 flex items-center gap-1">
-                        <Sparkles className="w-2.5 h-2.5 text-indigo-400" /> Premium Blueprint Architecture
+                        <Eye className="w-2.5 h-2.5 text-white/30" />
+                        {(post.views ?? 0).toLocaleString()} {(post.views ?? 0) === 1 ? 'view' : 'views'}
                       </p>
                     </div>
                     <span className="font-mono font-bold text-xs text-emerald-400 shrink-0">

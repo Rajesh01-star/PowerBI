@@ -5,7 +5,7 @@ import { postsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, asc } from "drizzle-orm";
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -136,8 +136,24 @@ export async function getPostsAction() {
     return posts;
 }
 
-export async function getPublicPostsAction() {
-    const posts = await db.select().from(postsTable).orderBy(desc(postsTable.createdAt));
+export async function getPublicPostsAction(sort: string = 'views') {
+    let orderByClause;
+    switch (sort) {
+        case 'newest':
+            orderByClause = desc(postsTable.createdAt);
+            break;
+        case 'oldest':
+            orderByClause = asc(postsTable.createdAt);
+            break;
+        case 'atoz':
+            orderByClause = asc(postsTable.title);
+            break;
+        case 'views':
+        default:
+            orderByClause = desc(postsTable.views);
+            break;
+    }
+    const posts = await db.select().from(postsTable).orderBy(orderByClause);
     return posts;
 }
 
