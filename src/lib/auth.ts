@@ -29,7 +29,8 @@ export const auth = betterAuth({
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID as string,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-            scope: ["email", "profile", "https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/gmail.modify", "https://www.googleapis.com/auth/tasks"],
+            // Keep only standard sign-in scopes
+            scope: ["email", "profile"], 
             accessType: "offline" as const,
             prompt: "consent" as const,
         },
