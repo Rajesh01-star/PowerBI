@@ -18,7 +18,7 @@ export default function Home() {
         {/* Main Sandbox Bento Showroom */}
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="space-y-1 mb-8">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-indigo-400">Sandbox Showroom</h2>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Sandbox Showroom</h2>
             <p className="text-sm text-muted-foreground">Hover over active configurations to boot live workspace previews.</p>
           </div>
           <LiveDemo />

@@ -8,11 +8,11 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-card/30 backdrop-blur-xl relative z-10">
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-3 gap-8 text-xs items-start">
-        
+
         {/* Branding Capsule */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border border-border/40">
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center border border-border/40">
               <Cpu className="w-3 h-3 text-white" />
             </div>
             <span className="font-bold tracking-tight text-foreground">Studio Analytics</span>

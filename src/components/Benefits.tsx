@@ -4,9 +4,9 @@ import { Shield, Zap, Cloud } from 'lucide-react';
 
 export function Benefits() {
   const benefits = [
-    { icon: <Zap className="w-4 h-4 text-indigo-400" />, title: "Instant Hydration", desc: "Download and deploy premium template architectures smoothly into production spaces." },
-    { icon: <Shield className="w-4 h-4 text-indigo-400" />, title: "Enterprise Secure", desc: "Engineered strict data safety principles with integrated row-level governance." },
-    { icon: <Cloud className="w-4 h-4 text-indigo-400" />, title: "Cloud Topology", desc: "Native alignment configurations tailored perfectly for global Power BI Services environments." },
+    { icon: <Zap className="w-4 h-4 text-amber-500" />, title: "Instant Hydration", desc: "Download and deploy premium template architectures smoothly into production spaces." },
+    { icon: <Shield className="w-4 h-4 text-amber-500" />, title: "Enterprise Secure", desc: "Engineered strict data safety principles with integrated row-level governance." },
+    { icon: <Cloud className="w-4 h-4 text-amber-500" />, title: "Cloud Topology", desc: "Native alignment configurations tailored perfectly for global Power BI Services environments." },
   ];
 
   return (
@@ -22,7 +22,7 @@ export function Benefits() {
               transition={{ duration: 0.4, delay: i * 0.05 }}
               className="bg-card/50 border border-border p-5 rounded-xl flex flex-col justify-between space-y-3 shadow-sm hover:shadow-md transition-all duration-300"
             >
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center border border-indigo-500/10 shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/10 shrink-0">
                 {b.icon}
               </div>
               <div className="space-y-1">

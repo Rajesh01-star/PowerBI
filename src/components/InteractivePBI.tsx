@@ -48,7 +48,7 @@ export default function InteractivePBI() {
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-50 bg-background/80 backdrop-blur-md flex flex-col items-center justify-center"
           >
-            <Loader2 className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+            <Loader2 className="w-12 h-12 text-amber-500 animate-spin mb-4" />
             <h3 className="font-heading text-xl font-medium tracking-wide">Initializing Data Workspace</h3>
             <p className="text-muted-foreground text-sm mt-2 font-mono">Loading model definitions...</p>
           </motion.div>
@@ -116,15 +116,15 @@ export default function InteractivePBI() {
               <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke={strokeColor} vertical={false} />
                 <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip contentStyle={{ backgroundColor: tooltipBg, borderColor: tooltipBorder, borderRadius: '8px', color: tooltipText }} />
-                <Area type="monotone" dataKey="revenue" stroke="#6366F1" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
+                <Area type="monotone" dataKey="revenue" stroke="#F59E0B" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
               </AreaChart>
             </ResponsiveContainer>
           </motion.div>
@@ -142,7 +142,7 @@ export default function InteractivePBI() {
                 <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip cursor={{ fill: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: tooltipBg, borderColor: tooltipBorder, borderRadius: '8px', color: tooltipText }} />
-                <Bar dataKey="users" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="users" fill="#F97316" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </motion.div>

@@ -112,7 +112,7 @@ export function LiveDemo() {
     return (
       <div className="w-full h-48 flex items-center justify-center">
         <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-          <Loader2 className="w-4 h-4 animate-spin text-indigo-500" />
+          <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
           SYNCING CACHED FRAMEWORKS...
         </div>
       </div>
@@ -134,7 +134,7 @@ export function LiveDemo() {
             onClick={() => setActiveSort(option.value)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 border ${
               activeSort === option.value
-                ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-600 dark:text-indigo-300 shadow-sm shadow-indigo-500/10'
+                ? 'bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-300 shadow-sm shadow-amber-500/10'
                 : 'bg-muted border-border text-muted-foreground hover:bg-accent hover:border-border hover:text-foreground'
             }`}
           >
@@ -167,7 +167,7 @@ export function LiveDemo() {
             >
               {/* Ambient Background Blur Glow */}
               <div className={`absolute inset-0 bg-gradient-to-tr ${
-                isEven ? 'from-indigo-500/10 to-blue-500/10' : 'from-purple-500/10 to-pink-500/10'
+                isEven ? 'from-amber-500/10 to-orange-500/10' : 'from-amber-600/10 to-amber-900/10'
               } blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
               
               {/* Main Container */}
@@ -229,8 +229,8 @@ export function LiveDemo() {
                             : status === 'failed'
                             ? 'bg-red-500/20 border-red-500/30 text-red-500 dark:text-red-400'
                             : status === 'processing'
-                            ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-600 dark:text-indigo-300 cursor-wait'
-                            : 'bg-indigo-600 hover:bg-indigo-500 border-indigo-600 text-white shadow-md hover:scale-105 active:scale-95'
+                            ? 'bg-amber-500/20 border-amber-500/30 text-amber-600 dark:text-amber-300 cursor-wait'
+                            : 'bg-amber-600 hover:bg-amber-500 border-amber-600 text-white shadow-md hover:scale-105 active:scale-95'
                         }`}
                       >
                         <AnimatePresence mode="wait">
@@ -255,7 +255,7 @@ export function LiveDemo() {
                       </button>
                     )}
                     {/* Expand Icon */}
-                    <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center border border-border text-muted-foreground group-hover:text-foreground group-hover:bg-indigo-500/20 group-hover:border-indigo-500/30 transition-all duration-300">
+                    <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center border border-border text-muted-foreground group-hover:text-foreground group-hover:bg-amber-500/20 group-hover:border-amber-500/30 transition-all duration-300">
                       <Maximize2 className="w-3 h-3" />
                     </div>
                   </div>
@@ -267,7 +267,7 @@ export function LiveDemo() {
                   className="absolute inset-0 z-20 flex items-center justify-center bg-transparent hover:bg-background/40 transition-colors duration-300 group/overlay"
                 >
                   <div className={`px-4 py-2 rounded-xl text-xs font-medium text-white ${
-                    isEven ? 'bg-indigo-500/85 shadow-indigo-500/20' : 'bg-purple-500/85 shadow-purple-500/20'
+                    isEven ? 'bg-amber-500/85 shadow-amber-500/20' : 'bg-amber-600/85 shadow-amber-600/20'
                   } border border-white/10 shadow-2xl opacity-0 scale-95 group-hover/overlay:opacity-100 group-hover/overlay:scale-100 transition-all duration-300 flex items-center gap-1.5 backdrop-blur-md`}>
                     <Sparkles className="w-3.5 h-3.5 animate-pulse" /> View Fullscreen Space
                   </div>
