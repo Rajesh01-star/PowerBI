@@ -16,29 +16,29 @@ const categories = ["All", "Finance", "Sales", "HR", "Marketing", "Operations", 
 
 export default function Marketplace() {
   return (
-    <div className="min-h-screen bg-[#050505] text-white pt-12 pb-20">
+    <div className="min-h-screen bg-background text-foreground pt-12 pb-20">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <Link href="/" className="inline-flex items-center gap-2 text-white/50 hover:text-white mb-6 text-sm transition-colors">
+            <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 text-sm transition-colors">
               <ChevronLeft className="w-4 h-4" /> Back to Home
             </Link>
-            <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">Marketplace</h1>
-            <p className="text-white/60">Discover premium Power BI templates for every business unit.</p>
+            <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4 text-foreground">Marketplace</h1>
+            <p className="text-muted-foreground">Discover premium Power BI templates for every business unit.</p>
           </div>
           
           <div className="flex items-center gap-4 w-full md:w-auto">
             <div className="relative flex-1 md:w-64">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input 
                 type="text" 
                 placeholder="Search templates..." 
-                className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:border-indigo-500/50 transition-colors"
+                className="w-full bg-muted border border-border rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:border-indigo-500/50 transition-colors text-foreground placeholder:text-muted-foreground"
               />
             </div>
-            <button className="p-2 glass rounded-full hover:bg-white/10 transition-colors">
+            <button className="p-2 bg-muted hover:bg-accent border border-border rounded-full transition-colors text-muted-foreground hover:text-foreground">
               <Filter className="w-4 h-4" />
             </button>
           </div>
@@ -49,7 +49,7 @@ export default function Marketplace() {
           {categories.map((cat, i) => (
             <button 
               key={cat}
-              className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${i === 0 ? 'bg-indigo-600 text-white' : 'glass hover:bg-white/10 text-white/70'}`}
+              className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${i === 0 ? 'bg-indigo-600 text-white shadow-md' : 'bg-muted hover:bg-accent border border-border text-muted-foreground hover:text-foreground'}`}
             >
               {cat}
             </button>
@@ -65,20 +65,20 @@ export default function Marketplace() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
             >
-              <Link href={`/template/${template.id}`} className="block glass-card rounded-3xl overflow-hidden group">
+              <Link href={`/template/${template.id}`} className="block bg-card border border-border rounded-3xl overflow-hidden group shadow-sm hover:shadow-md transition-all duration-300">
                 <div className={`w-full aspect-[4/3] ${template.img} relative flex items-center justify-center`}>
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
                   <BarChart3 className="w-16 h-16 text-white/20 group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute top-4 right-4 px-3 py-1 rounded-full glass text-xs font-medium backdrop-blur-md">
+                  <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-background/80 text-foreground border border-border text-xs font-medium backdrop-blur-md">
                     {template.category}
                   </div>
                 </div>
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-heading font-semibold group-hover:text-indigo-400 transition-colors">{template.title}</h3>
-                    <span className="font-mono font-medium text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">{template.price}</span>
+                    <h3 className="text-lg font-heading font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors text-foreground">{template.title}</h3>
+                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">{template.price}</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-white/50">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                       {template.rating}

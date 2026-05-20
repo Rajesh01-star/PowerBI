@@ -66,11 +66,11 @@ export default function UserDashboard() {
   // Redirect if not logged in
   if (!sessionLoading && !sessionData?.user) {
     return (
-      <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
-        <div className="text-center p-6 border border-white/5 bg-white/[0.01] rounded-2xl max-w-sm space-y-4">
-          <ShieldCheck className="w-8 h-8 text-indigo-400 mx-auto" />
-          <p className="text-xs text-white/50">Authentication required to access your workspace.</p>
-          <Link href="/" className="inline-flex text-xs text-indigo-400 hover:underline">Return Home</Link>
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center p-6 border border-border bg-card rounded-2xl max-w-sm space-y-4 shadow-md">
+          <ShieldCheck className="w-8 h-8 text-indigo-500 mx-auto" />
+          <p className="text-xs text-muted-foreground">Authentication required to access your workspace.</p>
+          <Link href="/" className="inline-flex text-xs text-indigo-500 hover:underline">Return Home</Link>
         </div>
       </div>
     );
@@ -79,32 +79,32 @@ export default function UserDashboard() {
   const user = sessionData?.user;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white pt-28 pb-20 selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-background text-foreground pt-28 pb-20 selection:bg-indigo-500/30">
       <div className="max-w-7xl mx-auto px-6">
 
         <div className="flex flex-col md:flex-row gap-8">
 
           {/* Sidebar */}
           <div className="w-full md:w-56 shrink-0 space-y-2">
-            <div className="bg-white/[0.02] border border-white/5 p-5 rounded-2xl mb-5">
-              <div className="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold mb-3 border border-indigo-500/20">
+            <div className="bg-card border border-border p-5 rounded-2xl mb-5 shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-bold mb-3 border border-indigo-500/20">
                 {user?.name ? getInitials(user.name) : '??'}
               </div>
-              <h2 className="text-sm font-semibold text-white/90 truncate">{user?.name || 'User'}</h2>
-              <p className="text-[11px] text-white/40 truncate">{user?.email || ''}</p>
+              <h2 className="text-sm font-semibold text-foreground truncate">{user?.name || 'User'}</h2>
+              <p className="text-[11px] text-muted-foreground truncate">{user?.email || ''}</p>
             </div>
 
             <nav className="space-y-0.5">
-              <Link href="/dashboard" className="flex items-center gap-2.5 px-3.5 py-2.5 bg-white/[0.06] rounded-xl text-xs text-white font-medium border border-white/[0.06]">
-                <Package className="w-3.5 h-3.5 text-indigo-400" /> My Inventory
+              <Link href="/dashboard" className="flex items-center gap-2.5 px-3.5 py-2.5 bg-indigo-500/10 rounded-xl text-xs text-indigo-600 dark:text-indigo-400 font-medium border border-indigo-500/20">
+                <Package className="w-3.5 h-3.5" /> My Inventory
               </Link>
-              <Link href="#" className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-white/[0.03] rounded-xl text-xs text-white/50 hover:text-white/70 transition-colors">
+              <Link href="#" className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-accent rounded-xl text-xs text-muted-foreground hover:text-foreground transition-colors">
                 <History className="w-3.5 h-3.5" /> Acquisition History
               </Link>
-              <Link href="#" className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-white/[0.03] rounded-xl text-xs text-white/50 hover:text-white/70 transition-colors">
+              <Link href="#" className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-accent rounded-xl text-xs text-muted-foreground hover:text-foreground transition-colors">
                 <Settings className="w-3.5 h-3.5" /> Account Settings
               </Link>
-              <Link href="/" className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-rose-500/10 hover:text-rose-400 rounded-xl text-xs text-white/30 transition-colors mt-6">
+              <Link href="/" className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl text-xs text-muted-foreground transition-colors mt-6">
                 <LogOut className="w-3.5 h-3.5" /> Sign Out
               </Link>
             </nav>
@@ -114,18 +114,18 @@ export default function UserDashboard() {
           <div className="flex-1 space-y-6">
 
             {/* Header */}
-            <div className="space-y-1 border-b border-white/5 pb-4">
+            <div className="space-y-1 border-b border-border pb-4">
               <div className="flex items-center gap-1.5">
-                <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/10 text-[9px] font-mono text-indigo-300 uppercase tracking-wider">Workspace</span>
+                <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/10 text-[9px] font-mono text-indigo-600 dark:text-indigo-300 uppercase tracking-wider">Workspace</span>
               </div>
-              <h1 className="text-lg font-bold tracking-tight text-white/90">My Inventory</h1>
-              <p className="text-xs text-white/50">Manage your purchased templates and access persistent download links.</p>
+              <h1 className="text-lg font-bold tracking-tight text-foreground">My Inventory</h1>
+              <p className="text-xs text-muted-foreground">Manage your purchased templates and access persistent download links.</p>
             </div>
 
             {/* Loading State */}
             {(loading || sessionLoading) && (
               <div className="flex items-center justify-center py-20">
-                <div className="flex items-center gap-2 text-xs text-white/40 font-mono">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
                   <Loader2 className="w-4 h-4 animate-spin text-indigo-500" />
                   SYNCHRONIZING ASSET INVENTORY...
                 </div>
@@ -146,19 +146,19 @@ export default function UserDashboard() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.06 }}
-                        className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden hover:border-white/10 transition-all duration-300 group"
+                        className="bg-card border border-border/80 rounded-2xl overflow-hidden hover:border-border transition-all duration-300 group shadow-sm hover:shadow-md"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4">
 
                           {/* Thumbnail */}
-                          <div className="w-16 h-16 rounded-xl bg-black border border-white/5 overflow-hidden shrink-0 relative">
+                          <div className="w-16 h-16 rounded-xl bg-muted border border-border overflow-hidden shrink-0 relative">
                             <img
                               src={screenshotUrl}
                               alt={item.title}
                               className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity"
                             />
                             <div className="absolute bottom-1 right-1">
-                              <span className="px-1 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[8px] font-mono text-white/50 uppercase border border-white/5 flex items-center gap-0.5">
+                              <span className="px-1 py-0.5 rounded bg-background/80 backdrop-blur-sm text-[8px] font-mono text-muted-foreground uppercase border border-border flex items-center gap-0.5">
                                 {isVertical ? <Smartphone className="w-2 h-2" /> : <Monitor className="w-2 h-2" />}
                                 {item.aspect}
                               </span>
@@ -168,15 +168,15 @@ export default function UserDashboard() {
                           {/* Info */}
                           <div className="flex-1 min-w-0 space-y-1.5">
                             <div className="flex items-center gap-2">
-                              <h3 className="text-xs font-semibold text-white/90 truncate">{item.title}</h3>
-                              <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-mono font-bold text-emerald-400 uppercase tracking-wider shrink-0">
+                              <h3 className="text-xs font-semibold text-foreground truncate">{item.title}</h3>
+                              <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-mono font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider shrink-0">
                                 Paid
                               </span>
                             </div>
                             {item.description && (
-                              <p className="text-[10px] text-white/35 truncate max-w-lg">{item.description}</p>
+                              <p className="text-[10px] text-muted-foreground/80 truncate max-w-lg">{item.description}</p>
                             )}
-                            <div className="flex items-center gap-3 text-[10px] text-white/30 font-mono">
+                            <div className="flex items-center gap-3 text-[10px] text-muted-foreground/60 font-mono">
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-2.5 h-2.5" />
                                 {formatDate(item.purchasedAt)}
@@ -199,13 +199,13 @@ export default function UserDashboard() {
                           <div className="flex items-center gap-2 shrink-0">
                             <Link
                               href={`/template/${item.postId}`}
-                              className="h-7 px-3 bg-indigo-500/80 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-medium transition-colors flex items-center gap-1.5 shadow-lg shadow-indigo-500/10"
+                              className="h-7 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-medium transition-colors flex items-center gap-1.5 shadow-md"
                             >
                               <Download className="w-3 h-3" /> Download .pbit
                             </Link>
                             <Link
                               href={`/template/${item.postId}`}
-                              className="h-7 w-7 bg-white/[0.04] hover:bg-white/[0.08] border border-white/5 rounded-lg flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                              className="h-7 w-7 bg-muted hover:bg-accent border border-border rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                               title="View Template"
                             >
                               <ExternalLink className="w-3 h-3" />
@@ -222,12 +222,12 @@ export default function UserDashboard() {
 
             {/* Empty State */}
             {!loading && !sessionLoading && purchases.length === 0 && (
-              <div className="bg-white/[0.01] border border-white/5 p-12 rounded-2xl flex flex-col items-center justify-center text-center">
-                <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center mb-5">
-                  <LayoutDashboard className="w-6 h-6 text-white/15" />
+              <div className="bg-card border border-border p-12 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-muted border border-border flex items-center justify-center mb-5">
+                  <LayoutDashboard className="w-6 h-6 text-muted-foreground/20" />
                 </div>
-                <h3 className="text-sm font-semibold text-white/80 mb-1">No Templates Acquired</h3>
-                <p className="text-[11px] text-white/35 mb-6 max-w-xs leading-relaxed">
+                <h3 className="text-sm font-semibold text-foreground mb-1">No Templates Acquired</h3>
+                <p className="text-[11px] text-muted-foreground mb-6 max-w-xs leading-relaxed">
                   Your workspace inventory is empty. Browse the Sandbox Showroom to discover production-ready analytics frameworks.
                 </p>
                 <Link

@@ -111,7 +111,7 @@ export function LiveDemo() {
   if (isLoading) {
     return (
       <div className="w-full h-48 flex items-center justify-center">
-        <div className="flex items-center gap-2 text-xs text-white/40 font-mono">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
           <Loader2 className="w-4 h-4 animate-spin text-indigo-500" />
           SYNCING CACHED FRAMEWORKS...
         </div>
@@ -125,7 +125,7 @@ export function LiveDemo() {
 
       {/* Sorting Controls */}
       <div className="flex items-center gap-2 mb-5">
-        <div className="flex items-center gap-1.5 text-[10px] text-white/30 uppercase font-bold tracking-wider mr-1">
+        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider mr-1">
           <ArrowDownWideNarrow className="w-3.5 h-3.5" /> Sort
         </div>
         {SORT_OPTIONS.map((option) => (
@@ -134,8 +134,8 @@ export function LiveDemo() {
             onClick={() => setActiveSort(option.value)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 border ${
               activeSort === option.value
-                ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-300 shadow-sm shadow-indigo-500/10'
-                : 'bg-white/[0.02] border-white/5 text-white/40 hover:bg-white/[0.04] hover:border-white/10 hover:text-white/60'
+                ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-600 dark:text-indigo-300 shadow-sm shadow-indigo-500/10'
+                : 'bg-muted border-border text-muted-foreground hover:bg-accent hover:border-border hover:text-foreground'
             }`}
           >
             {option.icon}
@@ -171,10 +171,10 @@ export function LiveDemo() {
               } blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
               
               {/* Main Container */}
-              <div className="relative w-full h-full bg-[#0d0d11]/40 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/5 transition-all duration-500 group-hover:border-white/10 flex flex-col justify-between">
+              <div className="relative w-full h-full bg-card/40 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/80 transition-all duration-500 group-hover:border-border flex flex-col justify-between">
                 
                 {/* CANVAS GRAPHIC LAYER */}
-                <div className="absolute inset-0 z-0 overflow-hidden bg-zinc-950">
+                <div className="absolute inset-0 z-0 overflow-hidden bg-muted/10">
                   {isLoaded && post.url ? (
                     /* The iframe only renders when hovered */
                     <iframe 
@@ -188,34 +188,34 @@ export function LiveDemo() {
                     <img 
                       src={screenshotUrl} 
                       alt={post.title}
-                      className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-all duration-700 filter saturate-50 group-hover:saturate-100 group-hover:scale-105"
+                      className="w-full h-full object-cover opacity-75 dark:opacity-30 group-hover:opacity-90 dark:group-hover:opacity-45 transition-all duration-700 filter saturate-50 group-hover:saturate-100 group-hover:scale-105"
                     />
                   )}
 
                   {/* Badges Overlay */}
-                  <div className="absolute top-3 left-3 flex gap-1.5 z-10 backdrop-blur-md bg-black/40 rounded-md p-0.5 border border-white/5">
-                    <span className="px-1.5 py-0.5 text-[9px] font-mono text-white/50 uppercase tracking-wider flex items-center gap-1">
+                  <div className="absolute top-3 left-3 flex gap-1.5 z-10 backdrop-blur-md bg-background/80 rounded-md p-0.5 border border-border">
+                    <span className="px-1.5 py-0.5 text-[9px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                       {isVertical ? <Smartphone className="w-2.5 h-2.5" /> : <Monitor className="w-2.5 h-2.5" />}
                       {post.aspect}
                     </span>
-                    <span className="px-1.5 py-0.5 text-[9px] font-mono text-white/40 flex items-center gap-1 border-l border-white/10">
+                    <span className="px-1.5 py-0.5 text-[9px] font-mono text-muted-foreground/60 flex items-center gap-1 border-l border-border">
                       <Eye className="w-2.5 h-2.5" />
                       {(post.views ?? 0).toLocaleString()}
                     </span>
                   </div>
 
                   {post.price && (
-                    <span className="absolute top-3 right-3 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono font-bold text-emerald-400 z-10 backdrop-blur-md">
+                    <span className="absolute top-3 right-3 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 z-10 backdrop-blur-md">
                       ${parseFloat(post.price).toFixed(2)}
                     </span>
                   )}
                 </div>
 
                 {/* Card Title Info Block */}
-                <div className="mt-auto w-full p-3.5 bg-gradient-to-t from-[#050508] via-[#050508]/95 to-transparent z-10 border-t border-white/5 backdrop-blur-md flex items-center justify-between gap-3">
+                <div className="mt-auto w-full p-3.5 bg-gradient-to-t from-background via-background/95 to-transparent z-10 border-t border-border backdrop-blur-md flex items-center justify-between gap-3">
                   <div className="space-y-0.5 truncate flex-1 min-w-0">
-                    <h4 className="text-xs font-semibold text-white/90 truncate">{post.title || "Production Dashboard"}</h4>
-                    <p className="text-[10px] text-white/40 truncate">{post.description || "Hover to activate real-time intelligence interface."}</p>
+                    <h4 className="text-xs font-semibold text-foreground truncate">{post.title || "Production Dashboard"}</h4>
+                    <p className="text-[10px] text-muted-foreground truncate">{post.description || "Hover to activate real-time intelligence interface."}</p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     {/* Purchase Button */}
@@ -225,12 +225,12 @@ export function LiveDemo() {
                         disabled={status === 'processing' || status === 'success'}
                         className={`relative z-30 h-7 rounded-lg text-[10px] font-semibold flex items-center gap-1 px-2.5 transition-all duration-300 border ${
                           status === 'success'
-                            ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400 cursor-default'
+                            ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 cursor-default'
                             : status === 'failed'
-                            ? 'bg-red-500/20 border-red-500/30 text-red-400'
+                            ? 'bg-red-500/20 border-red-500/30 text-red-500 dark:text-red-400'
                             : status === 'processing'
-                            ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300 cursor-wait'
-                            : 'bg-indigo-500/80 hover:bg-indigo-500 border-indigo-400/30 text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:scale-105 active:scale-95'
+                            ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-600 dark:text-indigo-300 cursor-wait'
+                            : 'bg-indigo-600 hover:bg-indigo-500 border-indigo-600 text-white shadow-md hover:scale-105 active:scale-95'
                         }`}
                       >
                         <AnimatePresence mode="wait">
@@ -255,7 +255,7 @@ export function LiveDemo() {
                       </button>
                     )}
                     {/* Expand Icon */}
-                    <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center border border-white/5 text-white/40 group-hover:text-white group-hover:bg-indigo-500/20 group-hover:border-indigo-500/30 transition-all duration-300">
+                    <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center border border-border text-muted-foreground group-hover:text-foreground group-hover:bg-indigo-500/20 group-hover:border-indigo-500/30 transition-all duration-300">
                       <Maximize2 className="w-3 h-3" />
                     </div>
                   </div>
@@ -264,7 +264,7 @@ export function LiveDemo() {
                 {/* Hover Interaction Layer */}
                 <Link 
                   href={`/template/${post.id}`} 
-                  className="absolute inset-0 z-20 flex items-center justify-center bg-black/0 hover:bg-black/30 transition-colors duration-300 group/overlay"
+                  className="absolute inset-0 z-20 flex items-center justify-center bg-transparent hover:bg-background/40 transition-colors duration-300 group/overlay"
                 >
                   <div className={`px-4 py-2 rounded-xl text-xs font-medium text-white ${
                     isEven ? 'bg-indigo-500/85 shadow-indigo-500/20' : 'bg-purple-500/85 shadow-purple-500/20'
