@@ -11,6 +11,9 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 export function RegisterDialog() {
   const [open, setOpen] = useState(false);
@@ -80,16 +83,16 @@ export function RegisterDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <button className="text-[13px] font-medium bg-white text-black px-3 py-1.5 rounded-md hover:bg-neutral-200 transition-colors">
+        <Button className="text-[13px] font-medium bg-foreground text-background hover:bg-foreground/90 px-4 py-2.5 transition-colors cursor-pointer">
           Register
-        </button>
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-neutral-900 border-neutral-800 text-white">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl">
             {isLoginView ? "Welcome back" : "Create an account"}
           </DialogTitle>
-          <DialogDescription className="text-neutral-400">
+          <DialogDescription>
             {isLoginView
               ? "Sign in to your account to continue."
               : "Sign up to get started with your account."}
@@ -97,7 +100,7 @@ export function RegisterDialog() {
         </DialogHeader>
 
         {error && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center text-red-500 text-sm">
+          <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center text-destructive text-sm">
             <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
             {error}
           </div>
@@ -106,19 +109,19 @@ export function RegisterDialog() {
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           {!isLoginView && (
             <div>
-              <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+              <Label className="block mb-1.5 text-foreground/80 font-semibold">
                 Full Name
-              </label>
+              </Label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-500">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground z-10">
                   <User className="h-4 w-4" />
                 </div>
-                <input
+                <Input
                   type="text"
                   required={!isLoginView}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-neutral-800 rounded-lg bg-neutral-950/50 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors text-sm"
+                  className="block w-full pl-9 pr-3 py-2 bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-indigo-500/50"
                   placeholder="John Doe"
                 />
               </div>
@@ -126,71 +129,72 @@ export function RegisterDialog() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+            <Label className="block mb-1.5 text-foreground/80 font-semibold">
               Email Address
-            </label>
+            </Label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-500">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground z-10">
                 <Mail className="h-4 w-4" />
               </div>
-              <input
+              <Input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full pl-9 pr-3 py-2 border border-neutral-800 rounded-lg bg-neutral-950/50 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors text-sm"
+                className="block w-full pl-9 pr-3 py-2 bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-indigo-500/50"
                 placeholder="you@example.com"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+            <Label className="block mb-1.5 text-foreground/80 font-semibold">
               Password
-            </label>
+            </Label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-500">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground z-10">
                 <Lock className="h-4 w-4" />
               </div>
-              <input
+              <Input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full pl-9 pr-3 py-2 border border-neutral-800 rounded-lg bg-neutral-950/50 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors text-sm"
+                className="block w-full pl-9 pr-3 py-2 bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-indigo-500/50"
                 placeholder="••••••••"
               />
             </div>
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-4"
+            className="w-full flex items-center justify-center py-2 px-4 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-4 cursor-pointer"
           >
             {loading ? "Please wait..." : isLoginView ? "Sign in" : "Sign up"}
             {!loading && <ArrowRight className="ml-2 w-4 h-4" />}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-4">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-800" />
+              <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-neutral-900 text-neutral-500">
+              <span className="px-2 bg-popover text-muted-foreground">
                 Or continue with
               </span>
             </div>
           </div>
 
           <div className="mt-4">
-            <button
+            <Button
               onClick={handleGoogleLogin}
               disabled={loading}
               type="button"
-              className="w-full flex items-center justify-center px-4 py-2 border border-neutral-800 rounded-lg shadow-sm bg-neutral-950/50 text-sm font-medium text-white hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-500 transition-colors"
+              variant="outline"
+              className="w-full flex items-center justify-center px-4 py-2 bg-input/10 border-border text-sm font-medium text-foreground hover:bg-accent transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                 <path
@@ -211,12 +215,12 @@ export function RegisterDialog() {
                 />
               </svg>
               Google
-            </button>
+            </Button>
           </div>
         </div>
 
         <div className="mt-4 text-center text-sm">
-          <span className="text-neutral-400">
+          <span className="text-muted-foreground">
             {isLoginView ? "Don't have an account?" : "Already have an account?"}
           </span>
           <button
@@ -225,7 +229,7 @@ export function RegisterDialog() {
               setIsLoginView(!isLoginView);
               setError("");
             }}
-            className="ml-2 font-medium text-blue-500 hover:text-blue-400 focus:outline-none"
+            className="ml-2 font-medium text-indigo-500 hover:text-indigo-400 focus:outline-none cursor-pointer"
           >
             {isLoginView ? "Sign up" : "Sign in"}
           </button>

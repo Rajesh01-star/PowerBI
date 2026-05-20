@@ -17,7 +17,7 @@ export function Hero() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#25D366]/30 bg-transparent mb-6 self-start">
               <span className="w-2.5 h-2.5 rounded-full bg-[#25D366]" />
-              <span className="text-sm font-medium text-white/90">Available for Projects</span>
+              <span className="text-sm font-medium text-foreground/90">Available for Projects</span>
             </div>
           </motion.div>
 
@@ -25,7 +25,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl lg:text-5xl font-sans font-medium tracking-tight mb-6 leading-[1.1] text-white"
+            className="text-4xl lg:text-5xl font-sans font-medium tracking-tight mb-6 leading-[1.1] text-foreground"
           >
             Meet the Expert <br />
             Power BI Creator
@@ -170,13 +170,13 @@ export function Hero() {
             <div className="relative w-[120px] h-[120px] lg:w-[140px] lg:h-[140px] animate-[spin_10s_linear_infinite]">
               <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
                 <path id="circlePath" d="M 50, 50 m -38, 0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" fill="transparent" />
-                <text className="text-[11px] lg:text-[12px] font-bold tracking-widest fill-white uppercase">
+                <text className="text-[11px] lg:text-[12px] font-bold tracking-widest fill-current text-foreground uppercase">
                   <textPath href="#circlePath" startOffset="0%">POWER BI EXPERT CREATOR •</textPath>
                 </text>
               </svg>
             </div>
             <div className="absolute w-12 h-12 rounded-xl flex items-center justify-center">
-              <BarChart3 className="w-8 h-8 text-white" />
+              <BarChart3 className="w-8 h-8 text-foreground" />
             </div>
           </motion.div>
 
@@ -186,7 +186,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-white/60 text-[15px] leading-relaxed mb-8 max-w-[320px] font-light"
+              className="text-muted-foreground text-[15px] leading-relaxed mb-8 max-w-[320px] font-light"
             >
               As a professional Power BI developer, I rely on top-notch tools to create stunning executive dashboards that captivate and engage. Skip the endless development cycles and get premium access.
             </motion.p>
@@ -203,7 +203,7 @@ export function Hero() {
           </div>
         </div>
       </div>
-      <div className="absolute w-[200vw] left-[-50vw] bottom-[-10px] h-[350px] bg-gradient-to-t from-[#050505] via-[#050505]/90 to-transparent pointer-events-none z-10" />
+      <div className="absolute w-[200vw] left-[-50vw] bottom-[-10px] h-[350px] bg-gradient-to-t from-background via-background/90 to-transparent pointer-events-none z-10" />
     </div>
   );
 }

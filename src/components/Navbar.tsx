@@ -2,13 +2,54 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { User as UserIcon, LogOut, Search } from 'lucide-react';
 import { RegisterDialog } from './RegisterDialog';
 import { authClient } from '@/lib/auth-client';
 import { cn } from "@/lib/utils";
 import { ModeToggle } from './ModeToggle';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+
+const AdobeXDIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-6 h-6 text-[#FF26BE]" fill="currentColor">
+    <rect width="24" height="24" rx="5" fill="url(#xd-grad)" />
+    <text x="50%" y="58%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold" fontFamily="sans-serif">Xd</text>
+    <defs>
+      <linearGradient id="xd-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#470037" />
+        <stop offset="100%" stopColor="#FF26BE" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+const FigmaIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 5C12 3.34315 10.6569 2 9 2C7.34315 2 6 3.34315 6 5C6 6.65685 7.34315 8 9 8C10.6569 8 12 6.65685 12 5Z" fill="#F24E1E" />
+    <path d="M6 11C6 9.34315 7.34315 8 9 8H12V14H9C7.34315 14 6 12.6569 6 11Z" fill="#A259FF" />
+    <path d="M12 8H15C16.6569 8 18 6.65685 18 5C18 3.34315 16.6569 2 15 2C13.3431 2 12 3.34315 12 5V8Z" fill="#F24E1E" />
+    <path d="M12 11H15C16.6569 11 18 12.3431 18 14C18 15.6569 16.6569 17 15 17C13.3431 17 12 15.6569 12 14V11Z" fill="#1ABC9C" />
+    <path d="M6 17C6 15.3431 7.34315 14 9 14H12V17C12 18.6569 10.6569 20 9 20C7.34315 20 6 18.6569 6 17Z" fill="#0ACF83" />
+  </svg>
+);
+
+const PowerBIIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="15" y="4" width="4" height="16" rx="1" fill="#F2C811" />
+    <rect x="10" y="9" width="4" height="11" rx="1" fill="#F2A511" />
+    <rect x="5" y="14" width="4" height="6" rx="1" fill="#D97911" />
+  </svg>
+);
 
 export function Navbar() {
+  const router = useRouter();
   const { data: sessionData, isPending } = authClient.useSession();
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -83,36 +124,126 @@ export function Navbar() {
           className={cn(
             "flex h-16 items-center justify-between border backdrop-blur-2xl transition-all duration-500 ease-out",
             scrolled
-              ? "rounded-none border-x-0 border-t-0 border-white/[0.06] bg-black/80 shadow-[0_10px_40px_rgba(0,0,0,0.45)] px-6"
-              : "rounded-[20px] border-white/[0.04] bg-black/40 shadow-[0_0_40px_rgba(79,70,229,0.04)] px-4 sm:px-6"
+              ? "rounded-none border-x-0 border-t-0 border-border/40 bg-background/80 shadow-md px-6"
+              : "rounded-[20px] border-border/40 bg-background/40 shadow-sm px-4 sm:px-6"
           )}
         >
           {/* Left: Logo & Brand */}
           <Link href="/" className="flex items-center gap-2 py-1 text-sm font-semibold cursor-pointer">
-            <img src="https://cdn.skiper-ui.com/logos/logo.svg" alt="Logo" className="w-6 h-6" />
-            <span className="text-white tracking-wide hidden xs:block">GENGRAPHS & GRAPHICS</span>
+            <img src="https://cdn.skiper-ui.com/logos/logo.svg" alt="Logo" className="w-6 h-6 animate-pulse" />
+            <span className="text-foreground tracking-wide hidden xs:block">GENGRAPHS & GRAPHICS</span>
           </Link>
 
           {/* Center: Navigation Links */}
-          <div className="hidden md:flex items-center gap-6 text-xs font-medium">
-            <Link href="/marketplace" className="text-white/70 hover:text-white transition-colors">Marketplace</Link>
-            <Link href="/solutions" className="text-white/70 hover:text-white transition-colors">Solutions</Link>
-            <Link href="/previews" className="text-white/70 hover:text-white transition-colors">Live Previews</Link>
-            <Link href="/resources" className="text-white/70 hover:text-white transition-colors">Resources</Link>
+          <div className="hidden md:flex items-center gap-6">
+            <NavigationMenu>
+              <NavigationMenuList>
+                {/* About Us Nav Item */}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger
+                    onClick={() => router.push('/about')}
+                    className="text-foreground/70 hover:text-foreground bg-transparent hover:bg-accent focus:bg-accent data-[popup-open]:bg-accent data-[popup-open]:text-foreground transition-all cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1"
+                  >
+                    About Us
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className="cursor-pointer p-5 w-[560px] md:w-[600px] lg:w-[640px]" onClick={() => { router.push("/about") }}>
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
+                      <div className="md:col-span-2 flex flex-col justify-between rounded-xl bg-gradient-to-br from-indigo-950/20 via-popover to-background p-4 border border-border/40 shadow-xl">
+                        <div>
+                          <h4 className="text-xs font-semibold text-foreground tracking-wide uppercase bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
+                            Gengraphs &amp; Graphics
+                          </h4>
+                          <p className="mt-2 text-[10px] text-muted-foreground leading-relaxed">
+                            Founded in 2026 by <span className="text-foreground font-medium">Mohit Bhardwaj</span>.
+                          </p>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-border/40">
+                          <Link
+                            href="/about"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 text-[9px] font-medium text-indigo-500 transition-all border border-indigo-500/20 group/btn"
+                          >
+                            <span>About Us</span>
+                            <span className="transition-transform group-hover/btn:translate-x-0.5">→</span>
+                          </Link>
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-3 flex flex-col justify-between gap-3 text-foreground/70 text-[10px] leading-relaxed">
+                        <p>
+                          Offers services in <span className="text-foreground font-medium">Data analytics</span>, <span className="text-foreground font-medium">Business Intelligence</span>, and <span className="text-foreground font-medium">Graphic designing</span>, drawing on deep expertise in Power BI, Tableau, Advanced Excel, and Project Management. Every project is approached like a mini-strategy engagement: understanding your goals, mapping the right KPIs, and delivering visuals that executives can act on in minutes, not hours.
+                        </p>
+                        <p>
+                          Alongside data, we offer end-to-end visual and product design—brand-aligned graphic design, presentation and pitch-deck design, and UX/UI for dashboards, internal tools, and business websites—so your insights and ideas look as powerful as they look premium.
+                        </p>
+                      </div>
+                    </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                {/* Products Nav Item */}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger
+                    onClick={() => router.push('/marketplace')}
+                    className="text-foreground/70 hover:text-foreground bg-transparent hover:bg-accent focus:bg-accent data-[popup-open]:bg-accent data-[popup-open]:text-foreground transition-all cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1"
+                  >
+                    Products
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className="p-2 w-[450px]">
+                    <div className="grid grid-cols-1 gap-1">
+                      <NavigationMenuLink href="/products/adobe-xd" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
+                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-500/10 border border-pink-500/20 group-hover/item:bg-pink-500/20 transition-all duration-300">
+                          <AdobeXDIcon />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-semibold text-foreground group-hover/item:text-[#FF26BE] transition-colors">Adobe XD</h4>
+                          <p className="mt-0.5 text-[10px] text-muted-foreground leading-relaxed">
+                            Professional UX/UI mockup design, interactive digital prototyping, and high-fidelity wireframing.
+                          </p>
+                        </div>
+                      </NavigationMenuLink>
+
+                      <NavigationMenuLink href="/products/figma" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
+                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 group-hover/item:bg-orange-500/20 transition-all duration-300">
+                          <FigmaIcon />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-semibold text-foreground group-hover/item:text-[#F24E1E] transition-colors">Figma</h4>
+                          <p className="mt-0.5 text-[10px] text-muted-foreground leading-relaxed">
+                            Collaborative interface design, interactive prototypes, design systems, and component libraries.
+                          </p>
+                        </div>
+                      </NavigationMenuLink>
+
+                      <NavigationMenuLink href="/products/power-bi" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
+                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-yellow-500/10 border border-yellow-500/20 group-hover/item:bg-yellow-500/20 transition-all duration-300">
+                          <PowerBIIcon />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-semibold text-foreground group-hover/item:text-[#F2C811] transition-colors">Power BI</h4>
+                          <p className="mt-0.5 text-[10px] text-muted-foreground leading-relaxed">
+                            Interactive corporate dashboards, advanced DAX modeling, custom visuals, and actionable intelligence.
+                          </p>
+                        </div>
+                      </NavigationMenuLink>
+                    </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
 
           {/* Right: Actions & Auth */}
           <div className="flex items-center gap-4">
             {/* Search/Command */}
-            <button type="button" className="text-white/50 hover:text-white transition-colors p-2 flex items-center gap-2 rounded-md hover:bg-white/5">
+            <button type="button" className="text-muted-foreground hover:text-foreground transition-colors p-2 flex items-center gap-2 rounded-md hover:bg-accent">
               <Search className="w-4 h-4" />
-              <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-white/10 bg-white/5 px-1.5 font-mono text-[10px] font-medium text-white/50 opacity-100">
+              <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                 <span className="text-xs">⌘</span>K
               </kbd>
             </button>
             <ModeToggle />
 
-            <div className="w-px h-6 bg-white/10" />
+            <div className="w-px h-6 bg-border" />
 
             {/* Auth State */}
             {!isPending && !sessionData?.user && <RegisterDialog />}
@@ -122,7 +253,7 @@ export function Navbar() {
                 {/* Avatar Button */}
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className={`relative h-7 w-7 rounded-full border border-white/[0.08] bg-gradient-to-br ${currentGradient} flex items-center justify-center text-[10px] font-medium text-white/90 hover:border-white/[0.15] transition-colors cursor-pointer overflow-hidden`}
+                  className={`relative h-7 w-7 rounded-full border border-border bg-gradient-to-br ${currentGradient} flex items-center justify-center text-[10px] font-medium text-foreground/90 hover:border-border/80 transition-colors cursor-pointer overflow-hidden`}
                 >
                   <img
                     src={`/avatars/${String((avatarIndex % 5) + 1).padStart(2, '0')}.webp`}
@@ -137,31 +268,31 @@ export function Navbar() {
 
                 {/* Dropdown Menu */}
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[#0A0A0A]/95 border border-white/[0.06] backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] p-1 z-50">
+                  <div className="absolute right-0 mt-2 w-44 rounded-xl bg-popover/95 border border-border backdrop-blur-2xl shadow-xl p-1 z-50 text-popover-foreground">
                     {/* Header */}
-                    <div className="px-3 py-1.5 border-b border-white/[0.04] mb-1">
-                      <div className="text-xs font-medium text-white">{sessionData.user.name}</div>
-                      <div className="text-[10px] text-white/50 truncate">{sessionData.user.email}</div>
+                    <div className="px-3 py-1.5 border-b border-border/40 mb-1">
+                      <div className="text-xs font-medium text-foreground">{sessionData.user.name}</div>
+                      <div className="text-[10px] text-muted-foreground truncate">{sessionData.user.email}</div>
                     </div>
 
                     {/* Navigation */}
                     <div className="space-y-0.5">
-                      <Link href="/dashboard" className="flex items-center px-3 py-1.5 text-xs text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg transition-colors cursor-pointer">
+                      <Link href="/dashboard" className="flex items-center px-3 py-1.5 text-xs text-foreground/70 hover:text-foreground hover:bg-accent rounded-lg transition-colors cursor-pointer">
                         Dashboard
                       </Link>
                       {sessionData.user.isAdmin && (
-                        <Link href="/admin" className="flex items-center px-3 py-1.5 text-xs text-indigo-400 hover:text-indigo-300 hover:bg-white/[0.04] rounded-lg transition-colors cursor-pointer">
+                        <Link href="/admin" className="flex items-center px-3 py-1.5 text-xs text-indigo-500 hover:text-indigo-600 hover:bg-accent rounded-lg transition-colors cursor-pointer">
                           Admin
                         </Link>
                       )}
                     </div>
 
-                    <div className="h-px bg-white/[0.04] my-1" />
+                    <div className="h-px bg-border/40 my-1" />
 
                     {/* Footer */}
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center px-3 py-1.5 text-xs text-white/60 hover:text-red-400 hover:bg-white/[0.04] rounded-lg transition-colors cursor-pointer"
+                      className="w-full flex items-center px-3 py-1.5 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5 mr-2" />
                       Sign Out

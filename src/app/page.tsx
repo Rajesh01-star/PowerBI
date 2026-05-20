@@ -6,7 +6,7 @@ import { Footer } from '@/components/Footer';
 
 export default function Home() {
   return (
-    <div className="relative w-full min-h-screen bg-[#050505] text-white overflow-x-hidden selection:bg-indigo-500/30">
+    <div className="relative w-full min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-indigo-500/30">
       {/* Background glow effects */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute top-[40%] right-[-10%] w-[40%] h-[40%] bg-blue-600/5 blur-[100px] rounded-full pointer-events-none" />
@@ -18,7 +18,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="space-y-1 mb-8">
             <h2 className="text-xs font-bold uppercase tracking-wider text-indigo-400">Sandbox Showroom</h2>
-            <p className="text-sm text-white/50">Hover over active configurations to boot live workspace previews.</p>
+            <p className="text-sm text-muted-foreground">Hover over active configurations to boot live workspace previews.</p>
           </div>
           <LiveDemo />
         </div>
