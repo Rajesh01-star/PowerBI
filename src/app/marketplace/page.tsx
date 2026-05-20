@@ -16,7 +16,7 @@ const categories = ["All", "Finance", "Sales", "HR", "Marketing", "Operations", 
 
 export default function Marketplace() {
   return (
-    <div className="min-h-screen bg-background text-foreground pt-12 pb-20">
+    <div className="min-h-screen bg-transparent text-foreground pt-12 pb-20">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         
         {/* Header */}

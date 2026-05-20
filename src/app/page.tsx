@@ -1,15 +1,16 @@
 import { Hero } from '@/components/Hero';
 import { LiveDemo } from '@/components/LiveDemo';
+import { TransitionSection } from '@/components/TransitionSection';
 import { Benefits } from '@/components/Benefits';
 import { FeaturedTemplates } from '@/components/FeaturedTemplates';
 import { Footer } from '@/components/Footer';
 
 export default function Home() {
   return (
-    <div className="relative w-full min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-indigo-500/30">
+    <div className="relative w-full min-h-screen bg-transparent text-foreground overflow-x-hidden selection:bg-indigo-500/30">
       {/* Background glow effects */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute top-[40%] right-[-10%] w-[40%] h-[40%] bg-blue-600/5 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-amber-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-[40%] right-[-10%] w-[40%] h-[40%] bg-amber-500/5 blur-[100px] rounded-full pointer-events-none" />
       
       <main className="relative z-10">
         <Hero />
@@ -23,6 +24,8 @@ export default function Home() {
           <LiveDemo />
         </div>
       </main>
+
+      <TransitionSection />
 
       <Benefits />
       <FeaturedTemplates />

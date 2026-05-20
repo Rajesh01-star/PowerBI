@@ -66,7 +66,7 @@ export default function UserDashboard() {
   // Redirect if not logged in
   if (!sessionLoading && !sessionData?.user) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-foreground flex items-center justify-center">
         <div className="text-center p-6 border border-border bg-card rounded-2xl max-w-sm space-y-4 shadow-md">
           <ShieldCheck className="w-8 h-8 text-indigo-500 mx-auto" />
           <p className="text-xs text-muted-foreground">Authentication required to access your workspace.</p>
@@ -79,7 +79,7 @@ export default function UserDashboard() {
   const user = sessionData?.user;
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-28 pb-20 selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-transparent text-foreground pt-28 pb-20 selection:bg-indigo-500/30">
       <div className="max-w-7xl mx-auto px-6">
 
         <div className="flex flex-col md:flex-row gap-8">

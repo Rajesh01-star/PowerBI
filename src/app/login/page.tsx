@@ -57,11 +57,11 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
             {/* Background elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
-                <div className="absolute top-[60%] -right-[10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[120px]" />
+                <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-amber-600/10 blur-[120px]" />
+                <div className="absolute top-[60%] -right-[10%] w-[50%] h-[50%] rounded-full bg-amber-500/10 blur-[120px]" />
             </div>
 
             <motion.div

@@ -55,7 +55,7 @@ export default function TemplateDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-foreground flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
           <p className="text-xs text-muted-foreground font-mono">RETRIEVING BLUEPRINT ARCHITECTURE...</p>
@@ -66,7 +66,7 @@ export default function TemplateDetail() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div className="min-h-screen bg-transparent text-foreground flex items-center justify-center">
         <div className="text-center p-4 border border-border bg-card/50 rounded-xl max-w-xs">
           <p className="text-xs text-muted-foreground">Specified blueprint framework could not be located.</p>
           <Link href="/" className="mt-3 inline-flex text-xs text-indigo-600 dark:text-indigo-400 hover:underline">Return Home</Link>
@@ -148,7 +148,7 @@ export default function TemplateDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-16 selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-transparent text-foreground pb-16 selection:bg-indigo-500/30">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <div className="max-w-7xl mx-auto px-6 pt-28 pb-6 space-y-6">
         

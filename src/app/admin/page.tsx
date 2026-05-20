@@ -61,7 +61,7 @@ export default function AdminPage() {
 
     if (isPending) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
+            <div className="min-h-screen bg-transparent flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2">
                     <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />
                     <p className="text-xs text-muted-foreground">Loading admin panel...</p>
@@ -72,7 +72,7 @@ export default function AdminPage() {
 
     if (!sessionData?.user?.isAdmin) {
         return (
-            <div className="min-h-screen bg-background flex flex-col items-center justify-center text-foreground p-4">
+            <div className="min-h-screen bg-transparent flex flex-col items-center justify-center text-foreground p-4">
                 <div className="text-center max-w-sm w-full glass-card p-6 rounded-2xl border border-red-500/15 bg-red-500/5">
                     <Shield className="w-10 h-10 text-red-500 mx-auto mb-4" />
                     <h1 className="text-sm font-bold mb-1">Access Denied</h1>
@@ -149,7 +149,7 @@ export default function AdminPage() {
     const totalRevenue = posts.reduce((sum, post) => sum + (parseFloat(post.price) || 0), 0);
 
     return (
-        <div className="min-h-screen bg-background text-foreground overflow-x-hidden relative select-none">
+        <div className="min-h-screen bg-transparent text-foreground overflow-x-hidden relative select-none">
             <div className="max-w-7xl mx-auto px-6 pt-28 pb-8 space-y-8 relative z-10">
                 
                 {/* Metrics */}
