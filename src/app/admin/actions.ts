@@ -178,7 +178,57 @@ export async function getPublicPostsAction(sort: string = 'views') {
 }
 
 export async function getPublicPostByIdAction(id: string) {
-    const posts = await db.select().from(postsTable).where(eq(postsTable.id, id));
+    const posts = await db.select({
+        id: postsTable.id,
+        title: postsTable.title,
+        description: postsTable.description,
+        price: postsTable.price,
+        url: postsTable.url,
+        aspect: postsTable.aspect,
+        imageUrl: postsTable.imageUrl,
+        thumbnails: postsTable.thumbnails,
+        activeThumbnailIndex: postsTable.activeThumbnailIndex,
+        tags: postsTable.tags,
+        userId: postsTable.userId,
+        views: postsTable.views,
+        createdAt: postsTable.createdAt,
+        updatedAt: postsTable.updatedAt
+    }).from(postsTable).where(eq(postsTable.id, id));
     return posts[0] || null;
+}
+
+import { ordersTable } from "@/db/schema";
+import { and } from "drizzle-orm";
+
+export async function getPostFileUrlAction(id: string) {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
+    }
+
+    if (!session.user.isAdmin) {
+        const purchases = await db.select().from(ordersTable).where(
+            and(
+                eq(ordersTable.userId, session.user.id),
+                eq(ordersTable.postId, id),
+                eq(ordersTable.status, "paid")
+            )
+        );
+
+        if (purchases.length === 0) {
+            // Also check if the post is free?
+            const post = await db.select({ price: postsTable.price }).from(postsTable).where(eq(postsTable.id, id));
+            const isFree = !post[0]?.price || parseFloat(post[0].price) <= 0;
+            if (!isFree) {
+                throw new Error("You have not purchased this template");
+            }
+        }
+    }
+
+    const posts = await db.select({ fileUrl: postsTable.fileUrl }).from(postsTable).where(eq(postsTable.id, id));
+    return posts[0]?.fileUrl || null;
 }
 

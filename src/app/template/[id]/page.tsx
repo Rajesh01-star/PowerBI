@@ -6,14 +6,18 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import InteractivePBI from '@/components/InteractivePBI';
 import Script from 'next/script';
-import { getPublicPostByIdAction } from '@/app/admin/actions';
+import { getPublicPostByIdAction, getPostFileUrlAction } from '@/app/admin/actions';
+import { authClient } from '@/lib/auth-client';
 
 export default function TemplateDetail() {
+  const { data: sessionData } = authClient.useSession();
   const params = useParams();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [viewCount, setViewCount] = useState<number | null>(null);
+  const [hasPurchased, setHasPurchased] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -30,6 +34,25 @@ export default function TemplateDetail() {
     };
     fetchPost();
   }, [params.id]);
+
+  // Check if user has purchased this template
+  useEffect(() => {
+    const checkPurchase = async () => {
+      if (sessionData?.user && params.id && typeof params.id === 'string') {
+        try {
+          const res = await fetch('/api/user/purchases');
+          const data = await res.json();
+          if (res.ok && data.purchases) {
+            const purchased = data.purchases.some((p: any) => p.postId === params.id);
+            setHasPurchased(purchased || sessionData.user.isAdmin);
+          }
+        } catch (error) {
+          console.error("Failed to check purchases:", error);
+        }
+      }
+    };
+    checkPurchase();
+  }, [sessionData, params.id]);
 
   // Increment view count on page visit
   useEffect(() => {
@@ -147,6 +170,27 @@ export default function TemplateDetail() {
     }
   };
 
+  const handleDownload = async () => {
+    try {
+      setIsDownloading(true);
+      const fileUrl = await getPostFileUrlAction(params.id as string);
+      if (fileUrl) {
+        const a = document.createElement('a');
+        a.href = fileUrl;
+        a.download = `${post.title || 'template'}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        alert("File not found for this template.");
+      }
+    } catch (err: any) {
+      alert(err.message || "Failed to download template");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-transparent text-foreground pb-16 selection:bg-indigo-500/30">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
@@ -254,22 +298,37 @@ export default function TemplateDetail() {
           <div className="lg:col-span-4 lg:sticky lg:top-8">
             <div className="bg-card border border-border p-5 rounded-2xl space-y-5 backdrop-blur-md shadow-lg">
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Commercial Transfer License</p>
-                <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="text-2xl font-mono font-bold text-indigo-500 dark:text-indigo-400">{displayPrice}</span>
-                  <span className="text-[10px] text-muted-foreground/60 font-medium">/ persistent download link</span>
-                </div>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                  {hasPurchased ? "Asset Acquired" : "Commercial Transfer License"}
+                </p>
+                {!hasPurchased && (
+                  <div className="flex items-baseline gap-1 mt-0.5">
+                    <span className="text-2xl font-mono font-bold text-indigo-500 dark:text-indigo-400">{displayPrice}</span>
+                    <span className="text-[10px] text-muted-foreground/60 font-medium">/ persistent download link</span>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
-                <button 
-                  onClick={handlePurchase}
-                  disabled={isProcessing}
-                  className="w-full h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 disabled:opacity-50 text-xs text-white font-medium flex items-center justify-center gap-1.5 transition-all shadow-md shadow-indigo-500/10 dark:shadow-indigo-500/20"
-                >
-                  {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <DownloadCloud className="w-4 h-4" />}
-                  {isProcessing ? "Processing..." : "Initialize Asset Acquisition"}
-                </button>
+                {hasPurchased ? (
+                  <button 
+                    onClick={handleDownload}
+                    disabled={isDownloading}
+                    className="w-full h-10 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-xs text-white font-medium flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-500/10 dark:shadow-emerald-500/20"
+                  >
+                    {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <DownloadCloud className="w-4 h-4" />}
+                    {isDownloading ? "Preparing File..." : "Download ZIP Asset"}
+                  </button>
+                ) : (
+                  <button 
+                    onClick={handlePurchase}
+                    disabled={isProcessing}
+                    className="w-full h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 disabled:opacity-50 text-xs text-white font-medium flex items-center justify-center gap-1.5 transition-all shadow-md shadow-indigo-500/10 dark:shadow-indigo-500/20"
+                  >
+                    {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <DownloadCloud className="w-4 h-4" />}
+                    {isProcessing ? "Processing..." : "Initialize Asset Acquisition"}
+                  </button>
+                )}
                 <button className="w-full h-10 rounded-xl bg-muted hover:bg-accent hover:text-accent-foreground text-xs text-foreground border border-border transition-all">
                   Inquire Custom Integration Support
                 </button>
