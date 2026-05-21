@@ -6,9 +6,6 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { eq, desc, asc } from "drizzle-orm";
-import { v4 as uuidv4 } from 'uuid';
-import * as fs from 'fs';
-import * as path from 'path';
 
 export async function createPostAction(formData: FormData) {
     const session = await auth.api.getSession({
@@ -24,30 +21,23 @@ export async function createPostAction(formData: FormData) {
     const price = formData.get("price") as string;
     const url = formData.get("url") as string;
     const aspect = formData.get("aspect") as 'horizontal' | 'vertical';
-    const imageFile = formData.get("image") as File | null;
+    const activeThumbnailIndex = parseInt(formData.get("activeThumbnailIndex") as string || "0");
+    
+    const tagsData = formData.get("tags") as string;
+    const tags = tagsData ? JSON.parse(tagsData) : [];
+
+    const thumbnailsData = formData.get("thumbnails") as string;
+    const thumbnails = thumbnailsData ? JSON.parse(thumbnailsData) : [];
 
     if (!title) {
          throw new Error("Title is required");
     }
 
-    let imageUrl: string | null = null;
-
-    if (imageFile && imageFile.size > 0) {
-        try {
-            const buffer = Buffer.from(await imageFile.arrayBuffer());
-            const filename = `${uuidv4()}-${imageFile.name}`;
-            const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-            
-            if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir, { recursive: true });
-            }
-            
-            fs.writeFileSync(path.join(uploadDir, filename), buffer);
-            imageUrl = `/uploads/${filename}`;
-        } catch (error) {
-            console.error("Failed to upload image:", error);
-            throw new Error("Failed to upload image");
-        }
+    let fileUrl: string | null = null;
+    const zipFile = formData.get("file") as File | null;
+    if (zipFile && zipFile.size > 0) {
+        const buffer = Buffer.from(await zipFile.arrayBuffer());
+        fileUrl = `data:${zipFile.type || 'application/zip'};base64,${buffer.toString('base64')}`;
     }
 
     await db.insert(postsTable).values({
@@ -56,7 +46,10 @@ export async function createPostAction(formData: FormData) {
         price: price ? price : null,
         url: url || null,
         aspect: aspect || 'horizontal',
-        imageUrl: imageUrl,
+        thumbnails,
+        activeThumbnailIndex,
+        tags,
+        fileUrl,
         userId: session.user.id
     });
 
@@ -82,7 +75,13 @@ export async function updatePostAction(formData: FormData) {
     const price = formData.get("price") as string;
     const url = formData.get("url") as string;
     const aspect = formData.get("aspect") as 'horizontal' | 'vertical';
-    const imageFile = formData.get("image") as File | null;
+    const activeThumbnailIndex = parseInt(formData.get("activeThumbnailIndex") as string || "0");
+    
+    const tagsData = formData.get("tags") as string;
+    const tags = tagsData ? JSON.parse(tagsData) : [];
+
+    const thumbnailsData = formData.get("thumbnails") as string;
+    const thumbnails = thumbnailsData ? JSON.parse(thumbnailsData) : [];
 
     if (!id || !title) {
          throw new Error("ID and Title are required");
@@ -94,24 +93,15 @@ export async function updatePostAction(formData: FormData) {
         price: price ? price : null,
         url: url || null,
         aspect: aspect || 'horizontal',
+        thumbnails,
+        activeThumbnailIndex,
+        tags,
     };
 
-    if (imageFile && imageFile.size > 0) {
-        try {
-            const buffer = Buffer.from(await imageFile.arrayBuffer());
-            const filename = `${uuidv4()}-${imageFile.name}`;
-            const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-            
-            if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir, { recursive: true });
-            }
-            
-            fs.writeFileSync(path.join(uploadDir, filename), buffer);
-            updateData.imageUrl = `/uploads/${filename}`;
-        } catch (error) {
-            console.error("Failed to upload image:", error);
-            throw new Error("Failed to upload image");
-        }
+    const zipFile = formData.get("file") as File | null;
+    if (zipFile && zipFile.size > 0) {
+        const buffer = Buffer.from(await zipFile.arrayBuffer());
+        updateData.fileUrl = `data:${zipFile.type || 'application/zip'};base64,${buffer.toString('base64')}`;
     }
 
     await db.update(postsTable).set(updateData).where(eq(postsTable.id, id));
@@ -132,7 +122,22 @@ export async function getPostsAction() {
         throw new Error("Unauthorized: Only admins can perform this action");
     }
 
-    const posts = await db.select().from(postsTable).orderBy(desc(postsTable.createdAt));
+    const posts = await db.select({
+        id: postsTable.id,
+        title: postsTable.title,
+        description: postsTable.description,
+        price: postsTable.price,
+        url: postsTable.url,
+        aspect: postsTable.aspect,
+        imageUrl: postsTable.imageUrl,
+        thumbnails: postsTable.thumbnails,
+        activeThumbnailIndex: postsTable.activeThumbnailIndex,
+        tags: postsTable.tags,
+        userId: postsTable.userId,
+        views: postsTable.views,
+        createdAt: postsTable.createdAt,
+        updatedAt: postsTable.updatedAt
+    }).from(postsTable).orderBy(desc(postsTable.createdAt));
     return posts;
 }
 
@@ -153,7 +158,22 @@ export async function getPublicPostsAction(sort: string = 'views') {
             orderByClause = desc(postsTable.views);
             break;
     }
-    const posts = await db.select().from(postsTable).orderBy(orderByClause);
+    const posts = await db.select({
+        id: postsTable.id,
+        title: postsTable.title,
+        description: postsTable.description,
+        price: postsTable.price,
+        url: postsTable.url,
+        aspect: postsTable.aspect,
+        imageUrl: postsTable.imageUrl,
+        thumbnails: postsTable.thumbnails,
+        activeThumbnailIndex: postsTable.activeThumbnailIndex,
+        tags: postsTable.tags,
+        userId: postsTable.userId,
+        views: postsTable.views,
+        createdAt: postsTable.createdAt,
+        updatedAt: postsTable.updatedAt
+    }).from(postsTable).orderBy(orderByClause);
     return posts;
 }
 
@@ -161,3 +181,4 @@ export async function getPublicPostByIdAction(id: string) {
     const posts = await db.select().from(postsTable).where(eq(postsTable.id, id));
     return posts[0] || null;
 }
+

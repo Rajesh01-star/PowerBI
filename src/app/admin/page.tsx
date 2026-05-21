@@ -28,8 +28,14 @@ export default function AdminPage() {
     const [price, setPrice] = useState("");
     const [aspect, setAspect] = useState<"horizontal" | "vertical">("horizontal");
     const [url, setUrl] = useState("");
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string>("");
+    
+    // New states
+    const [thumbnails, setThumbnails] = useState<string[]>([]);
+    const [activeThumbnailIndex, setActiveThumbnailIndex] = useState<number>(0);
+    const [zipFile, setZipFile] = useState<File | null>(null);
+    
+    const [tags, setTags] = useState<string[]>([]);
+    const [tagInput, setTagInput] = useState("");
 
     useEffect(() => {
         if (sessionData?.user?.isAdmin) {
@@ -49,13 +55,21 @@ export default function AdminPage() {
     // Handles the client-side visual image preview switch
     function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
-        if (file) {
-            setImageFile(file);
+        if (file && thumbnails.length < 4) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImagePreview(reader.result as string);
+                setThumbnails(prev => [...prev, reader.result as string]);
             };
             reader.readAsDataURL(file);
+        }
+    }
+
+    function removeThumbnail(index: number) {
+        setThumbnails(prev => prev.filter((_, i) => i !== index));
+        if (activeThumbnailIndex === index) {
+            setActiveThumbnailIndex(0);
+        } else if (activeThumbnailIndex > index) {
+            setActiveThumbnailIndex(activeThumbnailIndex - 1);
         }
     }
 
@@ -89,8 +103,11 @@ export default function AdminPage() {
         setPrice("");
         setAspect("horizontal");
         setUrl("");
-        setImageFile(null);
-        setImagePreview("");
+        setThumbnails([]);
+        setActiveThumbnailIndex(0);
+        setTags([]);
+        setTagInput("");
+        setZipFile(null);
         setStatus(null);
         setShowForm(false);
     }
@@ -112,9 +129,14 @@ export default function AdminPage() {
         formData.append("price", price);
         formData.append("aspect", aspect);
         formData.append("url", url);
-        if (imageFile) {
-            formData.append("image", imageFile); // Sent directly to Server Action binary router
+        formData.append("activeThumbnailIndex", activeThumbnailIndex.toString());
+        formData.append("thumbnails", JSON.stringify(thumbnails));
+        formData.append("tags", JSON.stringify(tags));
+        
+        if (zipFile) {
+            formData.append("file", zipFile);
         }
+        
         if (editingPostId) formData.append("id", editingPostId);
 
         try {
@@ -141,7 +163,11 @@ export default function AdminPage() {
         setPrice(post.price ? post.price.toString() : "");
         setAspect(post.aspect || "horizontal");
         setUrl(post.url || "");
-        setImagePreview(post.imageUrl || ""); // Read string reference from database schema
+        
+        setThumbnails(post.thumbnails?.length ? post.thumbnails : (post.imageUrl ? [post.imageUrl] : []));
+        setActiveThumbnailIndex(post.activeThumbnailIndex || 0);
+        setTags(post.tags || []);
+        
         setShowForm(true);
     }
 
@@ -209,20 +235,73 @@ export default function AdminPage() {
                                             <Textarea rows={2} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Summary framework specifications..." className="bg-muted/20 border-border text-xs rounded-lg resize-none" />
                                         </div>
  
-                                        {/* IMAGE UPLOAD SLOT */}
-                                        <div className="space-y-1">
+                                        {/* THUMBNAILS UPLOAD */}
+                                        <div className="space-y-2">
                                             <div className="flex items-center justify-between">
-                                                <Label className="text-[11px] text-muted-foreground">Static Preview Snapshot Image</Label>
-                                                {imagePreview && (
-                                                    <button type="button" onClick={() => { setImageFile(null); setImagePreview(""); }} className="text-[10px] text-red-400 hover:text-red-300 cursor-pointer">Remove</button>
+                                                <Label className="text-[11px] text-muted-foreground">Thumbnails (Max 4)</Label>
+                                            </div>
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                                {thumbnails.map((thumb, idx) => (
+                                                    <div key={idx} className={`relative rounded-md overflow-hidden aspect-video border ${activeThumbnailIndex === idx ? 'border-indigo-500 ring-2 ring-indigo-500' : 'border-border'}`}>
+                                                        <img src={thumb} alt="thumb" className="w-full h-full object-cover" />
+                                                        <div className="absolute top-1 right-1 flex gap-1 z-20">
+                                                            <button type="button" onClick={() => removeThumbnail(idx)} className="bg-black/60 p-1 rounded hover:bg-red-500/80 text-white"><X className="w-3 h-3" /></button>
+                                                        </div>
+                                                        <button type="button" onClick={() => setActiveThumbnailIndex(idx)} className="absolute inset-0 z-10 flex items-end p-1 cursor-pointer">
+                                                            {activeThumbnailIndex === idx && <span className="bg-indigo-500 text-white text-[8px] px-1 rounded">Primary</span>}
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                                {thumbnails.length < 4 && (
+                                                    <div className="relative rounded-md border border-dashed border-border bg-muted/20 flex flex-col items-center justify-center aspect-video cursor-pointer hover:border-indigo-400">
+                                                        <input type="file" accept="image/*" onChange={handleImageChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                                        <Plus className="w-4 h-4 text-muted-foreground" />
+                                                        <span className="text-[8px] text-muted-foreground mt-1">Add Image</span>
+                                                    </div>
                                                 )}
                                             </div>
-                                            <div className="relative border border-dashed border-border hover:border-accent-foreground/30 rounded-lg p-4 bg-muted/20 text-center transition-colors cursor-pointer group">
-                                                <input type="file" accept="image/*" onChange={handleImageChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                        </div>
+
+                                        {/* ZIP UPLOAD */}
+                                        <div className="space-y-1">
+                                            <Label className="text-[11px] text-muted-foreground">Downloadable ZIP File</Label>
+                                            <div className="relative border border-dashed border-border hover:border-accent-foreground/30 rounded-lg p-3 bg-muted/20 text-center transition-colors cursor-pointer group">
+                                                <input type="file" accept=".zip,application/zip" onChange={(e) => setZipFile(e.target.files?.[0] || null)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
                                                 <div className="flex flex-col items-center gap-1 text-muted-foreground group-hover:text-foreground">
-                                                    <Upload className="w-4 h-4 text-indigo-400" />
-                                                    <p className="text-[10px] font-medium">{imageFile ? imageFile.name : "Click to select dashboard screenshot asset"}</p>
-                                                    <p className="text-[9px] text-muted-foreground/40">Supports PNG, JPG, WebP formats</p>
+                                                    <Upload className="w-3 h-3 text-emerald-400" />
+                                                    <p className="text-[10px] font-medium">{zipFile ? zipFile.name : editingPostId ? "Upload new ZIP (replaces existing)" : "Click to select .zip asset"}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* TAGS */}
+                                        <div className="space-y-1">
+                                            <Label className="text-[11px] text-muted-foreground">Tags (Press Enter to add)</Label>
+                                            <div className="flex flex-col gap-2">
+                                                <Input 
+                                                    type="text" 
+                                                    value={tagInput}
+                                                    onChange={(e) => setTagInput(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            const val = tagInput.trim();
+                                                            if (val && !tags.includes(val)) {
+                                                                setTags([...tags, val]);
+                                                                setTagInput("");
+                                                            }
+                                                        }
+                                                    }}
+                                                    placeholder="e.g. Sales, Dark Mode" 
+                                                    className="bg-muted/20 border-border text-xs h-9" 
+                                                />
+                                                <div className="flex flex-wrap gap-1">
+                                                    {tags.map((tag, idx) => (
+                                                        <span key={idx} className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded text-[10px] flex items-center gap-1">
+                                                            {tag}
+                                                            <button type="button" onClick={() => setTags(tags.filter((_, i) => i !== idx))} className="hover:text-indigo-300"><X className="w-2.5 h-2.5" /></button>
+                                                        </span>
+                                                    ))}
                                                 </div>
                                             </div>
                                         </div>
@@ -269,9 +348,9 @@ export default function AdminPage() {
                                     <div className="flex-1 flex items-center justify-center p-3">
                                         <div className="w-full max-w-[240px] rounded-xl border border-border bg-card overflow-hidden shadow-xl">
                                             <div className={`w-full ${aspect === 'vertical' ? 'aspect-[3/4]' : 'aspect-video'} bg-muted/40 relative flex items-center justify-center border-b border-border overflow-hidden`}>
-                                                {imagePreview ? (
+                                                {thumbnails.length > 0 ? (
                                                     /* Dynamic live uploaded thumbnail placeholder graphic */
-                                                    <img src={imagePreview} alt="Snapshot Preview" className="w-full h-full object-cover" />
+                                                    <img src={thumbnails[activeThumbnailIndex] || thumbnails[0]} alt="Snapshot Preview" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="flex flex-col items-center gap-1 text-muted-foreground/30 font-mono text-[9px]">
                                                         <ImageIcon className="w-5 h-5" />
@@ -309,8 +388,11 @@ export default function AdminPage() {
                             <div key={post.id} className={`group bg-card rounded-xl border border-border hover:border-border/80 transition-all overflow-hidden flex flex-col relative shadow-sm hover:shadow-md ${post.aspect === 'vertical' ? 'row-span-2' : 'row-span-1'}`}>
                                 <div className={`w-full ${post.aspect === 'vertical' ? 'flex-1' : 'aspect-video'} bg-muted/40 relative flex items-center justify-center border-b border-border overflow-hidden`}>
                                     
-                                    {post.imageUrl ? (
-                                        /* Displays the uploaded image directly in the cards portfolio grid */
+                                    {post.thumbnails?.length > 0 ? (
+                                        /* Displays the active thumbnail image directly in the cards portfolio grid */
+                                        <img src={post.thumbnails[post.activeThumbnailIndex] || post.thumbnails[0]} alt={post.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                                    ) : post.imageUrl ? (
+                                        /* Fallback for legacy single image */
                                         <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
                                     ) : (
                                         <FileText className="w-5 h-5 text-muted-foreground/20" />

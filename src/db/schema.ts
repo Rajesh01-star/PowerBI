@@ -54,7 +54,16 @@ export const postsTable = pgTable('posts', {
     price: numeric('price', { precision: 10, scale: 2 }),
     url: text('url'),
     aspect: text('aspect').$type<'horizontal' | 'vertical'>().default('horizontal').notNull(),
+    // Legacy single image (kept for backward compat, prefer thumbnails array)
     imageUrl: text('image_url'),
+    // New: downloadable zip file URL
+    fileUrl: text('file_url'),
+    // New: array of up to 4 thumbnail image URLs
+    thumbnails: text('thumbnails').array().default([]).notNull(),
+    // New: index of the active/primary thumbnail (0-based)
+    activeThumbnailIndex: integer('active_thumbnail_index').default(0).notNull(),
+    // New: tags for categorization and filtering
+    tags: text('tags').array().default([]).notNull(),
     userId: text('user_id')
         .notNull()
         .references(() => user.id, { onDelete: 'cascade' }),
