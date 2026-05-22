@@ -129,10 +129,12 @@ export function Navbar() {
           )}
         >
           {/* Left: Logo & Brand */}
-          <Link href="/" className="flex items-center gap-2 py-1 text-sm font-semibold cursor-pointer">
-            <img src="https://cdn.skiper-ui.com/logos/logo.svg" alt="Logo" className="w-6 h-6 animate-pulse" />
-            <span className="text-foreground tracking-wide hidden xs:block">GENGRAPHS & GRAPHICS</span>
-          </Link>
+          <div className="flex-1 flex justify-start">
+            <Link href="/" className="flex items-center gap-2 py-1 text-sm font-semibold cursor-pointer">
+              <img src="https://cdn.skiper-ui.com/logos/logo.svg" alt="Logo" className="w-6 h-6 animate-pulse" />
+              <span className="text-xs text-foreground tracking-wide whitespace-nowrap">GENGRAPHS & GRAPHICS</span>
+            </Link>
+          </div>
 
           {/* Center: Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
@@ -228,22 +230,31 @@ export function Navbar() {
                     </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
+
+                {/* Contact Nav Item */}
+                <NavigationMenuItem>
+                  <Link href="/contact" passHref legacyBehavior>
+                    <NavigationMenuLink className="text-foreground/70 hover:text-foreground bg-transparent hover:bg-accent focus:bg-accent transition-all cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1">
+                      Contact
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
           </div>
 
           {/* Right: Actions & Auth */}
-          <div className="flex items-center gap-4">
+          <div className="flex-1 flex justify-end items-center gap-4">
             {/* Search/Command */}
-            <button type="button" className="text-muted-foreground hover:text-foreground transition-colors p-2 flex items-center gap-2 rounded-md hover:bg-accent">
+            {/* <button type="button" className="text-muted-foreground hover:text-foreground transition-colors p-2 flex items-center gap-2 rounded-md hover:bg-accent">
               <Search className="w-4 h-4" />
               <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                 <span className="text-xs">⌘</span>K
               </kbd>
-            </button>
-            <ModeToggle />
+            </button> */}
+            {/* <ModeToggle /> */}
 
-            <div className="w-px h-6 bg-border" />
+            <div className="w-px h-6" />
 
             {/* Auth State */}
             {!isPending && !sessionData?.user && <RegisterDialog />}

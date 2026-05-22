@@ -15,9 +15,9 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#25D366]/30 bg-transparent mb-6 self-start">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#25D366]" />
-              <span className="text-sm font-medium text-foreground/90">Available for Projects</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-500/20 bg-amber-500/5 mb-6 self-start backdrop-blur-md">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+              <span className="text-xs font-medium text-amber-500 dark:text-amber-400">Available for Projects</span>
             </div>
           </motion.div>
 
@@ -25,7 +25,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl lg:text-5xl font-sans font-medium tracking-tight mb-6 leading-[1.1] text-foreground"
+            className="text-3xl lg:text-4xl font-sans font-medium tracking-tight mb-6 leading-[1.1] text-foreground"
           >
             Meet the Expert <br />
             Power BI Creator
@@ -150,9 +150,9 @@ export function Hero() {
           {/* Person Image */}
           <div className="relative z-10 flex items-end justify-center w-full h-full">
             <img
-              src="/images/sample_nobg.png"
+              src="/images/sample_nobg_cropped.png"
               alt="Power BI Creator"
-              className="w-full max-w-[450px] lg:max-w-[580px] object-contain object-bottom relative z-10"
+              className="w-full max-w-[250px] lg:max-w-[250px] object-contain object-bottom relative z-10 translate-x-[20px]"
             />
             {/* Fade overlay specifically for the image cutoff */}
           </div>
@@ -164,10 +164,10 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            transition={{ duration: 1, delay: 1 }}
             className="absolute top-[-80px] lg:top-[-60px] right-0 lg:right-[-20px] flex items-center justify-center"
           >
-            <div className="relative w-[120px] h-[120px] lg:w-[140px] lg:h-[140px] animate-[spin_10s_linear_infinite]">
+            <div className="relative w-[120px] h-[120px] lg:w-[140px] lg:h-[140px] animate-[spin_15s_linear_infinite]">
               <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
                 <path id="circlePath" d="M 50, 50 m -38, 0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" fill="transparent" />
                 <text className="text-[11px] lg:text-[12px] font-bold tracking-widest fill-current text-foreground uppercase">
@@ -196,7 +196,7 @@ export function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              <button className="px-8 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#25D366]/90 text-black font-semibold transition-all shadow-lg shadow-[#25D366]/20">
+              <button className="px-8 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-black text-sm font-bold transition-all duration-300 shadow-[0_10px_20px_rgba(245,158,11,0.25)] hover:shadow-[0_10px_25px_rgba(245,158,11,0.4)] hover:-translate-y-0.5 cursor-pointer">
                 Explore Services
               </button>
             </motion.div>
