@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 import { Navbar } from "@/components/Navbar";
 import { Providers } from "@/components/Providers";
+import { Footer } from "@/components/Footer";
 
 export default function RootLayout({
   children,
@@ -29,7 +30,8 @@ export default function RootLayout({
         <ThemeProvider>
           <Providers>
             <Navbar />
-            {children}
+            <div className="flex-grow flex flex-col">{children}</div>
+            <Footer />
           </Providers>
         </ThemeProvider>
       </body>

@@ -4,7 +4,6 @@ import { Showroom } from '@/components/Showroom';
 import { TransitionSection } from '@/components/TransitionSection';
 import { Benefits } from '@/components/Benefits';
 import { FeaturedTemplates } from '@/components/FeaturedTemplates';
-import { Footer } from '@/components/Footer';
 
 export default function Home() {
   return (
@@ -42,8 +41,6 @@ export default function Home() {
       <TransitionSection />
 
       <Benefits />
-      <FeaturedTemplates />
-      <Footer />
     </div>
   );
 }

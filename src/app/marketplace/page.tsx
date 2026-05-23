@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { getPublicPostsAction, getMarketplaceStatsAction } from '@/app/admin/actions';
 import { ShowroomFilter, SortOption } from '@/components/ShowroomFilter';
 import { ShowroomGrid } from '@/components/ShowroomGrid';
-import { Footer } from '@/components/Footer';
 import { GooeyInput } from '@/components/ui/gooey-input';
 
 export default function Marketplace() {
@@ -239,8 +238,6 @@ export default function Marketplace() {
 
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

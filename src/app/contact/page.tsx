@@ -1,5 +1,4 @@
 import { Mail, Phone, MapPin, Clock, Sparkles, ShieldCheck, FileText, LayoutTemplate, Briefcase } from "lucide-react";
-import { Footer } from "@/components/Footer";
 import { ContactForm } from "./ContactForm";
 
 export const metadata = {
@@ -122,8 +121,6 @@ export default function ContactPage() {
 
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

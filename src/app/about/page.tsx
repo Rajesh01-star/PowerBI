@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { BarChart3, Layers, Paintbrush, ShieldCheck, Trophy, Sparkles, ArrowRight } from 'lucide-react';
-import { Footer } from '@/components/Footer';
 
 export const metadata = {
   title: "About Us - GENGRAPHS & GRAPHICS",
@@ -170,8 +169,6 @@ export default function AboutPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }
