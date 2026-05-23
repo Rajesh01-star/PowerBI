@@ -2,31 +2,18 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Maximize2, Sparkles, Smartphone, Monitor, Loader2, ShoppingCart, CheckCircle2, XCircle, Eye, ArrowDownWideNarrow, Clock, SortAsc, CalendarClock } from 'lucide-react';
+import { Maximize2, Sparkles, Smartphone, Monitor, Loader2, ShoppingCart, CheckCircle2, XCircle, Eye } from 'lucide-react';
 import Link from 'next/link';
 import Script from 'next/script';
-import { getPublicPostsAction } from '@/app/admin/actions';
-import { useQuery } from '@tanstack/react-query';
 
 type PaymentStatus = 'idle' | 'processing' | 'success' | 'failed';
 
-type SortOption = 'views' | 'newest' | 'atoz' | 'oldest';
+interface ShowroomGridProps {
+  posts: any[];
+  limit?: number;
+}
 
-const SORT_OPTIONS: { value: SortOption; label: string; icon: React.ReactNode }[] = [
-  { value: 'views', label: 'Most Viewed', icon: <Eye className="w-3 h-3" /> },
-  { value: 'newest', label: 'Newest First', icon: <Clock className="w-3 h-3" /> },
-  { value: 'atoz', label: 'A → Z', icon: <SortAsc className="w-3 h-3" /> },
-  { value: 'oldest', label: 'Oldest First', icon: <CalendarClock className="w-3 h-3" /> },
-];
-
-export function LiveDemo() {
-  const [activeSort, setActiveSort] = useState<SortOption>('views');
-
-  const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['public-posts', activeSort],
-    queryFn: () => getPublicPostsAction(activeSort),
-  });
-
+export function ShowroomGrid({ posts, limit }: ShowroomGridProps) {
   // Keep track of which card is currently active/hovered
   const [activeIframeId, setActiveIframeId] = useState<string | null>(null);
   // Track payment status per post
@@ -108,51 +95,18 @@ export function LiveDemo() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-48 flex items-center justify-center">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-          <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
-          SYNCING CACHED FRAMEWORKS...
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
 
-      {/* Sorting Controls */}
-      <div className="flex items-center gap-2 mb-5">
-        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider mr-1">
-          <ArrowDownWideNarrow className="w-3.5 h-3.5" /> Sort
-        </div>
-        {SORT_OPTIONS.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => setActiveSort(option.value)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 border ${
-              activeSort === option.value
-                ? 'bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-300 shadow-sm shadow-amber-500/10'
-                : 'bg-muted border-border text-muted-foreground hover:bg-accent hover:border-border hover:text-foreground'
-            }`}
-          >
-            {option.icon}
-            {option.label}
-          </button>
-        ))}
-      </div>
-
       <div id="live-demo" className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[280px] gap-5">
-        {posts.map((post, index) => {
+        {posts.slice(0, limit).map((post, index) => {
           const isVertical = post.aspect === 'vertical';
           const isEven = index % 2 === 0;
           const isLoaded = activeIframeId === post.id;
           const status = paymentStatus[post.id] || 'idle';
           const hasPaidPrice = post.price && parseFloat(post.price) > 0;
 
-          // Fallback placeholder images if no unique asset screenshot is provided
           const screenshotUrl = post.imageUrl || `https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80`;
 
           return (
@@ -165,7 +119,7 @@ export function LiveDemo() {
               onMouseLeave={() => setActiveIframeId(null)}
               className={`relative group ${isVertical ? 'row-span-2 h-full' : 'row-span-1'}`}
             >
-              {/* Ambient Background Blur Glow */}
+              {/* Ambient Background Glow */}
               <div className={`absolute inset-0 bg-gradient-to-tr ${
                 isEven ? 'from-amber-500/10 to-orange-500/10' : 'from-amber-600/10 to-amber-900/10'
               } blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
@@ -176,7 +130,6 @@ export function LiveDemo() {
                 {/* CANVAS GRAPHIC LAYER */}
                 <div className="absolute inset-0 z-0 overflow-hidden bg-muted/10">
                   {isLoaded && post.url ? (
-                    /* The iframe only renders when hovered */
                     <iframe 
                       title={post.title || "Live Preview"} 
                       className="w-full h-full border-0 absolute inset-0 z-0 transition-opacity duration-500"
@@ -184,7 +137,6 @@ export function LiveDemo() {
                       allowFullScreen
                     />
                   ) : (
-                    /* Static snapshot placeholder image when idle */
                     <img 
                       src={screenshotUrl} 
                       alt={post.title}

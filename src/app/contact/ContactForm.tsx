@@ -51,9 +51,9 @@ export function ContactForm() {
 
   if (success) {
     return (
-      <div className="relative overflow-hidden rounded-3xl border border-indigo-500/30 bg-card/60 p-8 sm:p-12 text-center backdrop-blur-xl shadow-xl animate-in fade-in zoom-in duration-500">
+      <div className="relative overflow-hidden rounded-3xl border border-amber-500/30 bg-card/60 p-8 sm:p-12 text-center backdrop-blur-xl shadow-xl animate-in fade-in zoom-in duration-500">
         {/* Glow behind success */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-indigo-500/10 blur-[60px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-amber-500/10 blur-[60px] rounded-full pointer-events-none" />
 
         <div className="relative z-10 flex flex-col items-center">
           <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 mb-6 animate-bounce">
@@ -79,7 +79,7 @@ export function ContactForm() {
             <Button
               onClick={() => (window.location.href = "/")}
               size="sm"
-              className="text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-[0_10px_20px_rgba(99,102,241,0.25)] hover:shadow-[0_10px_25px_rgba(99,102,241,0.4)] h-9 px-4 rounded-xl cursor-pointer"
+              className="text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-black hover:-translate-y-0.5 transition-all shadow-[0_10px_20px_rgba(245,158,11,0.25)] hover:shadow-[0_10px_25px_rgba(245,158,11,0.4)] h-9 px-4 rounded-xl cursor-pointer"
             >
               Return to Showroom
             </Button>
@@ -91,11 +91,11 @@ export function ContactForm() {
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card/40 p-6 sm:p-8 backdrop-blur-md shadow-lg">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[50px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 blur-[50px] rounded-full pointer-events-none" />
       
       <div className="mb-6">
         <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-          <MessageSquare className="w-4.5 h-4.5 text-indigo-500" />
+          <MessageSquare className="w-4.5 h-4.5 text-amber-500" />
           Configure Inquiry
         </h3>
         <p className="text-[11px] sm:text-xs text-muted-foreground mt-1">
@@ -124,8 +124,8 @@ export function ContactForm() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="block w-full pl-8 pr-3 h-8 text-xs bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-indigo-500/30 focus-visible:border-ring rounded-lg"
-              placeholder="Mohit Bhardwaj"
+              className="block w-full pl-8 pr-3 h-8 text-xs bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-amber-500/30 focus-visible:border-ring rounded-lg"
+              placeholder="John Adams"
             />
           </div>
         </div>
@@ -143,8 +143,8 @@ export function ContactForm() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="block w-full pl-8 pr-3 h-8 text-xs bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-indigo-500/30 focus-visible:border-ring rounded-lg"
-              placeholder="mohit@gengraphs.com"
+              className="block w-full pl-8 pr-3 h-8 text-xs bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-amber-500/30 focus-visible:border-ring rounded-lg"
+              placeholder="john@adams.com"
             />
           </div>
         </div>
@@ -156,7 +156,7 @@ export function ContactForm() {
           <select
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            className="w-full h-8 px-2.5 py-1 text-xs rounded-lg border border-border bg-card hover:bg-accent/20 text-foreground transition-colors outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none dark:bg-card cursor-pointer"
+            className="w-full h-8 px-2.5 py-1 text-xs bg-input/10 border border-border text-foreground hover:bg-input/20 transition-colors outline-none focus-visible:ring-amber-500/30 focus-visible:border-ring focus-visible:ring-2 focus-visible:outline-none rounded-lg cursor-pointer"
           >
             <option value="Consulting" className="bg-popover text-foreground">Data Analytics &amp; Power BI Consulting</option>
             <option value="Custom Design" className="bg-popover text-foreground">Bespoke UI/UX &amp; Graphic Design</option>
@@ -174,7 +174,7 @@ export function ContactForm() {
             required
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="block w-full px-3 py-2 text-xs bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-indigo-500/30 focus-visible:border-ring rounded-lg min-h-24 field-sizing-content"
+            className="block w-full px-3 py-2 text-xs bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-amber-500/30 focus-visible:border-ring rounded-lg min-h-24 field-sizing-content"
             placeholder="Describe your analytics goals, target audience, and preferred design stack..."
           />
         </div>
@@ -182,7 +182,7 @@ export function ContactForm() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full flex items-center justify-center h-8 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all mt-4 cursor-pointer shadow-[0_4px_12px_rgba(99,102,241,0.2)]"
+          className="mx-auto w-fit flex items-center justify-center h-8 rounded-lg text-xs font-semibold text-black bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all mt-4 cursor-pointer shadow-[0_4px_12px_rgba(245,158,11,0.2)]"
         >
           {loading ? (
             <span className="flex items-center gap-1">
@@ -195,7 +195,7 @@ export function ContactForm() {
           ) : (
             <span className="flex items-center gap-1.5">
               <span>Transmit Secure Inquiry</span>
-              <Send className="w-3.5 h-3.5" />
+              <Send className="w-2.5 h-2.5" />
             </span>
           )}
         </Button>

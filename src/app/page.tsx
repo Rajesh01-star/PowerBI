@@ -1,5 +1,6 @@
+import Link from 'next/link';
 import { Hero } from '@/components/Hero';
-import { LiveDemo } from '@/components/LiveDemo';
+import { Showroom } from '@/components/Showroom';
 import { TransitionSection } from '@/components/TransitionSection';
 import { Benefits } from '@/components/Benefits';
 import { FeaturedTemplates } from '@/components/FeaturedTemplates';
@@ -21,7 +22,20 @@ export default function Home() {
             <h2 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Sandbox Showroom</h2>
             <p className="text-sm text-muted-foreground">Hover over active configurations to boot live workspace previews.</p>
           </div>
-          <LiveDemo />
+          <Showroom limit={6} />
+          
+          {/* Marketplace Redirect Button */}
+          <div className="mt-8 flex justify-center">
+            <Link
+              href="/marketplace"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-black text-xs font-bold uppercase tracking-wider hover:-translate-y-0.5 transition-all duration-300 shadow-[0_10px_20px_rgba(245,158,11,0.25)] hover:shadow-[0_10px_25px_rgba(245,158,11,0.4)] cursor-pointer"
+            >
+              <span>Explore Marketplace</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </main>
 

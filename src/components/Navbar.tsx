@@ -95,7 +95,7 @@ export function Navbar() {
 
   const gradients = [
     "from-neutral-800 to-neutral-900",
-    "from-indigo-900/50 to-neutral-900",
+    "from-amber-900/50 to-neutral-900",
     "from-zinc-800 to-zinc-950",
     "from-slate-800 to-slate-950",
     "from-stone-800 to-stone-950"
@@ -150,9 +150,9 @@ export function Navbar() {
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="cursor-pointer p-5 w-[560px] md:w-[600px] lg:w-[640px]" onClick={() => { router.push("/about") }}>
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
-                      <div className="md:col-span-2 flex flex-col justify-between rounded-xl bg-gradient-to-br from-indigo-950/20 via-popover to-background p-4 border border-border/40 shadow-xl">
+                      <div className="md:col-span-2 flex flex-col justify-between rounded-xl bg-gradient-to-br from-amber-950/20 via-popover to-background p-4 border border-border/40 shadow-xl">
                         <div>
-                          <h4 className="text-xs font-semibold text-foreground tracking-wide uppercase bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
+                          <h4 className="text-xs font-semibold text-foreground tracking-wide uppercase bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
                             Gengraphs &amp; Graphics
                           </h4>
                           <p className="mt-2 text-[10px] text-muted-foreground leading-relaxed">
@@ -162,7 +162,7 @@ export function Navbar() {
                         <div className="mt-4 pt-4 border-t border-border/40">
                           <Link
                             href="/about"
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 text-[9px] font-medium text-indigo-500 transition-all border border-indigo-500/20 group/btn"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-1.5 text-[9px] font-medium text-amber-500 transition-all border border-amber-500/20 group/btn"
                           >
                             <span>About Us</span>
                             <span className="transition-transform group-hover/btn:translate-x-0.5">→</span>
@@ -233,11 +233,79 @@ export function Navbar() {
 
                 {/* Contact Nav Item */}
                 <NavigationMenuItem>
-                  <Link href="/contact" passHref legacyBehavior>
-                    <NavigationMenuLink className="text-foreground/70 hover:text-foreground bg-transparent hover:bg-accent focus:bg-accent transition-all cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1">
-                      Contact
-                    </NavigationMenuLink>
-                  </Link>
+                  <NavigationMenuTrigger
+                    onClick={() => router.push('/contact')}
+                    className="text-foreground/70 hover:text-foreground bg-transparent hover:bg-accent focus:bg-accent data-[popup-open]:bg-accent data-[popup-open]:text-foreground transition-all cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1"
+                  >
+                    Contact
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className="cursor-pointer p-5 w-[560px] md:w-[600px] lg:w-[640px]" onClick={() => { router.push("/contact") }}>
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
+                      <div className="md:col-span-2 flex flex-col justify-between rounded-xl bg-gradient-to-br from-amber-950/20 via-popover to-background p-4 border border-border/40 shadow-xl">
+                        <div>
+                          <h4 className="text-xs font-semibold text-foreground tracking-wide uppercase bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
+                            Get In Touch
+                          </h4>
+                          <p className="mt-2 text-[10px] text-muted-foreground leading-relaxed">
+                            Have a complex analytics challenge, custom visual request, or interface mockup project? Let&apos;s deploy a high-fidelity business intelligence solution together.
+                          </p>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-border/40">
+                          <Link
+                            href="/contact"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-1.5 text-[9px] font-medium text-amber-500 transition-all border border-amber-500/20 group/btn"
+                          >
+                            <span>Send Message</span>
+                            <span className="transition-transform group-hover/btn:translate-x-0.5">→</span>
+                          </Link>
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-3 flex flex-col justify-between gap-3 text-foreground/70 text-[10px] leading-relaxed">
+                        <div className="space-y-4">
+                          <div className="flex gap-3 items-center">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25H4.5A2.25 2.25 0 0 1 2.25 17.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5H4.5a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                              </svg>
+                            </div>
+                            <div>
+                              <div className="text-[8px] text-muted-foreground uppercase tracking-widest font-mono">Secure Email</div>
+                              <div className="text-[10px] font-semibold text-foreground">connect@gengraphs.com</div>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-3 items-center">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <div className="text-[8px] text-muted-foreground uppercase tracking-widest font-mono">Response SLA</div>
+                              <div className="text-[10px] font-semibold text-foreground">Guaranteed within 12 Hours</div>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-3 items-center">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <div className="text-[8px] text-muted-foreground uppercase tracking-widest font-mono">Location Hub</div>
+                              <div className="text-[10px] font-semibold text-foreground">New Delhi, India (Global Remote)</div>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="mt-2 text-[9px] text-muted-foreground leading-relaxed italic border-t border-border/40 pt-2">
+                          Ready to optimize your data pipeline or build standard mockups? Click above to launch our strategy submission form.
+                        </p>
+                      </div>
+                    </div>
+                  </NavigationMenuContent>
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
@@ -292,7 +360,7 @@ export function Navbar() {
                         Dashboard
                       </Link>
                       {sessionData.user.isAdmin && (
-                        <Link href="/admin" className="flex items-center px-3 py-1.5 text-xs text-indigo-500 hover:text-indigo-600 hover:bg-accent rounded-lg transition-colors cursor-pointer">
+                        <Link href="/admin" className="flex items-center px-3 py-1.5 text-xs text-amber-500 hover:text-amber-600 hover:bg-accent rounded-lg transition-colors cursor-pointer">
                           Admin
                         </Link>
                       )}
