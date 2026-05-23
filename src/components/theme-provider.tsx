@@ -1,68 +1,48 @@
 "use client"
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect } from "react";
 
-type Theme = "dark" | "light" | "system";
+type Theme = "dark";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
-  defaultTheme?: Theme;
+  // kept for backwards-compatibility — ignored, always dark
+  defaultTheme?: string;
   storageKey?: string;
 };
 
 type ThemeProviderState = {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
+  setTheme: (theme: string) => void;
 };
 
 const initialState: ThemeProviderState = {
-  theme: "system",
+  theme: "dark",
+  // no-op — theme is locked to dark
   setTheme: () => null,
 };
+
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
-  storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
-    }
-    return defaultTheme;
-  });
-
   useEffect(() => {
     const root = window.document.documentElement;
-
-    root.classList.remove("light", "dark");
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      root.classList.add(systemTheme);
-      return;
+    // Always enforce dark — clear any stale localStorage preference
+    root.classList.remove("light");
+    root.classList.add("dark");
+    try {
+      // Clear any previously saved light/system preference so returning
+      // visitors are no longer served the wrong theme.
+      localStorage.removeItem("vite-ui-theme");
+    } catch {
+      // localStorage may be unavailable in some environments — safe to ignore
     }
-
-    root.classList.add(theme);
-  }, [theme]);
-
-  const value = {
-    theme,
-    setTheme: (theme: Theme) => {
-      if (typeof window !== "undefined" && window.localStorage) {
-        localStorage.setItem(storageKey, theme);
-      }
-      setTheme(theme);
-    },
-  };
+  }, []);
 
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
+    <ThemeProviderContext.Provider {...props} value={initialState}>
       {children}
     </ThemeProviderContext.Provider>
   );

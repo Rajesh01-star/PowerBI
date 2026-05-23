@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", inter.variable, geist.variable, outfit.variable, "font-sans")}
+      className={cn("h-full dark", "antialiased", inter.variable, geist.variable, outfit.variable, "font-sans")}
     >
       <body className="min-h-full flex flex-col text-foreground font-sans overflow-x-hidden transition-colors duration-300">
         <ThemeProvider>
