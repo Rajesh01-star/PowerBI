@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin, Clock, Sparkles, ShieldCheck, FileText, LayoutTemplate, Briefcase } from "lucide-react";
 import { ContactForm } from "./ContactForm";
+import HeroParallaxDemo from "@/components/ui/hero-parallax-demo";
 
 export const metadata = {
   title: "Contact Us - GENGRAPHS & GRAPHICS",
@@ -120,6 +121,10 @@ export default function ContactPage() {
           </div>
 
         </div>
+          {/* Interactive Credentials Parallax Showcase */}
+      <div className="relative z-10 w-full pt-16">
+        <HeroParallaxDemo />
+      </div>
       </main>
     </div>
   );
