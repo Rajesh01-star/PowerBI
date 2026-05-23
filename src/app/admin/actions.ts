@@ -5,7 +5,7 @@ import { postsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { eq, desc, asc } from "drizzle-orm";
+import { eq, desc, asc, sql } from "drizzle-orm";
 
 export async function createPostAction(formData: FormData) {
     const session = await auth.api.getSession({
@@ -230,5 +230,44 @@ export async function getPostFileUrlAction(id: string) {
 
     const posts = await db.select({ fileUrl: postsTable.fileUrl }).from(postsTable).where(eq(postsTable.id, id));
     return posts[0]?.fileUrl || null;
+}
+
+export async function getMarketplaceStatsAction() {
+    try {
+        // 1. Total templates count in DB
+        const postsCountResult = await db.select({ count: sql<number>`count(*)` }).from(postsTable);
+        const templatesCount = Number(postsCountResult[0]?.count || 0);
+
+        // 2. Unique creators count
+        const creatorsCountResult = await db.select({ count: sql<number>`count(distinct ${postsTable.userId})` }).from(postsTable);
+        const creatorsCount = Number(creatorsCountResult[0]?.count || 0);
+
+        // 3. New templates in last 30 days
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const newReportsResult = await db.select({ count: sql<number>`count(*)` }).from(postsTable).where(
+            sql`${postsTable.createdAt} >= ${thirtyDaysAgo}`
+        );
+        const newMonthlyReports = Number(newReportsResult[0]?.count || 0);
+
+        // 4. Sum of all views across all posts
+        const totalViewsResult = await db.select({ totalViews: sql<number>`sum(${postsTable.views})` }).from(postsTable);
+        const reportViews = Number(totalViewsResult[0]?.totalViews || 0);
+
+        return {
+            templatesCount,
+            creatorsCount,
+            newMonthlyReports,
+            reportViews,
+        };
+    } catch (err) {
+        console.error("Failed to fetch marketplace stats:", err);
+        return {
+            templatesCount: 0,
+            creatorsCount: 0,
+            newMonthlyReports: 0,
+            reportViews: 0,
+        };
+    }
 }
 

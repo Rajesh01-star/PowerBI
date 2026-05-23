@@ -19,8 +19,8 @@ interface ShowroomFilterProps {
 
 export function ShowroomFilter({ activeSort, setActiveSort }: ShowroomFilterProps) {
   return (
-    <div className="flex items-center gap-2 mb-5">
-      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider mr-1">
+    <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider mr-1 shrink-0">
         <ArrowDownWideNarrow className="w-3.5 h-3.5" /> Sort
       </div>
       {SORT_OPTIONS.map((option) => (

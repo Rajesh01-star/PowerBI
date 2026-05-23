@@ -1,97 +1,246 @@
 "use client";
-import { motion } from 'framer-motion';
-import { Search, Filter, Star, BarChart3, ChevronLeft } from 'lucide-react';
-import Link from 'next/link';
 
-const templates = [
-  { id: 'finance-pro', title: "Finance Pro Exec", category: "Finance", price: "$149", rating: 4.9, img: "bg-gradient-to-br from-emerald-900 to-slate-900" },
-  { id: 'sales-command', title: "Sales Command Center", category: "Sales", price: "$129", rating: 4.8, img: "bg-gradient-to-br from-blue-900 to-slate-900" },
-  { id: 'hr-analytics', title: "HR People Analytics", category: "HR", price: "$99", rating: 4.7, img: "bg-gradient-to-br from-purple-900 to-slate-900" },
-  { id: 'marketing-roi', title: "Marketing ROI Dashboard", category: "Marketing", price: "$119", rating: 4.9, img: "bg-gradient-to-br from-pink-900 to-slate-900" },
-  { id: 'supply-chain', title: "Supply Chain Operations", category: "Operations", price: "$159", rating: 4.6, img: "bg-gradient-to-br from-amber-900 to-slate-900" },
-  { id: 'it-infrastructure', title: "IT Infrastructure Monitor", category: "IT", price: "$89", rating: 4.8, img: "bg-gradient-to-br from-cyan-900 to-slate-900" },
-];
-
-const categories = ["All", "Finance", "Sales", "HR", "Marketing", "Operations", "IT"];
+import React, { useState } from 'react';
+import { ChartColumn, Loader2, Search, Filter, Users, TrendingUp, Eye } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { getPublicPostsAction, getMarketplaceStatsAction } from '@/app/admin/actions';
+import { ShowroomFilter, SortOption } from '@/components/ShowroomFilter';
+import { ShowroomGrid } from '@/components/ShowroomGrid';
+import { Footer } from '@/components/Footer';
+import { GooeyInput } from '@/components/ui/gooey-input';
 
 export default function Marketplace() {
+  const [activeSort, setActiveSort] = useState<SortOption>('views');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ['public-posts', activeSort],
+    queryFn: () => getPublicPostsAction(activeSort),
+  });
+
+  const { data: stats = { templatesCount: 2400, creatorsCount: 1000, newMonthlyReports: 100, reportViews: 1000000 } } = useQuery({
+    queryKey: ['marketplace-stats'],
+    queryFn: () => getMarketplaceStatsAction(),
+  });
+
+  const formatViews = (views: number) => {
+    if (views >= 1000000) return `${(views / 1000000).toFixed(0)}M+`;
+    if (views >= 1000) return `${(views / 1000).toFixed(0)}k+`;
+    return `${views}+`;
+  };
+
+  const statsData = [
+    {
+      id: "templates",
+      value: stats.templatesCount,
+      label: "Power BI Templates",
+      icon: <ChartColumn className="w-4.5 h-4.5" />,
+    },
+    {
+      id: "creators",
+      value: stats.creatorsCount,
+      label: "Active Creators",
+      icon: <Users className="w-4.5 h-4.5" />,
+    },
+    {
+      id: "new-reports",
+      value: stats.newMonthlyReports,
+      label: "New Reports (30d)",
+      icon: <TrendingUp className="w-4.5 h-4.5" />,
+    },
+    {
+      id: "views",
+      value: stats.reportViews,
+      label: "Total Views",
+      icon: <Eye className="w-4.5 h-4.5" />,
+    },
+  ];
+
+  // Filter posts based on client-side search query and active category dropdown selection
+  const filteredPosts = posts.filter(post => {
+    const matchesSearch = 
+      !searchQuery || 
+      post.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      post.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesCategory = 
+      activeCategory === "All" || 
+      post.tags?.some((t: string) => t.toLowerCase() === activeCategory.toLowerCase()) ||
+      post.title?.toLowerCase().includes(activeCategory.toLowerCase());
+
+    return matchesSearch && matchesCategory;
+  });
+
   return (
-    <div className="min-h-screen bg-transparent text-foreground pt-12 pb-20">
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
-        
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <div>
-            <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 text-sm transition-colors">
-              <ChevronLeft className="w-4 h-4" /> Back to Home
-            </Link>
-            <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4 text-foreground">Marketplace</h1>
-            <p className="text-muted-foreground">Discover premium Power BI templates for every business unit.</p>
-          </div>
+    <div className="relative w-full min-h-screen bg-transparent text-foreground overflow-x-hidden selection:bg-amber-500/30 flex flex-col justify-between">
+      {/* Background glow effects */}
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[50%] bg-amber-600/10 blur-[130px] rounded-full pointer-events-none" />
+      <div className="absolute top-[30%] right-[-10%] w-[50%] h-[50%] bg-amber-600/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[10%] left-[20%] w-[40%] h-[40%] bg-amber-600/5 blur-[110px] rounded-full pointer-events-none" />
+
+      <main className="relative z-10 flex-grow pt-32 sm:pt-40 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
           
-          <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="relative flex-1 md:w-64">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input 
-                type="text" 
-                placeholder="Search templates..." 
-                className="w-full bg-muted border border-border rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:border-indigo-500/50 transition-colors text-foreground placeholder:text-muted-foreground"
-              />
-            </div>
-            <button className="p-2 bg-muted hover:bg-accent border border-border rounded-full transition-colors text-muted-foreground hover:text-foreground">
-              <Filter className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+          {/* Top Hero Stats Header Section */}
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4 animate-in fade-in slide-in-from-top-4 duration-1000">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
+              Production-Grade Power BI <br className="hidden sm:inline" />
+              <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent">Interactive Dashboard Gallery</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground/80 max-w-2xl mx-auto leading-relaxed">
+              Explore high-fidelity, interactive Power BI templates optimized for executive operations, financial forecasting, dynamic sales performance, and HR metrics. Instantly launch layouts, explore live embeds, and download configuration files to elevate your BI strategy.
+            </p>
 
-        {/* Categories */}
-        <div className="flex overflow-x-auto gap-3 mb-10 pb-2 scrollbar-hide">
-          {categories.map((cat, i) => (
-            <button 
-              key={cat}
-              className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${i === 0 ? 'bg-indigo-600 text-white shadow-md' : 'bg-muted hover:bg-accent border border-border text-muted-foreground hover:text-foreground'}`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates.map((template, i) => (
-            <motion.div 
-              key={template.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: i * 0.05 }}
-            >
-              <Link href={`/template/${template.id}`} className="block bg-card border border-border rounded-3xl overflow-hidden group shadow-sm hover:shadow-md transition-all duration-300">
-                <div className={`w-full aspect-[4/3] ${template.img} relative flex items-center justify-center`}>
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
-                  <BarChart3 className="w-16 h-16 text-white/20 group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-background/80 text-foreground border border-border text-xs font-medium backdrop-blur-md">
-                    {template.category}
+            {/* Stats Cards Row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 max-w-5xl mx-auto text-left">
+              {statsData.map((item) => (
+                <div 
+                  key={item.id}
+                  className="bg-neutral-900/40 backdrop-blur-xl border border-neutral-800/80 rounded-2xl p-4 flex items-center gap-3.5 shadow-md shadow-amber-500/2 hover:border-neutral-700/60 transition-all duration-300 min-w-0"
+                >
+                  <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
+                    {item.icon}
                   </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-heading font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors text-foreground">{template.title}</h3>
-                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">{template.price}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                      {template.rating}
+                  <div className="space-y-0.5 min-w-0">
+                    <div className="text-lg sm:text-xl font-bold text-foreground tracking-tight leading-none">
+                      {formatViews(item.value)}
                     </div>
-                    <span>Instant Download</span>
+                    <div className="text-[8px] uppercase font-bold tracking-widest text-muted-foreground/60 leading-normal whitespace-nowrap">
+                      {item.label}
+                    </div>
                   </div>
                 </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
+              ))}
+            </div>
+          </div>
 
-      </div>
+          {/* Integrated Search, Filter, and Sort Controls in a Single Row */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-3 border-b border-border/10 pb-3 z-30 relative w-full">
+            {/* Sorting controls on the left */}
+            <div className="flex items-center">
+              <ShowroomFilter activeSort={activeSort} setActiveSort={setActiveSort} />
+            </div>
+
+            {/* Search and Category Filter on the right */}
+            <div className="flex items-center gap-3 self-end md:self-auto">
+              {/* Gooey Search Input Container */}
+              <div className="relative flex items-center justify-start min-w-[120px] z-30">
+                <GooeyInput 
+                  value={searchQuery}
+                  onValueChange={setSearchQuery}
+                  placeholder="Search templates..." 
+                  collapsedWidth={115}
+                  expandedWidth={220}
+                  expandedOffset={50}
+                  gooeyBlur={5}
+                />
+              </div>
+
+              {/* Categorical filter dropdown container */}
+              <div className="relative z-30">
+                <button 
+                  onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
+                  className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 cursor-pointer shadow-md ${
+                    filterDropdownOpen 
+                      ? 'bg-amber-500 border-amber-600 text-white shadow-amber-500/20'
+                      : 'bg-neutral-800 border-neutral-700 text-amber-500 hover:bg-neutral-700 hover:text-amber-400 hover:border-neutral-600'
+                  }`}
+                >
+                  <Filter className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Dropdown Menu Popup */}
+                {filterDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 rounded-xl bg-neutral-900 border border-neutral-800/80 backdrop-blur-2xl shadow-xl p-1.5 z-50 text-foreground animate-in fade-in zoom-in duration-200">
+                    <div className="px-3 py-1.5 border-b border-neutral-850 mb-1">
+                      <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 font-mono">Category Filter</div>
+                    </div>
+                    <div className="space-y-0.5">
+                      {["All", "Finance", "Sales", "HR", "Marketing", "Operations", "IT"].map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            setActiveCategory(cat);
+                            setFilterDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center px-3 py-1.5 text-xs rounded-lg transition-colors cursor-pointer text-left ${
+                            activeCategory === cat
+                              ? 'bg-amber-500/10 text-amber-500 font-semibold'
+                              : 'text-foreground/70 hover:text-foreground hover:bg-neutral-800'
+                          }`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Real-time filters and live posts grid */}
+          {isLoading ? (
+            <div className="w-full h-96 flex items-center justify-center">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
+                <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+                SYNCHRONIZING TEMPLATE INVENTORIES...
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {/* Active Filter State Label (Shows only when not filtering All) */}
+              {(activeCategory !== "All" || searchQuery) && (
+                <div className="flex items-center gap-2 flex-wrap text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-2">
+                  <span>Filtered by:</span>
+                  {activeCategory !== "All" && (
+                    <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500">
+                      Category: {activeCategory}
+                    </span>
+                  )}
+                  {searchQuery && (
+                    <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500">
+                      Search: &ldquo;{searchQuery}&rdquo;
+                    </span>
+                  )}
+                  <button 
+                    onClick={() => {
+                      setActiveCategory("All");
+                      setSearchQuery("");
+                    }} 
+                    className="text-amber-500/80 hover:text-amber-500 underline transition-colors cursor-pointer normal-case text-[9px]"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
+              )}
+
+              {/* Showroom Grid rendering real filtered database templates */}
+              {filteredPosts.length > 0 ? (
+                <ShowroomGrid posts={filteredPosts} />
+              ) : (
+                <div className="w-full py-20 text-center rounded-3xl border border-dashed border-border/80 bg-card/20 backdrop-blur-xs">
+                  <p className="text-xs text-muted-foreground font-mono">NO ACTIVE CONFIGURATIONS FOUND MATCHING SPECIFICATIONS</p>
+                  <button 
+                    onClick={() => {
+                      setActiveCategory("All");
+                      setSearchQuery("");
+                    }} 
+                    className="mt-4 px-4 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-semibold uppercase tracking-wider hover:bg-amber-500/20 transition-all cursor-pointer"
+                  >
+                    Reset Active Filters
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }

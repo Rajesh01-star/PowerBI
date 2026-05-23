@@ -27,12 +27,12 @@ export function Showroom({ limit }: { limit?: number }) {
   }
 
   return (
-    <>
+    <div className='space-y-4'>
       {/* 1. Filter Sub-component */}
       <ShowroomFilter activeSort={activeSort} setActiveSort={setActiveSort} />
 
       {/* 2. Grid Sub-component */}
       <ShowroomGrid posts={posts} limit={limit} />
-    </>
+    </div>
   );
 }
