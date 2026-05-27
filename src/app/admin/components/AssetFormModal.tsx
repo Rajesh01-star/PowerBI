@@ -242,7 +242,7 @@ export function AssetFormModal({
                                         <div className="relative border border-dashed border-[#3E291F] hover:border-amber-500/50 bg-[#0E0907] hover:bg-[#130B09]/60 rounded-xl transition-all duration-200 cursor-pointer group">
                                             <input
                                                 type="file"
-                                                accept=".zip,application/zip"
+                                                accept=".zip,application/zip,.pbix"
                                                 onChange={(e) => setZipFile(e.target.files?.[0] || null)}
                                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                             />
@@ -252,7 +252,7 @@ export function AssetFormModal({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-[10px] font-semibold text-white/70 group-hover:text-white transition-colors leading-none">
-                                                        {editingPost ? "Replace ZIP file" : "Upload ZIP file"}
+                                                        {editingPost ? "Replace file (.zip or .pbix)" : "Upload file (.zip or .pbix)"}
                                                     </p>
                                                     <p className="text-[9px] text-white/30 mt-0.5">Drag & drop, or click Browse</p>
                                                 </div>
