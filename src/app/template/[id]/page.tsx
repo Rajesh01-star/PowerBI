@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Check, DownloadCloud, Server, ShieldCheck, Database, LayoutDashboard, Smartphone, Monitor, Loader2, Eye } from 'lucide-react';
+import { ChevronLeft, Check, DownloadCloud, Server, ShieldCheck, Database, LayoutDashboard, Smartphone, Monitor, Loader2, Eye, ImageIcon, X } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import InteractivePBI from '@/components/InteractivePBI';
@@ -18,12 +18,14 @@ export default function TemplateDetail() {
   const [loading, setLoading] = useState(true);
   const [viewCount, setViewCount] = useState<number | null>(null);
   const [hasPurchased, setHasPurchased] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPost = async () => {
       if (typeof params.id === 'string') {
         try {
           const data = await getPublicPostByIdAction(params.id);
+          console.log(data)
           setPost(data);
         } catch (error) {
           console.error("Failed to fetch post:", error);
@@ -80,7 +82,7 @@ export default function TemplateDetail() {
     return (
       <div className="min-h-screen bg-transparent text-foreground flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
-          <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
+          <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
           <p className="text-xs text-muted-foreground font-mono">RETRIEVING BLUEPRINT ARCHITECTURE...</p>
         </div>
       </div>
@@ -92,7 +94,7 @@ export default function TemplateDetail() {
       <div className="min-h-screen bg-transparent text-foreground flex items-center justify-center">
         <div className="text-center p-4 border border-border bg-card/50 rounded-xl max-w-xs">
           <p className="text-xs text-muted-foreground">Specified blueprint framework could not be located.</p>
-          <Link href="/" className="mt-3 inline-flex text-xs text-indigo-600 dark:text-indigo-400 hover:underline">Return Home</Link>
+          <Link href="/" className="mt-3 inline-flex text-xs text-amber-600 dark:text-amber-400 hover:underline">Return Home</Link>
         </div>
       </div>
     );
@@ -192,7 +194,7 @@ export default function TemplateDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-foreground pb-16 selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-transparent text-foreground pb-16 selection:bg-amber-500/30">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <div className="max-w-7xl mx-auto px-6 pt-28 pb-6 space-y-6">
         
@@ -208,23 +210,39 @@ export default function TemplateDetail() {
           <div className="lg:col-span-8 space-y-8">
             
             {/* Context Identification Headers */}
-            <div className="space-y-2 border-b border-border pb-4">
-              <div className="flex items-center gap-1.5">
-                <span className="px-2 py-0.5 rounded bg-muted border border-border text-[9px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                  {isVertical ? <Smartphone className="w-2.5 h-2.5" /> : <Monitor className="w-2.5 h-2.5" />}
+            <div className="flex flex-col gap-5 border-b border-border pb-8">
+              
+              {/* Metadata Badges */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border/50 text-[10px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                  {isVertical ? <Smartphone className="w-3 h-3" /> : <Monitor className="w-3 h-3" />}
                   {post.aspect} Target
                 </span>
-                <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/10 text-[9px] font-mono text-indigo-300 uppercase tracking-wider">Analytics</span>
                 {viewCount !== null && (
-                  <span className="px-2 py-0.5 rounded bg-muted border border-border text-[9px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                    <Eye className="w-2.5 h-2.5" />
+                  <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border/50 text-[10px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                    <Eye className="w-3 h-3" />
                     {viewCount.toLocaleString()} {viewCount === 1 ? 'view' : 'views'}
                   </span>
                 )}
               </div>
-              <h1 className="text-lg font-bold tracking-tight text-foreground">{post.title}</h1>
-              {post.description && (
-                <p className="text-xs text-muted-foreground leading-relaxed max-w-3xl">{post.description}</p>
+              
+              {/* Title & Description */}
+              <div className="space-y-1">
+                <h1 className="text-xl font-medium tracking-tight text-foreground">{post.title}</h1>
+                {post.description && (
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-3xl font-sans">{post.description}</p>
+                )}
+              </div>
+
+              {/* Tags */}
+              {post.tags && post.tags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                  {post.tags.map((tag: string, idx: number) => (
+                    <span key={idx} className="px-3.5 py-1.5 rounded-full bg-card border border-border text-[11px] font-medium text-foreground shadow-sm hover:border-amber-500/30 transition-colors cursor-default">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
 
@@ -259,39 +277,29 @@ export default function TemplateDetail() {
               </div>
             </div>
 
-            {/* Technical Parameters Ledger */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-card border border-border p-4 rounded-xl space-y-3 shadow-sm">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground/80 flex items-center gap-1.5">
-                  <Server className="w-3.5 h-3.5 text-indigo-400" /> Platform Parameters
+            {/* Thumbnails Gallery Section */}
+            {post.thumbnails && post.thumbnails.length > 0 && (
+              <div className="space-y-4 pt-2 mt-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground/80 flex items-center gap-1.5 mb-2">
+                  <ImageIcon className="w-4 h-4 text-amber-400" /> Visual Gallery
                 </h3>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-1 border-b border-border text-[11px]">
-                    <span className="text-muted-foreground">Compatibility</span>
-                    <span className="text-foreground font-medium">Power BI Cloud / Desktop</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-border text-[11px]">
-                    <span className="text-muted-foreground">Canvas Structure</span>
-                    <span className="text-foreground font-medium uppercase">{post.aspect} layout</span>
-                  </div>
-                  <div className="flex justify-between py-1 text-[11px]">
-                    <span className="text-muted-foreground">Core Version</span>
-                    <span className="text-foreground font-mono">v1.0.0 (Latest Deployment)</span>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {post.thumbnails.map((thumb: string, idx: number) => (
+                    <div 
+                      key={idx} 
+                      className="border border-border rounded-xl overflow-hidden bg-card/50 aspect-video relative group cursor-pointer"
+                      onClick={() => setSelectedImage(thumb)}
+                    >
+                      <img src={thumb} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <div className="absolute inset-0 border border-white/5 rounded-xl pointer-events-none" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                        <Eye className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-md" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-
-              <div className="bg-card border border-border p-4 rounded-xl space-y-3 shadow-sm">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground/80 flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" /> Integration Checklist
-                </h3>
-                <div className="space-y-2 text-[11px] text-muted-foreground">
-                  <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Optimized modeling connections setup ready.</div>
-                  <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Native color scheme matrices built in.</div>
-                  <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Custom DAX measures packaged cleanly.</div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Sticky Commercial Checklist Sidebar Block Right */}
@@ -303,7 +311,7 @@ export default function TemplateDetail() {
                 </p>
                 {!hasPurchased && (
                   <div className="flex items-baseline gap-1 mt-0.5">
-                    <span className="text-2xl font-mono font-bold text-indigo-500 dark:text-indigo-400">{displayPrice}</span>
+                    <span className="text-2xl font-mono font-bold text-amber-500 dark:text-amber-400">{displayPrice}</span>
                     <span className="text-[10px] text-muted-foreground/60 font-medium">/ persistent download link</span>
                   </div>
                 )}
@@ -323,7 +331,7 @@ export default function TemplateDetail() {
                   <button 
                     onClick={handlePurchase}
                     disabled={isProcessing}
-                    className="w-full h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 disabled:opacity-50 text-xs text-white font-medium flex items-center justify-center gap-1.5 transition-all shadow-md shadow-indigo-500/10 dark:shadow-indigo-500/20"
+                    className="w-full h-10 rounded-xl bg-gradient-to-r from-amber-500 to-black hover:opacity-90 disabled:opacity-50 text-xs text-white font-medium flex items-center justify-center gap-1.5 transition-all shadow-md shadow-amber-500/10 dark:shadow-amber-500/20"
                   >
                     {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <DownloadCloud className="w-4 h-4" />}
                     {isProcessing ? "Processing..." : "Initialize Asset Acquisition"}
@@ -334,25 +342,37 @@ export default function TemplateDetail() {
                 </button>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-border">
-                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Architecture Components Delivery</h4>
-                {[
-                  "Power BI Deployment Blueprint Asset (.pbit)",
-                  "Structured Data Schema Matrix Reference",
-                  "Implementation & Onboarding Documentation Guide",
-                  "Comprehensive Lifelong Framework Asset Updates"
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-2 text-[11px] text-muted-foreground leading-tight">
-                    <Database className="w-3.5 h-3.5 text-indigo-400/50 shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
 
         </div>
       </div>
+
+      {/* Fullscreen Image Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-6xl w-full h-full flex items-center justify-center">
+            <button 
+              className="absolute top-4 right-4 md:top-2 md:right-2 z-50 p-2.5 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors border border-white/20 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImage(null);
+              }}
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <img 
+              src={selectedImage} 
+              alt="Fullscreen Preview" 
+              className="max-w-full max-h-full object-contain rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)]" 
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
