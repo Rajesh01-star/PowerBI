@@ -132,7 +132,7 @@ export function Navbar() {
           <div className="flex-1 flex justify-start">
             <Link href="/" className="flex items-center gap-2 py-1 text-sm font-semibold cursor-pointer">
               <img src="/icons/logo.png" alt="Logo" className="h-9 w-auto object-contain drop-shadow-sm" />
-              <span className="text-base font-bold text-foreground tracking-wide whitespace-nowrap pt-0.5">GENGRAPHS & GRAPHICS</span>
+              <span className="text-sm font-bold text-foreground tracking-wide whitespace-nowrap pt-0.5">GENGRAPHS & GRAPHICS</span>
             </Link>
           </div>
 

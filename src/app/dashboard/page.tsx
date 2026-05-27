@@ -68,18 +68,23 @@ export default function UserDashboard() {
     return (
       <div className="min-h-screen bg-transparent text-foreground flex items-center justify-center">
         <div className="text-center p-6 border border-border bg-card rounded-2xl max-w-sm space-y-4 shadow-md">
-          <ShieldCheck className="w-8 h-8 text-indigo-500 mx-auto" />
+          <ShieldCheck className="w-8 h-8 text-amber-500 mx-auto" />
           <p className="text-xs text-muted-foreground">Authentication required to access your workspace.</p>
-          <Link href="/" className="inline-flex text-xs text-indigo-500 hover:underline">Return Home</Link>
+          <Link href="/" className="inline-flex text-xs text-amber-500 hover:underline">Return Home</Link>
         </div>
       </div>
     );
   }
 
+  const handleLogout = async () => {
+    await authClient.signOut();
+    window.location.href = "/";
+  };
+
   const user = sessionData?.user;
 
   return (
-    <div className="min-h-screen bg-transparent text-foreground pt-28 pb-20 selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-transparent text-foreground pt-28 pb-20 selection:bg-amber-500/30">
       <div className="max-w-7xl mx-auto px-6">
 
         <div className="flex flex-col md:flex-row gap-8">
@@ -87,7 +92,7 @@ export default function UserDashboard() {
           {/* Sidebar */}
           <div className="w-full md:w-56 shrink-0 space-y-2">
             <div className="bg-card border border-border p-5 rounded-2xl mb-5 shadow-sm">
-              <div className="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-bold mb-3 border border-indigo-500/20">
+              <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs font-bold mb-3 border border-amber-500/20">
                 {user?.name ? getInitials(user.name) : '??'}
               </div>
               <h2 className="text-sm font-semibold text-foreground truncate">{user?.name || 'User'}</h2>
@@ -95,18 +100,15 @@ export default function UserDashboard() {
             </div>
 
             <nav className="space-y-0.5">
-              <Link href="/dashboard" className="flex items-center gap-2.5 px-3.5 py-2.5 bg-indigo-500/10 rounded-xl text-xs text-indigo-600 dark:text-indigo-400 font-medium border border-indigo-500/20">
+              <Link href="/dashboard" className="flex items-center gap-2.5 px-3.5 py-2.5 bg-amber-500/10 rounded-xl text-xs text-amber-600 dark:text-amber-400 font-medium border border-amber-500/20">
                 <Package className="w-3.5 h-3.5" /> My Inventory
               </Link>
-              <Link href="#" className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-accent rounded-xl text-xs text-muted-foreground hover:text-foreground transition-colors">
-                <History className="w-3.5 h-3.5" /> Acquisition History
-              </Link>
-              <Link href="#" className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-accent rounded-xl text-xs text-muted-foreground hover:text-foreground transition-colors">
-                <Settings className="w-3.5 h-3.5" /> Account Settings
-              </Link>
-              <Link href="/" className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl text-xs text-muted-foreground transition-colors mt-6">
+              <button 
+                onClick={handleLogout} 
+                className="w-full flex items-center text-left gap-2.5 px-3.5 py-2.5 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl text-xs text-muted-foreground transition-colors mt-6"
+              >
                 <LogOut className="w-3.5 h-3.5" /> Sign Out
-              </Link>
+              </button>
             </nav>
           </div>
 
@@ -116,7 +118,7 @@ export default function UserDashboard() {
             {/* Header */}
             <div className="space-y-1 border-b border-border pb-4">
               <div className="flex items-center gap-1.5">
-                <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/10 text-[9px] font-mono text-indigo-600 dark:text-indigo-300 uppercase tracking-wider">Workspace</span>
+                <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/10 text-[9px] font-mono text-amber-600 dark:text-amber-300 uppercase tracking-wider">Workspace</span>
               </div>
               <h1 className="text-lg font-bold tracking-tight text-foreground">My Inventory</h1>
               <p className="text-xs text-muted-foreground">Manage your purchased templates and access persistent download links.</p>
@@ -126,7 +128,7 @@ export default function UserDashboard() {
             {(loading || sessionLoading) && (
               <div className="flex items-center justify-center py-20">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-                  <Loader2 className="w-4 h-4 animate-spin text-indigo-500" />
+                  <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
                   SYNCHRONIZING ASSET INVENTORY...
                 </div>
               </div>
@@ -199,7 +201,7 @@ export default function UserDashboard() {
                           <div className="flex items-center gap-2 shrink-0">
                             <Link
                               href={`/template/${item.postId}`}
-                              className="h-7 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-medium transition-colors flex items-center gap-1.5 shadow-md"
+                              className="h-7 px-3 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-[10px] font-medium transition-colors flex items-center gap-1.5 shadow-md"
                             >
                               <Download className="w-3 h-3" /> Download .pbit
                             </Link>
@@ -232,7 +234,7 @@ export default function UserDashboard() {
                 </p>
                 <Link
                   href="/"
-                  className="px-5 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium rounded-xl hover:opacity-90 transition-all shadow-lg shadow-indigo-500/20"
+                  className="px-5 py-2 bg-gradient-to-r from-amber-500 to-purple-500 text-white text-xs font-medium rounded-xl hover:opacity-90 transition-all shadow-lg shadow-amber-500/20"
                 >
                   Browse Showroom
                 </Link>

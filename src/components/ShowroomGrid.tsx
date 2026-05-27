@@ -156,11 +156,15 @@ export function ShowroomGrid({ posts, limit }: ShowroomGridProps) {
                     </span>
                   </div>
 
-                  {post.price && (
-                    <span className="absolute top-3 right-3 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 z-10 backdrop-blur-md">
-                      ${parseFloat(post.price).toFixed(2)}
-                    </span>
-                  )}
+                 {hasPaidPrice ? (
+  <span className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-emerald-500 text-[10px] font-mono font-bold text-black z-30 shadow-[0_2px_10px_rgba(16,185,129,0.4)]">
+    ${parseFloat(post.price).toFixed(2)}
+  </span>
+) : (
+  <span className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-blue-500 text-[10px] font-mono font-bold text-white z-30 shadow-[0_2px_10px_rgba(59,130,246,0.4)]">
+    Free
+  </span>
+)}
                 </div>
 
                 {/* Card Title Info Block */}
