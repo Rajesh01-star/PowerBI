@@ -3,8 +3,10 @@
 import { motion } from 'framer-motion';
 import { Cloud, Shield, Zap, BarChart3, Star, Command, Maximize } from 'lucide-react';
 import { OrbitingCircles } from '@/components/ui/orbiting-circles';
+import { useRouter } from 'next/navigation';
 
 export function Hero() {
+  const router = useRouter();
   return (
     <div className="relative w-full min-h-[90vh] lg:min-h-screen flex items-center justify-center pt-20 lg:pt-0 overflow-hidden">
       {/* Background Video */}
@@ -22,7 +24,7 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-background/60 to-background" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full max-w-7xl mx-auto px-4 lg:px-8 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full max-w-7xl mx-auto px-4 lg:px-8 relative z-20">
 
         {/* Left Column: Text & Actions */}
         <div className="flex flex-col justify-center order-2 lg:order-1 z-20 lg:pr-8">
@@ -41,7 +43,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl lg:text-5xl xl:text-6xl font-sans font-medium tracking-tight mb-6 leading-[1.1] text-foreground"
+            className="text-4xl lg:text-5xl font-sans font-medium tracking-tight mb-6 leading-[1.1] text-foreground "
           >
             Meet the Expert <br />
             Power BI Creator
@@ -62,44 +64,24 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="flex items-center gap-4"
           >
-            <button className="px-8 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-black text-sm font-bold transition-all duration-300 shadow-[0_10px_20px_rgba(245,158,11,0.25)] hover:shadow-[0_10px_25px_rgba(245,158,11,0.4)] hover:-translate-y-0.5 cursor-pointer">
-              Explore Services
+            <button onClick={()=>router.push("/marketplace")} className="px-8 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-black text-sm font-bold transition-all duration-300 shadow-[0_10px_20px_rgba(245,158,11,0.25)] hover:shadow-[0_10px_25px_rgba(245,158,11,0.4)] hover:-translate-y-0.5 cursor-pointer">
+              Explore Templates
             </button>
           </motion.div>
         </div>
 
         {/* Right Column: Subject Image with Orbiting Circles */}
         <div className="relative order-1 lg:order-2 flex items-center justify-end min-h-[550px] lg:min-h-[750px] w-full">
-          
-          {/* Spinning Badge */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 1 }}
-            className="absolute top-10 right-4 lg:right-10 flex items-center justify-center z-30"
-          >
-            <div className="relative w-[120px] h-[120px] lg:w-[140px] lg:h-[140px] animate-[spin_15s_linear_infinite]">
-              <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
-                <path id="circlePath" d="M 50, 50 m -38, 0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" fill="transparent" />
-                <text className="text-[11px] lg:text-[12px] font-bold tracking-widest fill-current text-foreground uppercase">
-                  <textPath href="#circlePath" startOffset="0%">POWER BI EXPERT CREATOR •</textPath>
-                </text>
-              </svg>
-            </div>
-            <div className="absolute w-12 h-12 rounded-xl flex items-center justify-center">
-              <BarChart3 className="w-8 h-8 text-foreground" />
-            </div>
-          </motion.div>
 
           {/* Orbiting Circles Container */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none lg:translate-x-12">
+          <div className="absolute inset-y-0 right-0 flex items-center justify-center pointer-events-none w-full lg:w-[350px] max-w-[320px] lg:max-w-[350px] -translate-y-24 lg:-translate-y-32">
 
             {/* Inner Orbit */}
             <OrbitingCircles
               className="border-none bg-transparent"
               duration={25}
-              radius={160}
-              iconSize={40}
+              radius={130}
+              iconSize={32}
               path={false}
             >
               {/* Power BI */}
@@ -123,10 +105,10 @@ export function Hero() {
             {/* Outer Orbit */}
             <OrbitingCircles
               className="border-none bg-transparent"
-              radius={240}
-              duration={35}
+              radius={190}
+              duration={30}
               reverse
-              iconSize={48}
+              iconSize={40}
               path={false}
             >
               {/* Airtable */}
@@ -157,11 +139,11 @@ export function Hero() {
           </div>
 
           {/* Person Image */}
-          <div className="relative z-10 flex items-end justify-end w-full h-full">
+          <div className="absolute inset-y-0 right-0 flex items-center justify-center w-full max-w-[320px] lg:max-w-[350px] pointer-events-none ">
             <img
               src="/images/sample_nobg_cropped.png"
               alt="Power BI Creator"
-              className="w-full max-w-[320px] lg:max-w-[480px] object-contain object-bottom relative z-10 translate-y-8"
+              className="w-full object-contain object-bottom relative z-10 pointer-events-auto"
             />
           </div>
         </div>
