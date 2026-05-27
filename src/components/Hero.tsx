@@ -74,7 +74,7 @@ export function Hero() {
         <div className="relative order-1 lg:order-2 flex items-center justify-end min-h-[550px] lg:min-h-[750px] w-full">
 
           {/* Orbiting Circles Container */}
-          <div className="absolute inset-y-0 right-0 flex items-center justify-center pointer-events-none w-full lg:w-[350px] max-w-[320px] lg:max-w-[350px] -translate-y-24 lg:-translate-y-32">
+          <div className="absolute inset-y-0 right-0 flex items-center justify-center pointer-events-none w-full lg:w-[350px] max-w-[320px] lg:max-w-[350px] -translate-y-24 lg:-translate-y-46 lg:-translate-x-5">
 
             {/* Inner Orbit */}
             <OrbitingCircles
@@ -84,21 +84,29 @@ export function Hero() {
               iconSize={32}
               path={false}
             >
-              {/* Power BI */}
-              <div className="flex items-center justify-center w-full h-full">
-                <img src="/icons/power-bi-icon.svg" alt="Power BI" className="w-8 h-8 object-contain" />
-              </div>
-              {/* Tableau */}
-              <div className="flex items-center justify-center w-full h-full">
-                <img src="/icons/tableau.svg" alt="Tableau" className="w-8 h-8 object-contain" />
-              </div>
               {/* Jira */}
               <div className="flex items-center justify-center w-full h-full">
                 <img src="https://api.iconify.design/logos:jira.svg" alt="Jira" className="w-8 h-8 object-contain" />
               </div>
-              {/* Microsoft Excel */}
+              {/* Airtable */}
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://api.iconify.design/vscode-icons:file-type-excel.svg" alt="Microsoft Excel" className="w-8 h-8 object-contain" />
+                <img src="https://api.iconify.design/logos:airtable.svg" alt="Airtable" className="w-8 h-8 object-contain" />
+              </div>
+              {/* Adobe Photoshop */}
+              <div className="flex items-center justify-center w-full h-full">
+                <img src="https://api.iconify.design/logos:adobe-photoshop.svg" alt="Adobe Photoshop" className="w-8 h-8 object-contain" />
+              </div>
+              {/* Adobe Express */}
+              <div className="flex items-center justify-center w-full h-full">
+                <img src="/icons/adobe-express-icon.svg" alt="Adobe Express" className="w-8 h-8 object-contain" />
+              </div>
+              {/* Adobe Animate */}
+              <div className="flex items-center justify-center w-full h-full">
+                <img src="/icons/adobe-animate-icon.svg" alt="Adobe Animate" className="w-8 h-8 object-contain" />
+              </div>
+              {/* Figma */}
+              <div className="flex items-center justify-center w-full h-full">
+                <img src="https://api.iconify.design/logos:figma.svg" alt="Figma" className="w-8 h-8 object-contain" />
               </div>
             </OrbitingCircles>
 
@@ -111,29 +119,21 @@ export function Hero() {
               iconSize={40}
               path={false}
             >
-              {/* Airtable */}
+              {/* Power BI */}
               <div className="flex items-center justify-center w-full h-full">
-                <img src="https://api.iconify.design/logos:airtable.svg" alt="Airtable" className="w-10 h-10 object-contain" />
+                <img src="/icons/power-bi-icon.svg" alt="Power BI" className="w-10 h-10 object-contain" />
+              </div>
+              {/* Tableau */}
+              <div className="flex items-center justify-center w-full h-full">
+                <img src="/icons/tableau.svg" alt="Tableau" className="w-10 h-10 object-contain" />
+              </div>
+              {/* Microsoft Excel */}
+              <div className="flex items-center justify-center w-full h-full">
+                <img src="https://api.iconify.design/vscode-icons:file-type-excel.svg" alt="Microsoft Excel" className="w-10 h-10 object-contain" />
               </div>
               {/* SQL */}
               <div className="flex items-center justify-center w-full h-full">
                 <img src="/icons/sql.svg" alt="SQL" className="w-10 h-10 object-contain" />
-              </div>
-              {/* Adobe Photoshop */}
-              <div className="flex items-center justify-center w-full h-full">
-                <img src="https://api.iconify.design/logos:adobe-photoshop.svg" alt="Adobe Photoshop" className="w-10 h-10 object-contain" />
-              </div>
-              {/* Adobe Express */}
-              <div className="flex items-center justify-center w-full h-full">
-                <img src="/icons/adobe-express-icon.svg" alt="Adobe Express" className="w-10 h-10 object-contain" />
-              </div>
-              {/* Adobe Animate */}
-              <div className="flex items-center justify-center w-full h-full">
-                <img src="/icons/adobe-animate-icon.svg" alt="Adobe Animate" className="w-10 h-10 object-contain" />
-              </div>
-              {/* Figma */}
-              <div className="flex items-center justify-center w-full h-full">
-                <img src="https://api.iconify.design/logos:figma.svg" alt="Figma" className="w-10 h-10 object-contain" />
               </div>
             </OrbitingCircles>
           </div>
