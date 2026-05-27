@@ -1,7 +1,5 @@
 import { Mail, Phone, MapPin, Clock, Sparkles, ShieldCheck, FileText, LayoutTemplate, Briefcase } from "lucide-react";
 import { ContactForm } from "./ContactForm";
-import HeroParallaxDemo from "@/components/ui/hero-parallax-demo";
-
 export const metadata = {
   title: "Contact Us - GENGRAPHS & GRAPHICS",
   description: "Get in touch with GENGRAPHS AND GRAPHICS PVT. LTD., founded by Mohit Bhardwaj. Secure an analytics consultation or custom Power BI and design deployment.",
@@ -121,10 +119,6 @@ export default function ContactPage() {
           </div>
 
         </div>
-          {/* Interactive Credentials Parallax Showcase */}
-      <div className="relative z-10 w-full pt-16">
-        <HeroParallaxDemo />
-      </div>
       </main>
     </div>
   );

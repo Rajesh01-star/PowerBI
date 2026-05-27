@@ -4,17 +4,22 @@ import { Showroom } from '@/components/Showroom';
 import { TransitionSection } from '@/components/TransitionSection';
 import { Benefits } from '@/components/Benefits';
 import { FeaturedTemplates } from '@/components/FeaturedTemplates';
+import HeroParallaxDemo from '@/components/ui/hero-parallax-demo';
 
 export default function Home() {
   return (
     <div className="relative w-full min-h-screen bg-transparent text-foreground overflow-x-hidden selection:bg-indigo-500/30">
       {/* Background glow effects */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-amber-600/10 blur-[120px] rounded-full pointer-events-none z-0" />
-      <div className="absolute top-[40%] right-[-10%] w-[40%] h-[40%] bg-amber-500/5 blur-[100px] rounded-full pointer-events-none z-0" />
-      
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-amber-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-[40%] right-[-10%] w-[40%] h-[40%] bg-amber-500/5 blur-[100px] rounded-full pointer-events-none" />
+
       <main className="relative z-10">
         <Hero />
-        
+        {/* Interactive Credentials Parallax Showcase */}
+        <div className="relative z-10 w-full pt-16">
+          <HeroParallaxDemo />
+        </div>
+
         {/* Main Sandbox Bento Showroom */}
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="space-y-1 mb-8">
@@ -22,7 +27,7 @@ export default function Home() {
             <p className="text-sm text-muted-foreground">Hover over active configurations to boot live workspace previews.</p>
           </div>
           <Showroom limit={6} />
-          
+
           {/* Marketplace Redirect Button */}
           <div className="mt-8 flex justify-center">
             <Link
