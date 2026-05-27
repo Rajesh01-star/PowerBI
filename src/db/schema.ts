@@ -1,4 +1,4 @@
-import { boolean, integer, numeric, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, integer, numeric, pgTable, text, timestamp, uuid, jsonb } from 'drizzle-orm/pg-core';
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -64,6 +64,8 @@ export const postsTable = pgTable('posts', {
     activeThumbnailIndex: integer('active_thumbnail_index').default(0).notNull(),
     // New: tags for categorization and filtering
     tags: text('tags').array().default([]).notNull(),
+    // New: resource links for client reference and learning
+    references: jsonb('references').$type<{ label: string; url: string }[]>().default([]).notNull(),
     userId: text('user_id')
         .notNull()
         .references(() => user.id, { onDelete: 'cascade' }),

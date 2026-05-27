@@ -29,6 +29,9 @@ export async function createPostAction(formData: FormData) {
     const thumbnailsData = formData.get("thumbnails") as string;
     const thumbnails = thumbnailsData ? JSON.parse(thumbnailsData) : [];
 
+    const referencesData = formData.get("references") as string;
+    const references = referencesData ? JSON.parse(referencesData) : [];
+
     if (!title) {
          throw new Error("Title is required");
     }
@@ -50,6 +53,7 @@ export async function createPostAction(formData: FormData) {
         activeThumbnailIndex,
         tags,
         fileUrl,
+        references,
         userId: session.user.id
     });
 
@@ -83,6 +87,9 @@ export async function updatePostAction(formData: FormData) {
     const thumbnailsData = formData.get("thumbnails") as string;
     const thumbnails = thumbnailsData ? JSON.parse(thumbnailsData) : [];
 
+    const referencesData = formData.get("references") as string;
+    const references = referencesData ? JSON.parse(referencesData) : [];
+
     if (!id || !title) {
          throw new Error("ID and Title are required");
     }
@@ -96,6 +103,7 @@ export async function updatePostAction(formData: FormData) {
         thumbnails,
         activeThumbnailIndex,
         tags,
+        references,
     };
 
     const zipFile = formData.get("file") as File | null;
@@ -133,6 +141,7 @@ export async function getPostsAction() {
         thumbnails: postsTable.thumbnails,
         activeThumbnailIndex: postsTable.activeThumbnailIndex,
         tags: postsTable.tags,
+        references: postsTable.references,
         userId: postsTable.userId,
         views: postsTable.views,
         createdAt: postsTable.createdAt,
@@ -169,6 +178,7 @@ export async function getPublicPostsAction(sort: string = 'views') {
         thumbnails: postsTable.thumbnails,
         activeThumbnailIndex: postsTable.activeThumbnailIndex,
         tags: postsTable.tags,
+        references: postsTable.references,
         userId: postsTable.userId,
         views: postsTable.views,
         createdAt: postsTable.createdAt,
@@ -189,6 +199,7 @@ export async function getPublicPostByIdAction(id: string) {
         thumbnails: postsTable.thumbnails,
         activeThumbnailIndex: postsTable.activeThumbnailIndex,
         tags: postsTable.tags,
+        references: postsTable.references,
         userId: postsTable.userId,
         views: postsTable.views,
         createdAt: postsTable.createdAt,

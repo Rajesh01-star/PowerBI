@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, Edit3, Plus, X, Laptop, ImageIcon, CheckCircle2, Loader2 } from "lucide-react";
+import { Upload, Edit3, Plus, X, Laptop, ImageIcon, CheckCircle2, Loader2, Link as LinkIcon, Trash2 } from "lucide-react";
 import { createPostAction, updatePostAction } from "../actions";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function AssetFormModal({
     editingPost,
@@ -20,7 +21,6 @@ export function AssetFormModal({
 }) {
     const queryClient = useQueryClient();
     const [isLoading, setIsLoading] = useState(false);
-    const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Form states
@@ -34,6 +34,11 @@ export function AssetFormModal({
     const [zipFile, setZipFile] = useState<File | null>(null);
     const [tags, setTags] = useState<string[]>([]);
     const [tagInput, setTagInput] = useState("");
+    
+    // Reference links state
+    const [references, setReferences] = useState<{ label: string; url: string }[]>([]);
+    const [refLabelInput, setRefLabelInput] = useState("");
+    const [refUrlInput, setRefUrlInput] = useState("");
 
     // Initialize states when modal opens or editingPost changes
     useEffect(() => {
@@ -47,6 +52,7 @@ export function AssetFormModal({
                 setThumbnails(editingPost.thumbnails?.length ? editingPost.thumbnails : (editingPost.imageUrl ? [editingPost.imageUrl] : []));
                 setActiveThumbnailIndex(editingPost.activeThumbnailIndex || 0);
                 setTags(editingPost.tags || []);
+                setReferences(editingPost.references || []);
             } else {
                 setTitle("");
                 setDescription("");
@@ -56,12 +62,33 @@ export function AssetFormModal({
                 setThumbnails([]);
                 setActiveThumbnailIndex(0);
                 setTags([]);
+                setReferences([]);
             }
             setTagInput("");
+            setRefLabelInput("");
+            setRefUrlInput("");
             setZipFile(null);
-            setStatus(null);
         }
     }, [isOpen, editingPost]);
+
+    // Escape key press handler
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                if (isLoading) {
+                    toast.info("Please wait while the asset is being processed.");
+                } else {
+                    onClose();
+                }
+            }
+        };
+        if (isOpen) {
+            window.addEventListener("keydown", handleKeyDown);
+        }
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [isOpen, onClose, isLoading]);
 
     function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
@@ -83,10 +110,26 @@ export function AssetFormModal({
         }
     }
 
+    function handleAddReference() {
+        const label = refLabelInput.trim();
+        const urlStr = refUrlInput.trim();
+        if (label && urlStr) {
+            try {
+                new URL(urlStr);
+                setReferences([...references, { label, url: urlStr }]);
+                setRefLabelInput("");
+                setRefUrlInput("");
+            } catch (e) {
+                toast.error("Please enter a valid URL including protocol (e.g. https://)");
+            }
+        } else {
+            toast.warning("Both label and URL are required to add a reference.");
+        }
+    }
+
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setIsLoading(true);
-        setStatus(null);
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
         const formData = new FormData();
@@ -98,6 +141,7 @@ export function AssetFormModal({
         formData.append("activeThumbnailIndex", activeThumbnailIndex.toString());
         formData.append("thumbnails", JSON.stringify(thumbnails));
         formData.append("tags", JSON.stringify(tags));
+        formData.append("references", JSON.stringify(references));
         
         if (zipFile) {
             formData.append("file", zipFile);
@@ -108,10 +152,10 @@ export function AssetFormModal({
         try {
             if (editingPost) {
                 await updatePostAction(formData);
-                setStatus({ type: 'success', message: '✓ Configuration updated!' });
+                toast.success('Configuration updated successfully!');
             } else {
                 await createPostAction(formData);
-                setStatus({ type: 'success', message: '✓ Configuration published!' });
+                toast.success('Configuration published successfully!');
             }
             
             // Invalidate the react-query cache for posts
@@ -119,7 +163,7 @@ export function AssetFormModal({
             
             timeoutRef.current = setTimeout(() => { onClose(); }, 1200);
         } catch (error: any) {
-            setStatus({ type: 'error', message: error.message || 'Failed to process request' });
+            toast.error(error.message || 'Failed to process request');
         } finally {
             setIsLoading(false);
         }
@@ -137,7 +181,13 @@ export function AssetFormModal({
                         className="bg-gradient-to-b from-[#18110E] to-[#0E0A09] border border-[#3E291F]/60 rounded-3xl w-full max-w-5xl max-h-[95vh] overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-5 p-5 lg:p-6 relative shadow-[0_0_50px_-12px_rgba(245,158,11,0.12)]"
                     >
                         <button 
-                            onClick={onClose} 
+                            onClick={() => {
+                                if (isLoading) {
+                                    toast.info("Please wait while the asset is being processed.");
+                                } else {
+                                    onClose();
+                                }
+                            }} 
                             className="absolute top-4 right-4 w-8 h-8 rounded-xl flex items-center justify-center bg-[#1D1412] border border-[#3E291F]/50 hover:bg-[#251A17] text-muted-foreground hover:text-white transition-colors z-20 cursor-pointer"
                         >
                             <X className="w-4 h-4" />
@@ -153,7 +203,7 @@ export function AssetFormModal({
                                     <h3 className="text-xs font-bold uppercase tracking-wider text-white">
                                         {editingPost ? 'Edit Configuration' : 'Global Asset Setup'}
                                     </h3>
-                                    <p className="text-[9px] text-muted-foreground">Customize your Power BI interactive dashboard blueprint</p>
+                                    <p className="text-[12px] text-muted-foreground">Customize your Power BI interactive dashboard blueprint</p>
                                 </div>
                             </div>
 
@@ -266,8 +316,14 @@ export function AssetFormModal({
 
                                 {/* TAGS */}
                                 <div className="space-y-1">
-                                    <div className="flex flex-col gap-2">
-                                        <Input 
+                                    <div className="w-full min-h-[36px] flex flex-wrap items-center gap-1.5 p-1.5 bg-[#130B09] border border-[#3E291F] rounded-xl focus-within:border-amber-500/50 focus-within:ring-2 focus-within:ring-amber-500/10 focus-within:ring-amber-500/10 transition-all duration-150">
+                                        {tags.map((tag, idx) => (
+                                            <span key={idx} className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-1 rounded-lg text-[12px] flex items-center gap-1 hover:bg-amber-500/20 transition-all font-medium duration-150 shrink-0 select-none">
+                                                {tag}
+                                                <button type="button" onClick={() => setTags(tags.filter((_, i) => i !== idx))} className="hover:text-amber-300 transition-colors cursor-pointer"><X className="w-2.5 h-2.5" /></button>
+                                            </span>
+                                        ))}
+                                        <input 
                                             type="text" 
                                             value={tagInput}
                                             onChange={(e) => setTagInput(e.target.value)}
@@ -279,21 +335,13 @@ export function AssetFormModal({
                                                         setTags([...tags, val]);
                                                         setTagInput("");
                                                     }
+                                                } else if (e.key === 'Backspace' && !tagInput && tags.length > 0) {
+                                                    setTags(tags.slice(0, -1));
                                                 }
                                             }}
-                                            placeholder="Tags (Press Enter to add, e.g. Sales, Dark Mode, Finance)" 
-                                            className="w-full h-9 px-3 bg-[#130B09] border border-[#3E291F] rounded-xl text-xs text-white placeholder:text-white/40 focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10 focus-visible:ring-amber-500/10 focus-visible:border-amber-500/50 transition-all outline-none duration-150" 
+                                            placeholder={tags.length === 0 ? "Tags (Press Enter to add, e.g. Sales, Finance)" : "Add tag..."} 
+                                            className="flex-1 min-w-[120px] bg-transparent border-0 p-0.5 text-xs text-white placeholder:text-white/40 focus:ring-0 focus:outline-none focus-visible:ring-0" 
                                         />
-                                        {tags.length > 0 && (
-                                            <div className="flex flex-wrap gap-1 bg-[#130B09]/40 border border-[#3E291F]/50 p-2 rounded-xl">
-                                                {tags.map((tag, idx) => (
-                                                    <span key={idx} className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-lg text-[9px] flex items-center gap-1 hover:bg-amber-500/20 transition-all font-medium duration-150">
-                                                        {tag}
-                                                        <button type="button" onClick={() => setTags(tags.filter((_, i) => i !== idx))} className="hover:text-amber-300 transition-colors"><X className="w-2.5 h-2.5" /></button>
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
 
@@ -332,11 +380,80 @@ export function AssetFormModal({
                                     </div>
                                 </div>
 
-                                {status && (
-                                    <div className={`p-2 rounded-xl text-xs text-center border ${status.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
-                                        {status.message}
+                                {/* REFERENCES & SUPPLEMENTAL RESOURCES SECTION */}
+                                <div className="space-y-2 border-t border-[#3E291F]/40 pt-3.5">
+                                    <div className="flex items-center justify-between">
+                                        <div className="text-[10px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
+                                            <LinkIcon className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+                                            Reference & Educational Links
+                                        </div>
+                                        <span className="text-[9px] font-mono text-[#A08B7E]">({references.length} added)</span>
                                     </div>
-                                )}
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
+                                        <div className="md:col-span-4">
+                                            <Input 
+                                                type="text" 
+                                                value={refLabelInput}
+                                                onChange={(e) => setRefLabelInput(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        handleAddReference();
+                                                    }
+                                                }}
+                                                placeholder="Label (e.g. Gartner Retail Report)" 
+                                                className="w-full h-8 px-2.5 bg-[#130B09] border border-[#3E291F] rounded-xl text-[11px] text-white placeholder:text-white/40 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/10 focus-visible:ring-amber-500/10 focus-visible:border-amber-500/50 outline-none transition-all duration-150" 
+                                            />
+                                        </div>
+                                        <div className="md:col-span-6">
+                                            <Input 
+                                                type="url" 
+                                                value={refUrlInput}
+                                                onChange={(e) => setRefUrlInput(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        handleAddReference();
+                                                    }
+                                                }}
+                                                placeholder="URL (https://example.com/industry-report)" 
+                                                className="w-full h-8 px-2.5 bg-[#130B09] border border-[#3E291F] rounded-xl text-[11px] text-white placeholder:text-white/40 focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/10 focus-visible:ring-amber-500/10 focus-visible:border-amber-500/50 outline-none transition-all duration-150" 
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <button 
+                                                type="button" 
+                                                onClick={handleAddReference}
+                                                className="w-full h-8 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 hover:border-amber-500/40 text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all duration-150 cursor-pointer shadow-sm hover:shadow-[0_2px_8px_rgba(245,158,11,0.1)]"
+                                            >
+                                                <Plus className="w-3.5 h-3.5" /> Add Link
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* List of references */}
+                                    {references.length > 0 && (
+                                        <div className="space-y-1.5 max-h-[130px] overflow-y-auto bg-[#130B09]/30 border border-[#3E291F]/40 p-2 rounded-2xl custom-scrollbar">
+                                            {references.map((ref, idx) => (
+                                                <div key={idx} className="flex items-center justify-between gap-3 bg-[#18110E] border border-[#3E291F]/30 px-3 py-1.5 rounded-xl group/ref text-[11px] hover:border-amber-500/20 transition-all duration-200">
+                                                    <div className="flex items-center gap-2.5 min-w-0">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+                                                        <p className="font-semibold text-white/90 truncate max-w-[160px]">{ref.label}</p>
+                                                        <span className="text-white/30 text-[9px] font-mono truncate max-w-[240px]">{ref.url}</span>
+                                                    </div>
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={() => setReferences(references.filter((_, i) => i !== idx))} 
+                                                        className="w-5 h-5 rounded-lg bg-red-500/5 hover:bg-red-500/20 border border-red-500/15 hover:border-red-500/30 flex items-center justify-center text-red-400 hover:text-white transition-all cursor-pointer shrink-0"
+                                                    >
+                                                        <Trash2 className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
 
                                 <div className="flex gap-3 pt-3 border-t border-[#3E291F]/40">
                                     <button 
@@ -372,16 +489,16 @@ export function AssetFormModal({
                             <div className="absolute bottom-[-20%] left-[-20%] w-[60%] aspect-square rounded-full bg-orange-500/8 blur-[80px] pointer-events-none" />
 
                             <div className="flex items-center justify-between z-10">
-                                <div className="flex items-center gap-2 text-[10px] text-amber-500/80 uppercase font-bold tracking-widest">
-                                    <Laptop className="w-3.5 h-3.5" /> Real-time Asset Canvas
+                                <div className="flex items-center gap-2 text-[12px] text-amber-500/80 uppercase font-bold tracking-widest">
+                                    <Laptop className="w-4 h-4" /> Real-time Asset Canvas
                                 </div>
-                                <span className="px-2 py-0.5 rounded-full bg-[#18100E] border border-[#3E291F] text-[9px] font-mono text-muted-foreground uppercase tracking-wider shadow-sm">
+                                <span className="px-2.5 py-0.5 rounded-full bg-[#18100E] border border-[#3E291F] text-[11px] font-mono text-muted-foreground uppercase tracking-wider shadow-sm">
                                     Preview
                                 </span>
                             </div>
                             
                             <div className="flex-1 flex items-center justify-center p-4 z-10">
-                                <div className="w-full max-w-[240px] rounded-xl border border-[#3E291F] bg-[#110A08]/90 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.65)] backdrop-blur-md hover:border-amber-500/30 transition-all duration-300 group">
+                                <div className="w-full max-w-[270px] rounded-xl border border-[#3E291F] bg-[#110A08]/90 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.65)] backdrop-blur-md hover:border-amber-500/30 transition-all duration-300 group">
                                     <div className={`w-full ${aspect === 'vertical' ? 'aspect-[3/4]' : 'aspect-video'} bg-[#1A1210] relative flex items-center justify-center border-b border-[#3E291F] overflow-hidden`}>
                                         {thumbnails.length > 0 ? (
                                             <img 
@@ -390,42 +507,42 @@ export function AssetFormModal({
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                                             />
                                         ) : (
-                                            <div className="flex flex-col items-center gap-1.5 text-muted-foreground/35 font-mono text-[9px] select-none">
-                                                <ImageIcon className="w-5 h-5 text-[#3E291F]" />
+                                            <div className="flex flex-col items-center gap-1.5 text-muted-foreground/35 font-mono text-[11px] select-none">
+                                                <ImageIcon className="w-6 h-6 text-[#3E291F]" />
                                                 <span>NO SNAPSHOT RENDERED</span>
                                             </div>
                                         )}
                                         {url && (
-                                            <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-[8px] font-bold text-blue-300 uppercase tracking-wide shadow-sm backdrop-blur-sm">
+                                            <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-[10px] font-bold text-blue-300 uppercase tracking-wide shadow-sm backdrop-blur-sm">
                                                 Live Link
                                             </span>
                                         )}
-                                        <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-[#0F0A09]/80 border border-[#3E291F] text-[8px] uppercase tracking-wider text-amber-400 font-bold font-mono shadow-sm">
+                                        <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-[#0F0A09]/80 border border-[#3E291F] text-[10px] uppercase tracking-wider text-amber-400 font-bold font-mono shadow-sm">
                                             {aspect}
                                         </span>
                                     </div>
                                     <div className="p-4 space-y-2">
                                         <div className="flex items-start justify-between gap-3">
-                                            <h4 className="font-bold text-xs text-foreground/90 truncate flex-1 group-hover:text-amber-400 transition-colors">
+                                            <h2 className="font-bold text-sm text-foreground/90 truncate flex-1 group-hover:text-amber-400 transition-colors">
                                                 {title || "Untitled Blueprint"}
-                                            </h4>
-                                            <span className="text-xs font-mono text-amber-500 font-bold bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg shadow-sm">
+                                            </h2>
+                                            <span className="text-sm font-mono text-amber-500 font-bold bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg shadow-sm">
                                                 {price ? `$${parseFloat(price).toFixed(2)}` : "Free"}
                                             </span>
                                         </div>
-                                        <p className="text-[10px] text-muted-foreground line-clamp-2 leading-relaxed min-h-[30px]">
+                                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed min-h-[36px]">
                                             {description || "No supplemental details provided for this blueprint asset. Add description on the form."}
                                         </p>
                                         
                                         {tags.length > 0 && (
                                             <div className="flex flex-wrap gap-1 pt-2 border-t border-[#3E291F]/30">
                                                 {tags.slice(0, 3).map((tag, i) => (
-                                                    <span key={i} className="text-[8px] font-semibold text-[#A08B7E] bg-[#1D1412] px-1.5 py-0.5 rounded border border-[#3E291F]/30">
+                                                    <span key={i} className="text-[10px] font-semibold text-[#A08B7E] bg-[#1D1412] px-1.5 py-0.5 rounded border border-[#3E291F]/30">
                                                         #{tag}
                                                     </span>
                                                 ))}
                                                 {tags.length > 3 && (
-                                                    <span className="text-[8px] text-muted-foreground/50 font-mono">
+                                                    <span className="text-[10px] text-muted-foreground/50 font-mono">
                                                         +{tags.length - 3}
                                                     </span>
                                                 )}
@@ -435,7 +552,7 @@ export function AssetFormModal({
                                 </div>
                             </div>
 
-                            <div className="text-center text-[9px] text-muted-foreground/40 font-mono tracking-wider pt-3 border-t border-[#3E291F]/30 z-10">
+                            <div className="text-center text-[10px] text-muted-foreground/40 font-mono tracking-wider pt-3 border-t border-[#3E291F]/30 z-10">
                                 BLUEPRINT RENDER ENGINE v1.2
                             </div>
                         </div>

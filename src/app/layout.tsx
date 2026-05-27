@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 import { Navbar } from "@/components/Navbar";
 import { Providers } from "@/components/Providers";
 import { Footer } from "@/components/Footer";
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -33,6 +34,7 @@ export default function RootLayout({
             <Navbar />
             <div className="flex-grow flex flex-col">{children}</div>
             <Footer />
+            <Toaster richColors closeButton position="top-right" theme="dark" />
           </Providers>
         </ThemeProvider>
       </body>

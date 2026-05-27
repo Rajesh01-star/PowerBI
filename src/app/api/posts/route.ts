@@ -44,6 +44,7 @@ export async function GET(request: Request) {
                 thumbnails: postsTable.thumbnails,
                 activeThumbnailIndex: postsTable.activeThumbnailIndex,
                 tags: postsTable.tags,
+                references: postsTable.references,
                 userId: postsTable.userId,
                 views: postsTable.views,
                 createdAt: postsTable.createdAt,

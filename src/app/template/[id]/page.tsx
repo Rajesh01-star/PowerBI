@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Check, DownloadCloud, Server, ShieldCheck, Database, LayoutDashboard, Smartphone, Monitor, Loader2, Eye, ImageIcon, X } from 'lucide-react';
+import { ChevronLeft, Check, DownloadCloud, Server, ShieldCheck, Database, LayoutDashboard, Smartphone, Monitor, Loader2, Eye, ImageIcon, X, BookOpen, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import InteractivePBI from '@/components/InteractivePBI';
 import Script from 'next/script';
 import { getPublicPostByIdAction, getPostFileUrlAction } from '@/app/admin/actions';
 import { authClient } from '@/lib/auth-client';
+import { toast } from 'sonner';
 
 export default function TemplateDetail() {
   const { data: sessionData } = authClient.useSession();
@@ -105,7 +106,7 @@ export default function TemplateDetail() {
 
   const handlePurchase = async () => {
     if (!post || !post.price || parseFloat(post.price) <= 0) {
-      alert("This template is free or invalid price.");
+      toast.warning("This template is free or has an invalid price.");
       return;
     }
 
@@ -120,7 +121,7 @@ export default function TemplateDetail() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "Failed to create order");
+        toast.error(data.error || "Failed to create order");
         setIsProcessing(false);
         return;
       }
@@ -145,13 +146,13 @@ export default function TemplateDetail() {
             });
             const verifyData = await verifyRes.json();
             if (verifyRes.ok && verifyData.success) {
-              alert("Payment successful! You can now access your template.");
+              toast.success("Payment successful! You can now access your template.");
             } else {
-              alert("Payment verification failed.");
+              toast.error("Payment verification failed.");
             }
           } catch (err) {
             console.error("Verification error", err);
-            alert("Error verifying payment");
+            toast.error("Error verifying payment");
           }
         },
         theme: {
@@ -161,12 +162,12 @@ export default function TemplateDetail() {
 
       const rzp = new (window as any).Razorpay(options);
       rzp.on("payment.failed", function (response: any) {
-        alert(`Payment failed: ${response.error.description}`);
+        toast.error(`Payment failed: ${response.error.description}`);
       });
       rzp.open();
     } catch (err) {
       console.error(err);
-      alert("An error occurred while initializing checkout");
+      toast.error("An error occurred while initializing checkout");
     } finally {
       setIsProcessing(false);
     }
@@ -184,10 +185,10 @@ export default function TemplateDetail() {
         a.click();
         document.body.removeChild(a);
       } else {
-        alert("File not found for this template.");
+        toast.error("File not found for this template.");
       }
     } catch (err: any) {
-      alert(err.message || "Failed to download template");
+      toast.error(err.message || "Failed to download template");
     } finally {
       setIsDownloading(false);
     }
@@ -297,6 +298,51 @@ export default function TemplateDetail() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Reference Resources Section */}
+            {post.references && post.references.length > 0 && (
+              <div className="space-y-4 pt-6 border-t border-border mt-6">
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-foreground/80 flex items-center gap-1.5">
+                    <BookOpen className="w-4 h-4 text-amber-500 animate-pulse" /> Educational & Reference Materials
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground leading-normal">
+                    Explore additional articles, industry benchmarks, and learning materials curated for this dataset blueprint.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {post.references.map((ref: { label: string; url: string }, idx: number) => {
+                    let domain = "Resource File";
+                    try {
+                      domain = new URL(ref.url).hostname.replace("www.", "");
+                    } catch (e) {}
+
+                    return (
+                      <a 
+                        key={idx}
+                        href={ref.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-between p-4 rounded-2xl border border-border bg-card/30 hover:bg-[#1D1412]/20 hover:border-amber-500/30 hover:shadow-[0_4px_20px_rgba(245,158,11,0.03)] transition-all duration-300 shadow-sm"
+                      >
+                        <div className="space-y-1.5 pr-4 min-w-0">
+                          <h4 className="font-semibold text-xs text-foreground group-hover:text-amber-400 transition-colors truncate">
+                            {ref.label}
+                          </h4>
+                          <span className="inline-flex text-[9px] font-mono font-semibold text-muted-foreground/60 uppercase tracking-wide bg-muted/65 border border-border/40 px-2 py-0.5 rounded-md">
+                            {domain}
+                          </span>
+                        </div>
+                        <div className="w-8 h-8 rounded-xl bg-muted border border-border group-hover:border-amber-500/25 group-hover:bg-amber-500/10 flex items-center justify-center text-muted-foreground group-hover:text-amber-500 shrink-0 transition-all duration-300">
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </div>
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             )}
