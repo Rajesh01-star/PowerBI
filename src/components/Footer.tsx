@@ -11,11 +11,9 @@ export function Footer() {
 
         {/* Branding Capsule */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg flex items-center justify-center border border-border/40">
-              <Cpu className="w-3 h-3 text-white" />
-            </div>
-            <span className="font-bold tracking-tight text-foreground">Studio Analytics</span>
+          <div className="flex items-center gap-3">
+            <img src="/icons/logo.png" alt="Logo" className="h-8 w-auto object-contain drop-shadow-sm" />
+            <span className="font-bold tracking-tight text-foreground text-base">GENGRAPHS & GRAPHICS</span>
           </div>
           <p className="text-[11px] text-muted-foreground leading-relaxed max-w-xs">Premium engineered data visualization matrices and deployment assets built for enterprise pipelines.</p>
         </div>
@@ -41,7 +39,7 @@ export function Footer() {
 
       {/* Footer Bottom copyright seal */}
       <div className="max-w-7xl mx-auto px-6 py-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-muted-foreground/60 font-mono">
-        <p>© {new Date().getFullYear()} STUDIO ANALYTICS. ALL RIGHTS RESERVED.</p>
+        <p>© {new Date().getFullYear()} GENGRAPHS & GRAPHICS. ALL RIGHTS RESERVED.</p>
         <p className="tracking-tighter">BUILT FOR POWER BI TOPOLOGY</p>
       </div>
     </footer>
