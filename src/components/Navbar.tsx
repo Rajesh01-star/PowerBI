@@ -192,26 +192,14 @@ export function Navbar() {
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="p-2 w-[450px]">
                     <div className="grid grid-cols-1 gap-1">
-                      <NavigationMenuLink href="/products/adobe-xd" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
-                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-500/10 border border-pink-500/20 group-hover/item:bg-pink-500/20 transition-all duration-300">
-                          <AdobeXDIcon />
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-semibold text-foreground group-hover/item:text-[#FF26BE] transition-colors">Adobe XD</h4>
-                          <p className="mt-0.5 text-[10px] text-muted-foreground leading-relaxed">
-                            Professional UX/UI mockup design, interactive digital prototyping, and high-fidelity wireframing.
-                          </p>
-                        </div>
-                      </NavigationMenuLink>
-
-                      <NavigationMenuLink href="/products/figma" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
-                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 group-hover/item:bg-orange-500/20 transition-all duration-300">
+                      <NavigationMenuLink href="/products/ux-ui-design" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
+                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 group-hover/item:bg-purple-500/20 transition-all duration-300">
                           <FigmaIcon />
                         </div>
                         <div>
-                          <h4 className="text-xs font-semibold text-foreground group-hover/item:text-[#F24E1E] transition-colors">Figma</h4>
+                          <h4 className="text-xs font-semibold text-foreground group-hover/item:text-purple-500 transition-colors">UX/UI & Graphic Designing</h4>
                           <p className="mt-0.5 text-[10px] text-muted-foreground leading-relaxed">
-                            Collaborative interface design, interactive prototypes, design systems, and component libraries.
+                            Professional UX/UI mockup design, brand-aligned graphic design, and high-fidelity wireframing.
                           </p>
                         </div>
                       </NavigationMenuLink>
