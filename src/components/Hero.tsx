@@ -43,7 +43,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl lg:text-5xl font-sans font-medium tracking-tight mb-6 leading-[1.1] text-foreground "
+            className="text-4xl lg:text-5xl font-serif font-medium tracking-tight mb-6 leading-[1.1] text-foreground "
           >
             Meet the Expert <br />
             Power BI Creator
