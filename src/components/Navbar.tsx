@@ -131,8 +131,8 @@ export function Navbar() {
           {/* Left: Logo & Brand */}
           <div className="flex-1 flex justify-start">
             <Link href="/" className="flex items-center gap-2 py-1 text-sm font-semibold cursor-pointer">
-              <img src="https://cdn.skiper-ui.com/logos/logo.svg" alt="Logo" className="w-6 h-6 animate-pulse" />
-              <span className="text-xs text-foreground tracking-wide whitespace-nowrap">GENGRAPHS & GRAPHICS</span>
+              <img src="/icons/logo.png" alt="Logo" className="h-9 w-auto object-contain drop-shadow-sm" />
+              <span className="text-base font-bold text-foreground tracking-wide whitespace-nowrap pt-0.5">GENGRAPHS & GRAPHICS</span>
             </Link>
           </div>
 
@@ -271,7 +271,7 @@ export function Navbar() {
                             </div>
                             <div>
                               <div className="text-[8px] text-muted-foreground uppercase tracking-widest font-mono">Secure Email</div>
-                              <div className="text-[10px] font-semibold text-foreground">connect@gengraphs.com</div>
+                              <div className="text-[10px] font-semibold text-foreground"> info@gengraphsandgraphics.com</div>
                             </div>
                           </div>
 
