@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Clock, Sparkles, ShieldCheck, FileText, LayoutTemplate, Briefcase } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, ShieldCheck } from "lucide-react";
 import { ContactForm } from "./ContactForm";
 export const metadata = {
   title: "Contact Us - GENGRAPHS & GRAPHICS",
