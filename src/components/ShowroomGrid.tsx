@@ -233,3 +233,25 @@ export function ShowroomGrid({ posts, limit }: ShowroomGridProps) {
     </>
   );
 }
+
+export function ShowroomGridSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[280px] gap-5">
+      {Array.from({ length: count }).map((_, index) => (
+        <div 
+          key={index}
+          className="relative w-full h-full bg-card/40 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/80 flex flex-col justify-between animate-pulse row-span-1"
+        >
+          <div className="absolute inset-0 z-0 bg-muted/20" />
+          <div className="mt-auto w-full p-3.5 bg-gradient-to-t from-background via-background/95 to-transparent z-10 border-t border-border flex items-center justify-between gap-3">
+            <div className="space-y-1.5 flex-1 min-w-0">
+              <div className="h-3.5 bg-neutral-800/80 rounded w-3/4"></div>
+              <div className="h-2 bg-neutral-800/80 rounded w-1/2"></div>
+            </div>
+            <div className="w-6 h-6 rounded-md bg-neutral-800/80 shrink-0"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

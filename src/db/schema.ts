@@ -62,6 +62,10 @@ export const postsTable = pgTable('posts', {
     thumbnails: text('thumbnails').array().default([]).notNull(),
     // New: index of the active/primary thumbnail (0-based)
     activeThumbnailIndex: integer('active_thumbnail_index').default(0).notNull(),
+    // New: Asset type to distinguish between Power BI and UI/UX templates
+    assetType: text('asset_type').$type<'powerbi' | 'uiux'>().default('powerbi').notNull(),
+    // New: Optional source link for UI/UX (e.g., Figma edit link)
+    sourceLink: text('source_link'),
     // New: tags for categorization and filtering
     tags: text('tags').array().default([]).notNull(),
     // New: resource links for client reference and learning

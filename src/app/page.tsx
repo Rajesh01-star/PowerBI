@@ -28,7 +28,7 @@ export default function Home() {
           {/* Marketplace Redirect Button */}
           <div className="mt-8 flex justify-center">
             <Link
-              href="/marketplace"
+              href="/products"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-black text-xs font-bold uppercase tracking-wider hover:-translate-y-0.5 transition-all duration-300 shadow-[0_10px_20px_rgba(245,158,11,0.25)] hover:shadow-[0_10px_25px_rgba(245,158,11,0.4)] cursor-pointer"
             >
               <span>Explore Marketplace</span>

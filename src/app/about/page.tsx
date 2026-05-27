@@ -57,7 +57,7 @@ export default function AboutPage() {
                   <div className="text-xs font-semibold text-foreground mt-0.5">Mohit Bhardwaj</div>
                 </div>
                 <Link
-                  href="/marketplace"
+                  href="/products"
                   className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-1.5 text-[9px] font-semibold text-amber-500 transition-all border border-amber-500/20 group/btn"
                 >
                   <span>Browse Visuals</span>
@@ -159,7 +159,7 @@ export default function AboutPage() {
             </p>
             <div className="relative z-10">
               <Link
-                href="/marketplace"
+                href="/products"
                 className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 px-4 py-2 text-xs font-semibold text-black hover:-translate-y-0.5 transition-all shadow-[0_10px_20px_rgba(245,158,11,0.25)] hover:shadow-[0_10px_25px_rgba(245,158,11,0.4)] cursor-pointer"
               >
                 <span>Browse Custom Visuals</span>

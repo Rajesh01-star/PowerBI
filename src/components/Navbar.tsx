@@ -185,14 +185,14 @@ export function Navbar() {
                 {/* Products Nav Item */}
                 <NavigationMenuItem>
                   <NavigationMenuTrigger
-                    onClick={() => router.push('/marketplace')}
+                    onClick={() => router.push('/products')}
                     className="text-foreground/70 hover:text-foreground bg-transparent hover:bg-accent focus:bg-accent data-[popup-open]:bg-accent data-[popup-open]:text-foreground transition-all cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1"
                   >
                     Products
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="p-2 w-[450px]">
                     <div className="grid grid-cols-1 gap-1">
-                      <NavigationMenuLink href="/products/ux-ui-design" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
+                      <NavigationMenuLink href="/products/ui-ux" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
                         <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 group-hover/item:bg-purple-500/20 transition-all duration-300">
                           <FigmaIcon />
                         </div>

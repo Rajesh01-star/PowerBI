@@ -27,6 +27,8 @@ export function AssetFormModal({
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
+    const [assetType, setAssetType] = useState<"powerbi" | "uiux">("powerbi");
+    const [sourceLink, setSourceLink] = useState("");
     const [aspect, setAspect] = useState<"horizontal" | "vertical">("horizontal");
     const [url, setUrl] = useState("");
     const [thumbnails, setThumbnails] = useState<string[]>([]);
@@ -47,6 +49,8 @@ export function AssetFormModal({
                 setTitle(editingPost.title || "");
                 setDescription(editingPost.description || "");
                 setPrice(editingPost.price ? editingPost.price.toString() : "");
+                setAssetType(editingPost.assetType || "powerbi");
+                setSourceLink(editingPost.sourceLink || "");
                 setAspect(editingPost.aspect || "horizontal");
                 setUrl(editingPost.url || "");
                 setThumbnails(editingPost.thumbnails?.length ? editingPost.thumbnails : (editingPost.imageUrl ? [editingPost.imageUrl] : []));
@@ -57,6 +61,8 @@ export function AssetFormModal({
                 setTitle("");
                 setDescription("");
                 setPrice("");
+                setAssetType("powerbi");
+                setSourceLink("");
                 setAspect("horizontal");
                 setUrl("");
                 setThumbnails([]);
@@ -136,6 +142,8 @@ export function AssetFormModal({
         formData.append("title", title);
         formData.append("description", description);
         formData.append("price", price);
+        formData.append("assetType", assetType);
+        formData.append("sourceLink", sourceLink);
         formData.append("aspect", aspect);
         formData.append("url", url);
         formData.append("activeThumbnailIndex", activeThumbnailIndex.toString());
@@ -208,6 +216,18 @@ export function AssetFormModal({
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+                                <div className="space-y-1">
+                                    <Select value={assetType} onValueChange={(val) => { console.log('AssetType changed to:', val); setAssetType(val as "powerbi" | "uiux"); }}>
+                                        <SelectTrigger className="w-full bg-[#130B09] border border-[#3E291F] rounded-xl text-xs h-9 px-3 text-white focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10 transition-all outline-none cursor-pointer">
+                                            <SelectValue placeholder="Asset Type *" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-[#18110E] border border-[#3E291F] text-white text-xs shadow-xl rounded-xl ring-1 ring-black/40 z-[200]">
+                                            <SelectItem value="powerbi" className="hover:bg-amber-500/10 focus:bg-amber-500/10 text-white text-xs py-2 rounded-lg cursor-pointer">Power BI Dashboard</SelectItem>
+                                            <SelectItem value="uiux" className="hover:bg-amber-500/10 focus:bg-amber-500/10 text-white text-xs py-2 rounded-lg cursor-pointer">UX/UI & Graphic Design</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
                                 <div className="space-y-1">
                                     <Input 
                                         type="text" 
@@ -292,7 +312,7 @@ export function AssetFormModal({
                                         <div className="relative border border-dashed border-[#3E291F] hover:border-amber-500/50 bg-[#0E0907] hover:bg-[#130B09]/60 rounded-xl transition-all duration-200 cursor-pointer group">
                                             <input
                                                 type="file"
-                                                accept=".zip,application/zip,.pbix"
+                                                accept={assetType === 'powerbi' ? ".zip,application/zip,.pbix" : ".zip,application/zip,.fig,.psd,.ai,.xd"}
                                                 onChange={(e) => setZipFile(e.target.files?.[0] || null)}
                                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                             />
@@ -302,7 +322,7 @@ export function AssetFormModal({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-[10px] font-semibold text-white/70 group-hover:text-white transition-colors leading-none">
-                                                        {editingPost ? "Replace file (.zip or .pbix)" : "Upload file (.zip or .pbix)"}
+                                                        {editingPost ? `Replace file (${assetType === 'powerbi' ? '.zip or .pbix' : '.zip, .fig, .psd, etc'})` : `Upload file (${assetType === 'powerbi' ? '.zip or .pbix' : '.zip, .fig, .psd, etc'})`}
                                                     </p>
                                                     <p className="text-[9px] text-white/30 mt-0.5">Drag & drop, or click Browse</p>
                                                 </div>
@@ -374,11 +394,23 @@ export function AssetFormModal({
                                             type="url" 
                                             value={url} 
                                             onChange={(e) => setUrl(e.target.value)} 
-                                            placeholder="Power BI Live Link (https://...)" 
+                                            placeholder={assetType === 'powerbi' ? "Power BI Live Link (https://...)" : "Live Preview Link (Figma prototype / web)"} 
                                             className="w-full h-9 px-3 bg-[#130B09] border border-[#3E291F] rounded-xl text-xs text-white placeholder:text-white/40 focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10 focus-visible:ring-amber-500/10 focus-visible:border-amber-500/50 transition-all outline-none duration-150" 
                                         />
                                     </div>
                                 </div>
+
+                                {assetType === 'uiux' && (
+                                    <div className="space-y-1">
+                                        <Input 
+                                            type="url" 
+                                            value={sourceLink} 
+                                            onChange={(e) => setSourceLink(e.target.value)} 
+                                            placeholder="Figma Edit Link (Optional source link for buyers)" 
+                                            className="w-full h-9 px-3 bg-[#130B09] border border-[#3E291F] rounded-xl text-xs text-white placeholder:text-white/40 focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10 focus-visible:ring-amber-500/10 focus-visible:border-amber-500/50 transition-all outline-none duration-150" 
+                                        />
+                                    </div>
+                                )}
 
                                 {/* REFERENCES & SUPPLEMENTAL RESOURCES SECTION */}
                                 <div className="space-y-2 border-t border-[#3E291F]/40 pt-3.5">
@@ -490,7 +522,7 @@ export function AssetFormModal({
 
                             <div className="flex items-center justify-between z-10">
                                 <div className="flex items-center gap-2 text-[12px] text-amber-500/80 uppercase font-bold tracking-widest">
-                                    <Laptop className="w-4 h-4" /> Real-time Asset Canvas
+                                    <Laptop className="w-4 h-4" /> {assetType === 'powerbi' ? 'Real-time Asset Canvas' : 'UX/UI Design Canvas'}
                                 </div>
                                 <span className="px-2.5 py-0.5 rounded-full bg-[#18100E] border border-[#3E291F] text-[11px] font-mono text-muted-foreground uppercase tracking-wider shadow-sm">
                                     Preview
@@ -524,14 +556,14 @@ export function AssetFormModal({
                                     <div className="p-4 space-y-2">
                                         <div className="flex items-start justify-between gap-3">
                                             <h2 className="font-bold text-sm text-foreground/90 truncate flex-1 group-hover:text-amber-400 transition-colors">
-                                                {title || "Untitled Blueprint"}
+                                                {title || (assetType === 'powerbi' ? "Untitled Blueprint" : "Untitled Design")}
                                             </h2>
                                             <span className="text-sm font-mono text-amber-500 font-bold bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg shadow-sm">
                                                 {price ? `$${parseFloat(price).toFixed(2)}` : "Free"}
                                             </span>
                                         </div>
                                         <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed min-h-[36px]">
-                                            {description || "No supplemental details provided for this blueprint asset. Add description on the form."}
+                                            {description || `No supplemental details provided for this ${assetType === 'powerbi' ? 'blueprint' : 'design'} asset. Add description on the form.`}
                                         </p>
                                         
                                         {tags.length > 0 && (

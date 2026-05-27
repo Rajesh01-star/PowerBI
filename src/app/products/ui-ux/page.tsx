@@ -3,23 +3,23 @@
 import React, { useState } from 'react';
 import { ChartColumn, Loader2, Search, Filter, Users, TrendingUp, Eye } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { getPublicPostsAction, getMarketplaceStatsAction } from '@/app/admin/actions';
+import { getPublicPostsByTypeAction, getMarketplaceStatsAction } from '@/app/admin/actions';
 import { ShowroomFilter, SortOption } from '@/components/ShowroomFilter';
-import { ShowroomGrid } from '@/components/ShowroomGrid';
+import { ShowroomGrid, ShowroomGridSkeleton } from '@/components/ShowroomGrid';
 import { GooeyInput } from '@/components/ui/gooey-input';
 
-export default function Marketplace() {
+export default function ProductsUiUx() {
   const [activeSort, setActiveSort] = useState<SortOption>('views');
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
 
   const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['public-posts', activeSort],
-    queryFn: () => getPublicPostsAction(activeSort),
+    queryKey: ['public-posts', 'uiux', activeSort],
+    queryFn: () => getPublicPostsByTypeAction('uiux', activeSort),
   });
 
-  const { data: stats = { templatesCount: 2400, creatorsCount: 1000, newMonthlyReports: 100, reportViews: 1000000 } } = useQuery({
+  const { data: stats = { templatesCount: 0, creatorsCount: 0, newMonthlyReports: 0, reportViews: 0 }, isLoading: isStatsLoading } = useQuery({
     queryKey: ['marketplace-stats'],
     queryFn: () => getMarketplaceStatsAction(),
   });
@@ -34,7 +34,7 @@ export default function Marketplace() {
     {
       id: "templates",
       value: stats.templatesCount,
-      label: "Power BI Templates",
+      label: "UI/UX Templates",
       icon: <ChartColumn className="w-4.5 h-4.5" />,
     },
     {
@@ -85,33 +85,48 @@ export default function Marketplace() {
           {/* Top Hero Stats Header Section */}
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4 animate-in fade-in slide-in-from-top-4 duration-1000">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
-              Production-Grade Power BI <br className="hidden sm:inline" />
+              Production-Grade UI/UX <br className="hidden sm:inline" />
               <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent">Interactive Dashboard Gallery</span>
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground/80 max-w-2xl mx-auto leading-relaxed">
-              Explore high-fidelity, interactive Power BI templates optimized for executive operations, financial forecasting, dynamic sales performance, and HR metrics. Instantly launch layouts, explore live embeds, and download configuration files to elevate your BI strategy.
+              Explore high-fidelity, interactive UI/UX templates optimized for executive operations, financial forecasting, dynamic sales performance, and HR metrics. Instantly launch layouts, explore live embeds, and download configuration files to elevate your BI strategy.
             </p>
 
             {/* Stats Cards Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 max-w-5xl mx-auto text-left">
-              {statsData.map((item) => (
-                <div 
-                  key={item.id}
-                  className="bg-neutral-900/40 backdrop-blur-xl border border-neutral-800/80 rounded-2xl p-4 flex items-center gap-3.5 shadow-md shadow-amber-500/2 hover:border-neutral-700/60 transition-all duration-300 min-w-0"
-                >
-                  <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
-                    {item.icon}
-                  </div>
-                  <div className="space-y-0.5 min-w-0">
-                    <div className="text-lg sm:text-xl font-bold text-foreground tracking-tight leading-none">
-                      {formatViews(item.value)}
-                    </div>
-                    <div className="text-[8px] uppercase font-bold tracking-widest text-muted-foreground/60 leading-normal whitespace-nowrap">
-                      {item.label}
+              {isStatsLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div 
+                    key={i}
+                    className="bg-neutral-900/40 backdrop-blur-xl border border-neutral-800/80 rounded-2xl p-4 flex items-center gap-3.5 shadow-md shadow-amber-500/2 min-w-0 animate-pulse"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-neutral-800/80 shrink-0"></div>
+                    <div className="space-y-1.5 min-w-0 flex-1">
+                      <div className="h-4 sm:h-5 bg-neutral-800/80 rounded w-16"></div>
+                      <div className="h-2.5 bg-neutral-800/80 rounded w-24"></div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                statsData.map((item) => (
+                  <div 
+                    key={item.id}
+                    className="bg-neutral-900/40 backdrop-blur-xl border border-neutral-800/80 rounded-2xl p-4 flex items-center gap-3.5 shadow-md shadow-amber-500/2 hover:border-neutral-700/60 transition-all duration-300 min-w-0"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
+                      {item.icon}
+                    </div>
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="text-lg sm:text-xl font-bold text-foreground tracking-tight leading-none">
+                        {formatViews(item.value)}
+                      </div>
+                      <div className="text-[8px] uppercase font-bold tracking-widest text-muted-foreground/60 leading-normal whitespace-nowrap">
+                        {item.label}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -182,11 +197,8 @@ export default function Marketplace() {
 
           {/* Real-time filters and live posts grid */}
           {isLoading ? (
-            <div className="w-full h-96 flex items-center justify-center">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-                <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
-                SYNCHRONIZING TEMPLATE INVENTORIES...
-              </div>
+            <div className="space-y-3">
+              <ShowroomGridSkeleton count={6} />
             </div>
           ) : (
             <div className="space-y-3">

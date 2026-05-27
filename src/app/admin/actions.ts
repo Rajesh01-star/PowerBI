@@ -22,6 +22,8 @@ export async function createPostAction(formData: FormData) {
     const url = formData.get("url") as string;
     const aspect = formData.get("aspect") as 'horizontal' | 'vertical';
     const activeThumbnailIndex = parseInt(formData.get("activeThumbnailIndex") as string || "0");
+    const assetType = (formData.get("assetType") as 'powerbi' | 'uiux') || 'powerbi';
+    const sourceLink = formData.get("sourceLink") as string;
     
     const tagsData = formData.get("tags") as string;
     const tags = tagsData ? JSON.parse(tagsData) : [];
@@ -51,6 +53,8 @@ export async function createPostAction(formData: FormData) {
         aspect: aspect || 'horizontal',
         thumbnails,
         activeThumbnailIndex,
+        assetType,
+        sourceLink: sourceLink || null,
         tags,
         fileUrl,
         references,
@@ -58,7 +62,7 @@ export async function createPostAction(formData: FormData) {
     });
 
     revalidatePath("/");
-    revalidatePath("/marketplace");
+    revalidatePath("/products");
     revalidatePath("/admin");
 
     return { success: true };
@@ -80,6 +84,8 @@ export async function updatePostAction(formData: FormData) {
     const url = formData.get("url") as string;
     const aspect = formData.get("aspect") as 'horizontal' | 'vertical';
     const activeThumbnailIndex = parseInt(formData.get("activeThumbnailIndex") as string || "0");
+    const assetType = (formData.get("assetType") as 'powerbi' | 'uiux') || 'powerbi';
+    const sourceLink = formData.get("sourceLink") as string;
     
     const tagsData = formData.get("tags") as string;
     const tags = tagsData ? JSON.parse(tagsData) : [];
@@ -102,6 +108,8 @@ export async function updatePostAction(formData: FormData) {
         aspect: aspect || 'horizontal',
         thumbnails,
         activeThumbnailIndex,
+        assetType,
+        sourceLink: sourceLink || null,
         tags,
         references,
     };
@@ -115,7 +123,7 @@ export async function updatePostAction(formData: FormData) {
     await db.update(postsTable).set(updateData).where(eq(postsTable.id, id));
 
     revalidatePath("/");
-    revalidatePath("/marketplace");
+    revalidatePath("/products");
     revalidatePath("/admin");
 
     return { success: true };
@@ -140,6 +148,8 @@ export async function getPostsAction() {
         imageUrl: postsTable.imageUrl,
         thumbnails: postsTable.thumbnails,
         activeThumbnailIndex: postsTable.activeThumbnailIndex,
+        assetType: postsTable.assetType,
+        sourceLink: postsTable.sourceLink,
         tags: postsTable.tags,
         references: postsTable.references,
         userId: postsTable.userId,
@@ -177,6 +187,8 @@ export async function getPublicPostsAction(sort: string = 'views') {
         imageUrl: postsTable.imageUrl,
         thumbnails: postsTable.thumbnails,
         activeThumbnailIndex: postsTable.activeThumbnailIndex,
+        assetType: postsTable.assetType,
+        sourceLink: postsTable.sourceLink,
         tags: postsTable.tags,
         references: postsTable.references,
         userId: postsTable.userId,
@@ -184,6 +196,45 @@ export async function getPublicPostsAction(sort: string = 'views') {
         createdAt: postsTable.createdAt,
         updatedAt: postsTable.updatedAt
     }).from(postsTable).orderBy(orderByClause);
+    return posts;
+}
+
+export async function getPublicPostsByTypeAction(type: 'powerbi' | 'uiux', sort: string = 'views') {
+    let orderByClause;
+    switch (sort) {
+        case 'newest':
+            orderByClause = desc(postsTable.createdAt);
+            break;
+        case 'oldest':
+            orderByClause = asc(postsTable.createdAt);
+            break;
+        case 'atoz':
+            orderByClause = asc(postsTable.title);
+            break;
+        case 'views':
+        default:
+            orderByClause = desc(postsTable.views);
+            break;
+    }
+    const posts = await db.select({
+        id: postsTable.id,
+        title: postsTable.title,
+        description: postsTable.description,
+        price: postsTable.price,
+        url: postsTable.url,
+        aspect: postsTable.aspect,
+        imageUrl: postsTable.imageUrl,
+        thumbnails: postsTable.thumbnails,
+        activeThumbnailIndex: postsTable.activeThumbnailIndex,
+        assetType: postsTable.assetType,
+        sourceLink: postsTable.sourceLink,
+        tags: postsTable.tags,
+        references: postsTable.references,
+        userId: postsTable.userId,
+        views: postsTable.views,
+        createdAt: postsTable.createdAt,
+        updatedAt: postsTable.updatedAt
+    }).from(postsTable).where(eq(postsTable.assetType, type)).orderBy(orderByClause);
     return posts;
 }
 
@@ -198,6 +249,8 @@ export async function getPublicPostByIdAction(id: string) {
         imageUrl: postsTable.imageUrl,
         thumbnails: postsTable.thumbnails,
         activeThumbnailIndex: postsTable.activeThumbnailIndex,
+        assetType: postsTable.assetType,
+        sourceLink: postsTable.sourceLink,
         tags: postsTable.tags,
         references: postsTable.references,
         userId: postsTable.userId,
@@ -272,7 +325,7 @@ export async function getMarketplaceStatsAction() {
             reportViews,
         };
     } catch (err) {
-        console.error("Failed to fetch marketplace stats:", err);
+        console.error("Failed to fetch products stats:", err);
         return {
             templatesCount: 0,
             creatorsCount: 0,
