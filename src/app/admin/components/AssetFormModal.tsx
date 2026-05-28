@@ -9,6 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { AdminTagSelector } from "./AdminTagSelector";
+import { Editor } from "@/components/tiptap/Editor";
+import { ContentRenderer } from "@/components/tiptap/ContentRenderer";
 
 export function AssetFormModal({
     editingPost,
@@ -35,7 +38,6 @@ export function AssetFormModal({
     const [activeThumbnailIndex, setActiveThumbnailIndex] = useState<number>(0);
     const [zipFile, setZipFile] = useState<File | null>(null);
     const [tags, setTags] = useState<string[]>([]);
-    const [tagInput, setTagInput] = useState("");
     
     // Reference links state
     const [references, setReferences] = useState<{ label: string; url: string }[]>([]);
@@ -70,7 +72,6 @@ export function AssetFormModal({
                 setTags([]);
                 setReferences([]);
             }
-            setTagInput("");
             setRefLabelInput("");
             setRefUrlInput("");
             setZipFile(null);
@@ -239,14 +240,11 @@ export function AssetFormModal({
                                     />
                                 </div>
 
-                                <div className="space-y-1">
-                                    <Textarea 
-                                        rows={2} 
-                                        value={description} 
-                                        onChange={(e) => setDescription(e.target.value)} 
-                                        placeholder="Description (framework specifications / supplemental details)..." 
-                                        className="w-full px-3 py-2 bg-[#130B09] border border-[#3E291F] rounded-xl text-xs text-white placeholder:text-white/40 focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10 focus-visible:ring-amber-500/10 focus-visible:border-amber-500/50 transition-all outline-none duration-150 resize-none min-h-[56px]" 
-                                    />
+                                <div className="space-y-1 border border-[#3E291F] rounded-xl overflow-hidden focus-within:border-amber-500/50 focus-within:ring-2 focus-within:ring-amber-500/10 transition-all bg-[#161616]">
+                                    <div className="px-3 py-2 text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider bg-[#0E0907] border-b border-[#3E291F]">Description Editor</div>
+                                    <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                        <Editor content={description} onChange={setDescription} />
+                                    </div>
                                 </div>
 
                                 {/* THUMBNAILS UPLOAD */}
@@ -335,35 +333,7 @@ export function AssetFormModal({
                                 </div>
 
                                 {/* TAGS */}
-                                <div className="space-y-1">
-                                    <div className="w-full min-h-[36px] flex flex-wrap items-center gap-1.5 p-1.5 bg-[#130B09] border border-[#3E291F] rounded-xl focus-within:border-amber-500/50 focus-within:ring-2 focus-within:ring-amber-500/10 focus-within:ring-amber-500/10 transition-all duration-150">
-                                        {tags.map((tag, idx) => (
-                                            <span key={idx} className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-1 rounded-lg text-[12px] flex items-center gap-1 hover:bg-amber-500/20 transition-all font-medium duration-150 shrink-0 select-none">
-                                                {tag}
-                                                <button type="button" onClick={() => setTags(tags.filter((_, i) => i !== idx))} className="hover:text-amber-300 transition-colors cursor-pointer"><X className="w-2.5 h-2.5" /></button>
-                                            </span>
-                                        ))}
-                                        <input 
-                                            type="text" 
-                                            value={tagInput}
-                                            onChange={(e) => setTagInput(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault();
-                                                    const val = tagInput.trim();
-                                                    if (val && !tags.includes(val)) {
-                                                        setTags([...tags, val]);
-                                                        setTagInput("");
-                                                    }
-                                                } else if (e.key === 'Backspace' && !tagInput && tags.length > 0) {
-                                                    setTags(tags.slice(0, -1));
-                                                }
-                                            }}
-                                            placeholder={tags.length === 0 ? "Tags (Press Enter to add, e.g. Sales, Finance)" : "Add tag..."} 
-                                            className="flex-1 min-w-[120px] bg-transparent border-0 p-0.5 text-xs text-white placeholder:text-white/40 focus:ring-0 focus:outline-none focus-visible:ring-0" 
-                                        />
-                                    </div>
-                                </div>
+                                <AdminTagSelector tags={tags} setTags={setTags} />
 
                                 {/* Row with Value, Aspect Ratio, and Power BI Link */}
                                 <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
@@ -562,9 +532,13 @@ export function AssetFormModal({
                                                 {price ? `$${parseFloat(price).toFixed(2)}` : "Free"}
                                             </span>
                                         </div>
-                                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed min-h-[36px]">
-                                            {description || `No supplemental details provided for this ${assetType === 'powerbi' ? 'blueprint' : 'design'} asset. Add description on the form.`}
-                                        </p>
+                                        <div className="text-xs text-muted-foreground line-clamp-2 leading-relaxed min-h-[36px]">
+                                            {description ? (
+                                                <ContentRenderer content={description} className="[&>p]:m-0 [&>p]:inline text-[10px]" />
+                                            ) : (
+                                                `No supplemental details provided for this ${assetType === 'powerbi' ? 'blueprint' : 'design'} asset. Add description on the form.`
+                                            )}
+                                        </div>
                                         
                                         {tags.length > 0 && (
                                             <div className="flex flex-wrap gap-1 pt-2 border-t border-[#3E291F]/30">

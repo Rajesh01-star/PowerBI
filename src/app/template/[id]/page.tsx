@@ -9,6 +9,8 @@ import Script from 'next/script';
 import { getPublicPostByIdAction, getPostFileUrlAction } from '@/app/admin/actions';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
+import { RegisterDialog } from '@/components/RegisterDialog';
+import { ContentRenderer } from '@/components/tiptap/ContentRenderer';
 
 export default function TemplateDetail() {
   const { data: sessionData } = authClient.useSession();
@@ -20,6 +22,7 @@ export default function TemplateDetail() {
   const [viewCount, setViewCount] = useState<number | null>(null);
   const [hasPurchased, setHasPurchased] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -43,11 +46,11 @@ export default function TemplateDetail() {
     const checkPurchase = async () => {
       if (sessionData?.user && params.id && typeof params.id === 'string') {
         try {
-          const res = await fetch('/api/user/purchases');
+          const res = await fetch('/api/user/purchases', { cache: 'no-store' });
           const data = await res.json();
           if (res.ok && data.purchases) {
             const purchased = data.purchases.some((p: any) => p.postId === params.id);
-            setHasPurchased(purchased || sessionData.user.isAdmin);
+            setHasPurchased(purchased);
           }
         } catch (error) {
           console.error("Failed to check purchases:", error);
@@ -105,6 +108,11 @@ export default function TemplateDetail() {
   const displayPrice = post.price ? `$${parseFloat(post.price).toFixed(2)}` : "Free";
 
   const handlePurchase = async () => {
+    if (!sessionData?.user) {
+      setShowLoginDialog(true);
+      return;
+    }
+
     if (!post || !post.price || parseFloat(post.price) <= 0) {
       toast.warning("This template is free or has an invalid price.");
       return;
@@ -147,6 +155,7 @@ export default function TemplateDetail() {
             const verifyData = await verifyRes.json();
             if (verifyRes.ok && verifyData.success) {
               toast.success("Payment successful! You can now access your template.");
+              setHasPurchased(true);
             } else {
               toast.error("Payment verification failed.");
             }
@@ -231,7 +240,9 @@ export default function TemplateDetail() {
               <div className="space-y-1">
                 <h1 className="text-xl font-medium tracking-tight text-foreground">{post.title}</h1>
                 {post.description && (
-                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-3xl font-sans">{post.description}</p>
+                  <div className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-3xl font-sans">
+                    <ContentRenderer content={post.description} />
+                  </div>
                 )}
               </div>
 
@@ -419,6 +430,12 @@ export default function TemplateDetail() {
           </div>
         </div>
       )}
+
+      <RegisterDialog 
+        open={showLoginDialog} 
+        onOpenChange={setShowLoginDialog} 
+        forceLoginView={true} 
+      />
     </div>
   );
 }

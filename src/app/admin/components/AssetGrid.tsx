@@ -1,4 +1,5 @@
 import { FileText, Edit3 } from "lucide-react";
+import { ContentRenderer } from "@/components/tiptap/ContentRenderer";
 
 export function AssetGrid({ posts, onEdit, onCreate }: { posts: any[], onEdit: (post: any) => void, onCreate: () => void }) {
     if (posts.length === 0) {
@@ -40,7 +41,11 @@ export function AssetGrid({ posts, onEdit, onCreate }: { posts: any[], onEdit: (
                                 <h3 className="font-medium text-xs text-foreground truncate">{post.title}</h3>
                                 <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">${post.price ? parseFloat(post.price).toFixed(2) : "0.00"}</span>
                             </div>
-                            {post.description && <p className="text-[11px] text-muted-foreground line-clamp-1 leading-normal">{post.description}</p>}
+                            {post.description && (
+                                <div className="text-[11px] text-muted-foreground line-clamp-1 leading-normal overflow-hidden">
+                                    <ContentRenderer content={post.description} className="[&>p]:m-0 [&>p]:inline [&_*]:!text-[11px] [&_*]:!text-muted-foreground" />
+                                </div>
+                            )}
                         </div>
                         <div className="pt-2 border-t border-border flex items-center justify-end">
                             <button onClick={() => onEdit(post)} className="text-[11px] font-medium text-amber-500 hover:text-amber-400 hover:underline flex items-center gap-0.5 cursor-pointer">Configure Space →</button>

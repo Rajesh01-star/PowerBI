@@ -5,7 +5,7 @@ import { postsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { eq, desc, asc, sql } from "drizzle-orm";
+import { eq, desc, asc, sql, arrayContains } from "drizzle-orm";
 
 export async function createPostAction(formData: FormData) {
     const session = await auth.api.getSession({
@@ -160,7 +160,7 @@ export async function getPostsAction() {
     return posts;
 }
 
-export async function getPublicPostsAction(sort: string = 'views') {
+export async function getPublicPostsAction(sort: string = 'views', tags: string[] = []) {
     let orderByClause;
     switch (sort) {
         case 'newest':
@@ -177,6 +177,9 @@ export async function getPublicPostsAction(sort: string = 'views') {
             orderByClause = desc(postsTable.views);
             break;
     }
+    
+    const whereClause = tags && tags.length > 0 ? arrayContains(postsTable.tags, tags) : undefined;
+
     const posts = await db.select({
         id: postsTable.id,
         title: postsTable.title,
@@ -195,7 +198,7 @@ export async function getPublicPostsAction(sort: string = 'views') {
         views: postsTable.views,
         createdAt: postsTable.createdAt,
         updatedAt: postsTable.updatedAt
-    }).from(postsTable).orderBy(orderByClause);
+    }).from(postsTable).where(whereClause).orderBy(orderByClause);
     return posts;
 }
 

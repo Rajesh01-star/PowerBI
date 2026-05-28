@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Maximize2, Sparkles, Smartphone, Monitor, Loader2, ShoppingCart, CheckCircle2, XCircle, Eye } from 'lucide-react';
 import Link from 'next/link';
 import Script from 'next/script';
+import { ContentRenderer } from "@/components/tiptap/ContentRenderer";
 
 type PaymentStatus = 'idle' | 'processing' | 'success' | 'failed';
 
@@ -171,7 +172,13 @@ export function ShowroomGrid({ posts, limit }: ShowroomGridProps) {
                 <div className="mt-auto w-full p-3.5 bg-gradient-to-t from-background via-background/95 to-transparent z-10 border-t border-border backdrop-blur-md flex items-center justify-between gap-3">
                   <div className="space-y-0.5 truncate flex-1 min-w-0">
                     <h4 className="text-xs font-semibold text-foreground truncate">{post.title || "Production Dashboard"}</h4>
-                    <p className="text-[10px] text-muted-foreground truncate">{post.description || "Hover to activate real-time intelligence interface."}</p>
+                    <div className="text-[10px] text-muted-foreground truncate overflow-hidden">
+                      {post.description ? (
+                        <ContentRenderer content={post.description} className="[&>p]:m-0 [&>p]:inline [&_*]:!text-[10px] [&_*]:!text-muted-foreground" />
+                      ) : (
+                        "Hover to activate real-time intelligence interface."
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     {/* Purchase Button */}

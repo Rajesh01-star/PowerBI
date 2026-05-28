@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Mail, Lock, User, ArrowRight, AlertCircle } from "lucide-react";
 import {
@@ -15,9 +15,27 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-export function RegisterDialog() {
-  const [open, setOpen] = useState(false);
-  const [isLoginView, setIsLoginView] = useState(false);
+export function RegisterDialog({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  forceLoginView = false,
+  trigger
+}: {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  forceLoginView?: boolean;
+  trigger?: React.ReactNode;
+} = {}) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+
+  const [isLoginView, setIsLoginView] = useState(forceLoginView);
+
+  useEffect(() => {
+    setIsLoginView(forceLoginView);
+  }, [forceLoginView]);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -45,7 +63,11 @@ export function RegisterDialog() {
         });
         if (error) throw new Error(error.message || "Failed to sign up");
       }
-      setOpen(false);
+      if (isControlled && controlledOnOpenChange) {
+        controlledOnOpenChange(false);
+      } else {
+        setUncontrolledOpen(false);
+      }
       window.location.reload(); // Refresh the page to show logged-in state
     } catch (err: any) {
       setError(err.message);
@@ -68,10 +90,14 @@ export function RegisterDialog() {
   };
 
   const handleOpenChange = (newOpen: boolean) => {
-    setOpen(newOpen);
+    if (isControlled && controlledOnOpenChange) {
+      controlledOnOpenChange(newOpen);
+    } else {
+      setUncontrolledOpen(newOpen);
+    }
     if (!newOpen) {
       setTimeout(() => {
-        setIsLoginView(false);
+        setIsLoginView(forceLoginView);
         setError("");
         setEmail("");
         setPassword("");
@@ -82,11 +108,19 @@ export function RegisterDialog() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button className="text-[13px] font-medium bg-foreground text-background hover:bg-foreground/90 px-4 py-2.5 transition-colors cursor-pointer">
-          Register
-        </Button>
-      </DialogTrigger>
+      {trigger ? (
+        <DialogTrigger asChild>
+          {trigger}
+        </DialogTrigger>
+      ) : (
+        !isControlled && (
+          <DialogTrigger asChild>
+            <Button className="text-[13px] font-medium bg-foreground text-background hover:bg-foreground/90 px-4 py-2.5 transition-colors cursor-pointer">
+              Register
+            </Button>
+          </DialogTrigger>
+        )
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl">
