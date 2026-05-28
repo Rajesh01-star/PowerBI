@@ -1,10 +1,10 @@
 interface ContentRendererProps {
-  content: string;
+  content?: string | null;
   className?: string;
 }
 
 export function ContentRenderer({
-  content,
+  content = "",
   className = "",
 }: ContentRendererProps) {
   return (
@@ -18,7 +18,7 @@ export function ContentRenderer({
         [&>pre>code]:bg-transparent [&>pre>code]:text-inherit [&>pre>code]:dark:bg-transparent [&>pre>code]:p-0
         ${className}
       `}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: content || "" }}
     />
   );
 }

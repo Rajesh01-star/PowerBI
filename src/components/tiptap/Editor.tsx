@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 
 interface EditorProps {
-  content: string;
+  content?: string | null;
   onChange: (content: string) => void;
 }
 
@@ -550,8 +550,11 @@ export const Editor = ({ content, onChange }: EditorProps) => {
 
   // Sync content updates from parent (e.g. loading a post)
   useEffect(() => {
-    if (editor && content && editor.getHTML() !== content) {
-      editor.commands.setContent(content);
+    if (editor) {
+      const safeContent = content || "";
+      if (editor.getHTML() !== safeContent) {
+        editor.commands.setContent(safeContent);
+      }
     }
   }, [content, editor]);
 
