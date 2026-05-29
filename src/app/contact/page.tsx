@@ -3,8 +3,8 @@ import { ContactForm } from "./ContactForm";
 import { PageShell } from "@/components/shared/PageShell";
 
 export const metadata = {
-  title: "Contact Us - GENGRAPHS & GRAPHICS",
-  description: "Get in touch with GENGRAPHS AND GRAPHICS PVT. LTD., founded by Mohit Bhardwaj. Secure an analytics consultation or custom Power BI and design deployment.",
+  title: "Contact Us - GENGRAPHS AND GRAPHICS PVT LTD®",
+  description: "Get in touch with GENGRAPHS AND GRAPHICS PVT LTD®, founded by Mohit Bhardwaj. Secure an analytics consultation or custom Power BI and design deployment.",
 };
 
 export default function ContactPage() {

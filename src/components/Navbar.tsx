@@ -17,6 +17,8 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
+import { BrandLogo } from './BrandLogo';
+
 const AdobeXDIcon = () => (
   <svg viewBox="0 0 24 24" className="w-6 h-6 text-[#FF26BE]" fill="currentColor">
     <rect width="24" height="24" rx="5" fill="url(#xd-grad)" />
@@ -130,9 +132,9 @@ export function Navbar() {
         >
           {/* Left: Logo & Brand */}
           <div className="flex-1 flex justify-start">
-            <Link href="/" className="flex items-center gap-2 py-1 text-sm font-semibold cursor-pointer">
+            <Link href="/" className="flex items-center gap-2 py-1 cursor-pointer">
               <img src="/icons/logo.png" alt="Logo" className="h-9 w-auto object-contain drop-shadow-sm" />
-              <span className="text-sm font-bold text-foreground tracking-wide whitespace-nowrap pt-0.5">GENGRAPHS & GRAPHICS</span>
+              <BrandLogo size="md" className="pt-0.5" />
             </Link>
           </div>
 

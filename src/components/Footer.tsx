@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Shield, Mail, Phone, X, Send } from 'lucide-react';
 import { FaLinkedin, FaInstagram, FaTwitter, FaYoutube, FaFacebook } from 'react-icons/fa';
 import Link from 'next/link';
+import { BrandLogo } from './BrandLogo';
 
 export function Footer() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,85 +26,90 @@ export function Footer() {
   return (
     <>
       <footer className="border-t border-border bg-card/30 backdrop-blur-xl relative z-10">
-        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 text-xs items-start">
-
-          {/* Column 1: Branding Capsule */}
-          <div className="space-y-4">
+        <div className="max-w-7xl mx-auto px-6 py-12 text-xs">
+          {/* Top Row: Full-width Branding & Description */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/40 pb-8 mb-10">
             <div className="flex items-center gap-3">
               <img src="/icons/logo.png" alt="Logo" className="h-9 w-auto object-contain drop-shadow-sm" />
-              <span className="font-bold tracking-tight text-foreground text-base">GENGRAPHS & GRAPHICS</span>
+              <BrandLogo size="md" />
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed max-w-xs">Premium engineered data visualization matrices and deployment assets built for enterprise pipelines.</p>
+            <p className="text-[11px] text-muted-foreground leading-relaxed max-w-md">
+              Premium engineered data visualization matrices and deployment assets built for enterprise pipelines.
+            </p>
           </div>
 
-          {/* Column 2: Navigation & Security */}
-          <div className="space-y-6">
-            <div className="space-y-2.5">
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Navigation Workspace</h4>
-              <div className="flex flex-col gap-1.5 text-muted-foreground/80">
-                <Link href="/" className="hover:text-foreground transition-colors text-[11px]">Showroom Matrix</Link>
-                <Link href="#live-demo" className="hover:text-foreground transition-colors text-[11px]">Active Blueprints</Link>
+          {/* Grid Columns for Directories */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 items-start">
+
+            {/* Column 2: Navigation & Security */}
+            <div className="space-y-6">
+              <div className="space-y-2.5">
+                <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Navigation Workspace</h4>
+                <div className="flex flex-col gap-1.5 text-muted-foreground/80">
+                  <Link href="/" className="hover:text-foreground transition-colors text-[11px]">Showroom Matrix</Link>
+                  <Link href="#live-demo" className="hover:text-foreground transition-colors text-[11px]">Active Blueprints</Link>
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Secure Settlement</h4>
+                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground bg-muted border border-border p-2 rounded-lg max-w-[220px]">
+                  <Shield className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Encrypted Ledger Gateway Active</span>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-2.5">
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Secure Settlement</h4>
-              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground bg-muted border border-border p-2 rounded-lg max-w-[220px]">
-                <Shield className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>Encrypted Ledger Gateway Active</span>
+            {/* Column 3: Contact & Socials */}
+            <div className="space-y-6">
+              <div className="space-y-2.5">
+                <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Contact Hub</h4>
+                <div className="flex flex-col gap-2 text-muted-foreground/80">
+                  <a href="mailto:info@gengraphsandgraphics.com" className="flex items-center gap-2 hover:text-foreground transition-colors text-[11px]">
+                    <Mail className="w-3.5 h-3.5" /> info@gengraphsandgraphics.com
+                  </a>
+                  <a href="tel:+919211217121" className="flex items-center gap-2 hover:text-foreground transition-colors text-[11px]">
+                    <Phone className="w-3.5 h-3.5" /> +91 9211217121
+                  </a>
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Social Networks</h4>
+                <div className="flex items-center gap-3">
+                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><FaLinkedin className="w-4 h-4" /></a>
+                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><FaInstagram className="w-4 h-4" /></a>
+                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><FaTwitter className="w-4 h-4" /></a>
+                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><FaYoutube className="w-4 h-4" /></a>
+                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><FaFacebook className="w-4 h-4" /></a>
+                </div>
               </div>
             </div>
+
+            {/* Column 4: Help & Assistance */}
+            <div className="space-y-4">
+              <div className="space-y-2.5">
+                <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Help</h4>
+                <div className="flex flex-col gap-1.5 text-muted-foreground/80">
+                  <Link href="/faq" className="hover:text-foreground transition-colors text-[11px]">FAQ</Link>
+                  <Link href="/contact" className="hover:text-foreground transition-colors text-[11px]">Contact Us</Link>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="mt-2 w-full max-w-[200px] h-9 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20 font-medium text-xs flex items-center justify-center gap-2 transition-all shadow-sm"
+              >
+                GENGRAPHS Assistance
+              </button>
+            </div>
+
           </div>
-
-          {/* Column 3: Contact & Socials */}
-          <div className="space-y-6">
-            <div className="space-y-2.5">
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Contact Hub</h4>
-              <div className="flex flex-col gap-2 text-muted-foreground/80">
-                <a href="mailto:info@gengraphsandgraphics.com" className="flex items-center gap-2 hover:text-foreground transition-colors text-[11px]">
-                  <Mail className="w-3.5 h-3.5" /> info@gengraphsandgraphics.com
-                </a>
-                <a href="tel:+919211217121" className="flex items-center gap-2 hover:text-foreground transition-colors text-[11px]">
-                  <Phone className="w-3.5 h-3.5" /> +91 9211217121
-                </a>
-              </div>
-            </div>
-
-            <div className="space-y-2.5">
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Social Networks</h4>
-              <div className="flex items-center gap-3">
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><FaLinkedin className="w-4 h-4" /></a>
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><FaInstagram className="w-4 h-4" /></a>
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><FaTwitter className="w-4 h-4" /></a>
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><FaYoutube className="w-4 h-4" /></a>
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><FaFacebook className="w-4 h-4" /></a>
-              </div>
-            </div>
-          </div>
-
-          {/* Column 4: Help & Assistance */}
-          <div className="space-y-4">
-            <div className="space-y-2.5">
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Help</h4>
-              <div className="flex flex-col gap-1.5 text-muted-foreground/80">
-                <Link href="/faq" className="hover:text-foreground transition-colors text-[11px]">FAQ</Link>
-                <Link href="/contact" className="hover:text-foreground transition-colors text-[11px]">Contact Us</Link>
-              </div>
-            </div>
-
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="mt-2 w-full max-w-[200px] h-9 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20 font-medium text-xs flex items-center justify-center gap-2 transition-all shadow-sm"
-            >
-              GENGRAPHS Assistance
-            </button>
-          </div>
-
         </div>
 
         {/* Footer Bottom copyright seal */}
         <div className="max-w-7xl mx-auto px-6 py-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-muted-foreground/60 font-mono">
-          <p>© {new Date().getFullYear()} GENGRAPHS & GRAPHICS. ALL RIGHTS RESERVED.</p>
+          <p>© {new Date().getFullYear()} GENGRAPHS AND GRAPHICS PVT LTD®. ALL RIGHTS RESERVED.</p>
           <p className="tracking-tighter">BUILT FOR POWER BI TOPOLOGY</p>
         </div>
       </footer>

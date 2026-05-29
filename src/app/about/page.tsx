@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { BarChart3, Layers, Paintbrush, ShieldCheck, Trophy, Sparkles, ArrowRight } from 'lucide-react';
 
 export const metadata = {
-  title: "About Us - GENGRAPHS & GRAPHICS",
-  description: "Learn more about GENGRAPHS AND GRAPHICS PVT. LTD., founded by Mohit Bhardwaj. Discover our services in Data Analytics, Business Intelligence, and UX/UI Design.",
+  title: "About Us - GENGRAPHS AND GRAPHICS PVT LTD®",
+  description: "Learn more about GENGRAPHS AND GRAPHICS PVT LTD®, founded by Mohit Bhardwaj. Discover our services in Data Analytics, Business Intelligence, and UX/UI Design.",
 };
 
 export default function AboutPage() {
@@ -22,10 +22,10 @@ export default function AboutPage() {
               <span>Founded in 2026</span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-4">
-              GENGRAPHS AND GRAPHICS <br />
-              <span className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 bg-clip-text text-transparent">
-                PVT. LTD.
+            <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-tight mb-4 select-none leading-tight">
+              <span className="text-[#E0A154]">GENGRAPHS</span> <br />
+              <span className="bg-gradient-to-r from-[#414141] to-neutral-400 bg-clip-text text-transparent">
+                AND GRAPHICS PVT LTD®
               </span>
             </h1>
             
@@ -44,7 +44,7 @@ export default function AboutPage() {
                 </h2>
                 <div className="h-0.5 w-8 bg-amber-500 rounded-full mb-6" />
                 <p className="text-xs text-muted-foreground leading-relaxed mb-6">
-                  Founded in <span className="text-foreground font-semibold">2026 by Mohit Bhardwaj</span>, Gengraphs &amp; Graphics stands at the intersection of complex quantitative analysis and high-fidelity product design. 
+                  Founded in <span className="text-foreground font-semibold">2026 by Mohit Bhardwaj</span>, <span className="font-serif text-[#E0A154] font-medium">GENGRAPHS</span> <span className="font-serif text-[#414141] dark:text-[#a3a3a3] font-medium">AND GRAPHICS PVT LTD®</span> stands at the intersection of complex quantitative analysis and high-fidelity product design. 
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   We don&apos;t just build dashboards or graphics. We build cognitive workflows that allow decision-makers to visual-inspect operations and execute strategies rapidly.
