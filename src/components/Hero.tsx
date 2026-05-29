@@ -65,7 +65,7 @@ export function Hero() {
             className="flex items-center gap-4"
           >
             <button onClick={()=>router.push("/products")} className="px-8 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-black text-sm font-bold transition-all duration-300 shadow-[0_10px_20px_rgba(245,158,11,0.25)] hover:shadow-[0_10px_25px_rgba(245,158,11,0.4)] hover:-translate-y-0.5 cursor-pointer">
-              Explore Templates
+              Explore Products
             </button>
           </motion.div>
         </div>
