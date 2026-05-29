@@ -115,7 +115,7 @@ export function RegisterDialog({
       ) : (
         !isControlled && (
           <DialogTrigger asChild>
-            <Button className="text-[13px] font-medium bg-foreground text-background hover:bg-foreground/90 px-4 py-2.5 transition-colors cursor-pointer">
+            <Button className="text-[13px] font-medium bg-foreground text-background hover:bg-foreground/90 px-4 py-5 transition-colors cursor-pointer">
               Register
             </Button>
           </DialogTrigger>
@@ -123,7 +123,7 @@ export function RegisterDialog({
       )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">
+          <DialogTitle className="text-xl font-bold">
             {isLoginView ? "Welcome back" : "Create an account"}
           </DialogTitle>
           <DialogDescription>
@@ -155,7 +155,7 @@ export function RegisterDialog({
                   required={!isLoginView}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-indigo-500/50"
+                  className="block w-full pl-9 pr-3 py-5 !bg-white !text-black border-zinc-200 placeholder-zinc-400 focus-visible:ring-amber-500/50"
                   placeholder="John Doe"
                 />
               </div>
@@ -175,7 +175,7 @@ export function RegisterDialog({
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full pl-9 pr-3 py-2 bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-indigo-500/50"
+                className="block w-full pl-9 pr-3 py-5 bg-white text-black border-zinc-200 placeholder-zinc-400 focus-visible:ring-amber-500/50"
                 placeholder="you@example.com"
               />
             </div>
@@ -194,7 +194,7 @@ export function RegisterDialog({
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full pl-9 pr-3 py-2 bg-input/10 border-border text-foreground placeholder-muted-foreground focus-visible:ring-indigo-500/50"
+                className="block w-full pl-9 pr-3 py-5 bg-white text-black border-zinc-200 placeholder-zinc-400 focus-visible:ring-amber-500/50"
                 placeholder="••••••••"
               />
             </div>
@@ -203,14 +203,14 @@ export function RegisterDialog({
           <Button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center py-2 px-4 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-4 cursor-pointer"
+            className="w-full flex items-center justify-center py-5 px-4 rounded-lg text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-4 cursor-pointer"
           >
             {loading ? "Please wait..." : isLoginView ? "Sign in" : "Sign up"}
             {!loading && <ArrowRight className="ml-2 w-4 h-4" />}
           </Button>
         </form>
 
-        <div className="mt-4">
+        <div className="mt-2">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border" />
@@ -253,7 +253,7 @@ export function RegisterDialog({
           </div>
         </div>
 
-        <div className="mt-4 text-center text-sm">
+        <div className="mt-2 text-center text-sm">
           <span className="text-muted-foreground">
             {isLoginView ? "Don't have an account?" : "Already have an account?"}
           </span>
@@ -263,7 +263,7 @@ export function RegisterDialog({
               setIsLoginView(!isLoginView);
               setError("");
             }}
-            className="ml-2 font-medium text-indigo-500 hover:text-indigo-400 focus:outline-none cursor-pointer"
+            className="ml-2 font-medium text-amber-500 hover:text-amber-400 focus:outline-none cursor-pointer"
           >
             {isLoginView ? "Sign up" : "Sign in"}
           </button>
