@@ -89,6 +89,13 @@ export const ordersTable = pgTable('orders', {
     updatedAt: timestamp('updated_at', { mode: 'date' }).$onUpdate(() => new Date()),
 });
 
+export const systemSettingsTable = pgTable('system_settings', {
+    key: text('key').primaryKey(),
+    value: text('value').notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'date' }).notNull().defaultNow(),
+});
+
+
 
 export type InsertUser = typeof user.$inferInsert;
 export type SelectUser = typeof user.$inferSelect;

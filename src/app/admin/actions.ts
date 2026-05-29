@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db/drizzle";
-import { postsTable, ordersTable } from "@/db/schema";
+import { postsTable, ordersTable, systemSettingsTable } from "@/db/schema";
 import { POST_SELECT_FIELDS, POST_PUBLIC_FIELDS, getOrderByClause } from "@/db/queries";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -240,4 +240,41 @@ export async function getMarketplaceStatsAction() {
             reportViews: 0,
         };
     }
+}
+
+export async function getSystemSettingsAction() {
+    try {
+        const settings = await db.select().from(systemSettingsTable);
+        const hidePowerbi = settings.find(s => s.key === "hide_powerbi")?.value === "true";
+        const hideUiux = settings.find(s => s.key === "hide_uiux")?.value === "true";
+        return {
+            hide_powerbi: hidePowerbi,
+            hide_uiux: hideUiux,
+        };
+    } catch (error) {
+        console.error("Failed to fetch system settings:", error);
+        return {
+            hide_powerbi: false,
+            hide_uiux: false,
+        };
+    }
+}
+
+export async function updateSystemSettingAction(key: string, value: string) {
+    await requireAdmin();
+
+    const existing = await db.select().from(systemSettingsTable).where(eq(systemSettingsTable.key, key));
+    if (existing.length > 0) {
+        await db.update(systemSettingsTable).set({ value }).where(eq(systemSettingsTable.key, key));
+    } else {
+        await db.insert(systemSettingsTable).values({ key, value });
+    }
+
+    revalidatePath("/");
+    revalidatePath("/products");
+    revalidatePath("/products/power-bi");
+    revalidatePath("/products/ui-ux");
+    revalidatePath("/admin");
+
+    return { success: true };
 }

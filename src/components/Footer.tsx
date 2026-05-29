@@ -95,13 +95,13 @@ export function Footer() {
                   <Link href="/contact" className="hover:text-foreground transition-colors text-[11px]">Contact Us</Link>
                 </div>
               </div>
-
+{/* 
               <button 
                 onClick={() => setIsModalOpen(true)}
                 className="mt-2 w-full max-w-[200px] h-9 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20 font-medium text-xs flex items-center justify-center gap-2 transition-all shadow-sm"
               >
                 GENGRAPHS Assistance
-              </button>
+              </button> */}
             </div>
 
           </div>

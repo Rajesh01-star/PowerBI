@@ -1,14 +1,21 @@
 import { ProductsLayout } from '@/components/ProductsLayout';
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
+import { getSystemSettingsAction } from '@/app/admin/actions';
+import { notFound } from 'next/navigation';
 
-export default function ProductsPowerBi() {
+export default async function ProductsPowerBi() {
+  const settings = await getSystemSettingsAction();
+  if (settings.hide_powerbi) {
+    notFound();
+  }
+
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-transparent text-foreground flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
-          <p className="text-xs text-muted-foreground font-mono">LOADING GALLERY Blaupause...</p>
+          <p className="text-xs text-muted-foreground font-mono">LOADING GALLERY Gallery...</p>
         </div>
       </div>
     }>

@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/navigation-menu";
 
 import { BrandLogo } from './BrandLogo';
+import { useQuery } from '@tanstack/react-query';
+import { getSystemSettingsAction } from '@/app/admin/actions';
 
 const AdobeXDIcon = () => (
   <svg viewBox="0 0 24 24" className="w-6 h-6 text-[#FF26BE]" fill="currentColor">
@@ -55,6 +57,15 @@ export function Navbar() {
   const { data: sessionData, isPending } = authClient.useSession();
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const { data: settings } = useQuery({
+    queryKey: ['systemSettings'],
+    queryFn: () => getSystemSettingsAction(),
+  });
+
+  const showPowerbi = !settings?.hide_powerbi;
+  const showUiux = !settings?.hide_uiux;
+  const showProducts = showPowerbi || showUiux;
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -185,41 +196,47 @@ export function Navbar() {
                 </NavigationMenuItem>
 
                 {/* Products Nav Item */}
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger
-                    onClick={() => router.push('/products')}
-                    className="text-foreground/70 hover:text-foreground bg-transparent hover:bg-accent focus:bg-accent data-[popup-open]:bg-accent data-[popup-open]:text-foreground transition-all cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1"
-                  >
-                    Products
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent className="p-2 w-[450px]">
-                    <div className="grid grid-cols-1 gap-1">
-                      <NavigationMenuLink href="/products/ui-ux" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
-                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 group-hover/item:bg-purple-500/20 transition-all duration-300">
-                          <FigmaIcon />
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-semibold text-foreground group-hover/item:text-purple-500 transition-colors">UX/UI & Graphic Designing</h4>
-                          <p className="mt-0.5 text-[10px] text-muted-foreground leading-relaxed">
-                            Professional UX/UI mockup design, brand-aligned graphic design, and high-fidelity wireframing.
-                          </p>
-                        </div>
-                      </NavigationMenuLink>
+                {showProducts && (
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger
+                      onClick={() => router.push('/products')}
+                      className="text-foreground/70 hover:text-foreground bg-transparent hover:bg-accent focus:bg-accent data-[popup-open]:bg-accent data-[popup-open]:text-foreground transition-all cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1"
+                    >
+                      Products
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent className="p-2 w-[450px]">
+                      <div className="grid grid-cols-1 gap-1">
+                        {showUiux && (
+                          <NavigationMenuLink href="/products/ui-ux" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
+                            <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 group-hover/item:bg-purple-500/20 transition-all duration-300">
+                              <FigmaIcon />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-semibold text-foreground group-hover/item:text-purple-500 transition-colors">UX/UI & Graphic Designing</h4>
+                              <p className="mt-0.5 text-[10px] text-muted-foreground leading-relaxed">
+                                Professional UX/UI mockup design, brand-aligned graphic design, and high-fidelity wireframing.
+                              </p>
+                            </div>
+                          </NavigationMenuLink>
+                        )}
 
-                      <NavigationMenuLink href="/products/power-bi" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
-                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-yellow-500/10 border border-yellow-500/20 group-hover/item:bg-yellow-500/20 transition-all duration-300">
-                          <PowerBIIcon />
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-semibold text-foreground group-hover/item:text-[#F2C811] transition-colors">Power BI</h4>
-                          <p className="mt-0.5 text-[10px] text-muted-foreground leading-relaxed">
-                            Interactive corporate dashboards, advanced DAX modeling, custom visuals, and actionable intelligence.
-                          </p>
-                        </div>
-                      </NavigationMenuLink>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
+                        {showPowerbi && (
+                          <NavigationMenuLink href="/products/power-bi" className="group/item flex gap-4 rounded-xl p-2.5 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border cursor-pointer">
+                            <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-yellow-500/10 border border-yellow-500/20 group-hover/item:bg-yellow-500/20 transition-all duration-300">
+                              <PowerBIIcon />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-semibold text-foreground group-hover/item:text-[#F2C811] transition-colors">Power BI</h4>
+                              <p className="mt-0.5 text-[10px] text-muted-foreground leading-relaxed">
+                                Interactive corporate dashboards, advanced DAX modeling, custom visuals, and actionable intelligence.
+                              </p>
+                            </div>
+                          </NavigationMenuLink>
+                        )}
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                )}
 
                 {/* Contact Nav Item */}
                 <NavigationMenuItem>
