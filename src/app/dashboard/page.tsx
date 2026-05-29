@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Download, History, Package, Settings, LogOut, LayoutDashboard, ExternalLink, Loader2, Monitor, Smartphone, ShieldCheck, Calendar, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { authClient } from '@/lib/auth-client';
+import { getMediaUrl } from '@/lib/utils';
 
 interface Purchase {
   orderId: string;
@@ -18,6 +19,8 @@ interface Purchase {
   url: string | null;
   aspect: 'horizontal' | 'vertical';
   imageUrl: string | null;
+  thumbnails?: string[] | null;
+  activeThumbnailIndex?: number | null;
 }
 
 export default function UserDashboard() {
@@ -140,7 +143,8 @@ export default function UserDashboard() {
                 <AnimatePresence>
                   {purchases.map((item, i) => {
                     const isVertical = item.aspect === 'vertical';
-                    const screenshotUrl = item.imageUrl || `https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=200&q=60`;
+                    const activeThumb = item.thumbnails?.[item.activeThumbnailIndex || 0] || item.imageUrl;
+                    const screenshotUrl = activeThumb ? getMediaUrl(activeThumb) : `https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=200&q=60`;
 
                     return (
                       <motion.div

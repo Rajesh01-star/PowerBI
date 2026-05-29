@@ -1,5 +1,6 @@
 import { FileText, Edit3 } from "lucide-react";
 import { ContentRenderer } from "@/components/tiptap/ContentRenderer";
+import { getMediaUrl } from "@/lib/utils";
 
 export function AssetGrid({ posts, onEdit, onCreate }: { posts: any[], onEdit: (post: any) => void, onCreate: () => void }) {
     if (posts.length === 0) {
@@ -17,9 +18,9 @@ export function AssetGrid({ posts, onEdit, onCreate }: { posts: any[], onEdit: (
                 <div key={post.id} className={`group bg-card rounded-xl border border-border hover:border-border/80 transition-all overflow-hidden flex flex-col relative shadow-sm hover:shadow-md ${post.aspect === 'vertical' ? 'row-span-2' : 'row-span-1'}`}>
                     <div className={`w-full ${post.aspect === 'vertical' ? 'flex-1' : 'aspect-video'} bg-muted/40 relative flex items-center justify-center border-b border-border overflow-hidden`}>
                         {post.thumbnails?.length > 0 ? (
-                            <img src={post.thumbnails[post.activeThumbnailIndex] || post.thumbnails[0]} alt={post.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                            <img src={getMediaUrl(post.thumbnails[post.activeThumbnailIndex] || post.thumbnails[0])} alt={post.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
                         ) : post.imageUrl ? (
-                            <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                            <img src={getMediaUrl(post.imageUrl)} alt={post.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
                         ) : (
                             <FileText className="w-5 h-5 text-muted-foreground/20" />
                         )}

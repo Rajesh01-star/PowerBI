@@ -11,6 +11,7 @@ import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { RegisterDialog } from '@/components/RegisterDialog';
 import { ContentRenderer } from '@/components/tiptap/ContentRenderer';
+import { getMediaUrl } from '@/lib/utils';
 
 export default function TemplateDetail() {
   const { data: sessionData } = authClient.useSession();
@@ -105,7 +106,9 @@ export default function TemplateDetail() {
   }
 
   const isVertical = post.aspect === 'vertical';
-  const displayPrice = post.price ? `$${parseFloat(post.price).toFixed(2)}` : "Free";
+  const isFree = !post.price || parseFloat(post.price) <= 0;
+  const displayPrice = isFree ? "Free" : `$${parseFloat(post.price).toFixed(2)}`;
+  const canDownload = hasPurchased || isFree;
 
   const handlePurchase = async () => {
     if (!sessionData?.user) {
@@ -183,6 +186,11 @@ export default function TemplateDetail() {
   };
 
   const handleDownload = async () => {
+    if (!sessionData?.user) {
+      setShowLoginDialog(true);
+      return;
+    }
+
     try {
       setIsDownloading(true);
       const fileUrl = await getPostFileUrlAction(params.id as string);
@@ -302,7 +310,7 @@ export default function TemplateDetail() {
                       className="border border-border rounded-xl overflow-hidden bg-card/50 aspect-video relative group cursor-pointer"
                       onClick={() => setSelectedImage(thumb)}
                     >
-                      <img src={thumb} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <img src={getMediaUrl(thumb)} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       <div className="absolute inset-0 border border-white/5 rounded-xl pointer-events-none" />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
                         <Eye className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-md" />
@@ -364,9 +372,9 @@ export default function TemplateDetail() {
             <div className="bg-card border border-border p-5 rounded-2xl space-y-5 backdrop-blur-md shadow-lg">
               <div>
                 <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                  {hasPurchased ? "Asset Acquired" : "Commercial Transfer License"}
+                  {canDownload ? "Asset Acquired" : "Commercial Transfer License"}
                 </p>
-                {!hasPurchased && (
+                {!canDownload && (
                   <div className="flex items-baseline gap-1 mt-0.5">
                     <span className="text-2xl font-mono font-bold text-amber-500 dark:text-amber-400">{displayPrice}</span>
                     <span className="text-[10px] text-muted-foreground/60 font-medium">/ persistent download link</span>
@@ -375,7 +383,7 @@ export default function TemplateDetail() {
               </div>
 
               <div className="space-y-2">
-                {hasPurchased ? (
+                {canDownload ? (
                   <button 
                     onClick={handleDownload}
                     disabled={isDownloading}
@@ -422,7 +430,7 @@ export default function TemplateDetail() {
               <X className="w-4 h-4" />
             </button>
             <img 
-              src={selectedImage} 
+              src={getMediaUrl(selectedImage)} 
               alt="Fullscreen Preview" 
               className="max-w-full max-h-full object-contain rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)]" 
               onClick={(e) => e.stopPropagation()}

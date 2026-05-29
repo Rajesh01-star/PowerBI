@@ -31,6 +31,8 @@ export async function GET() {
         url: postsTable.url,
         aspect: postsTable.aspect,
         imageUrl: postsTable.imageUrl,
+        thumbnails: postsTable.thumbnails,
+        activeThumbnailIndex: postsTable.activeThumbnailIndex,
       })
       .from(ordersTable)
       .innerJoin(postsTable, eq(ordersTable.postId, postsTable.id))

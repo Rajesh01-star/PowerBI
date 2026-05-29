@@ -6,6 +6,25 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { eq, desc, asc, sql, arrayContains } from "drizzle-orm";
+import { getUploadPresignedUrl, getDownloadPresignedUrl } from "@/lib/r2";
+import { v4 as uuidv4 } from "uuid";
+
+export async function getUploadUrlAction(fileName: string, fileType: string, isPublic = false, postId?: string) {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session || !session.user || !session.user.isAdmin) {
+        throw new Error("Unauthorized: Only admins can perform this action");
+    }
+
+    const folderId = postId || uuidv4();
+    const subFolder = isPublic ? "images" : "zip";
+    const fileKey = `templates/${folderId}/${subFolder}/${uuidv4()}-${fileName}`;
+    const uploadUrl = await getUploadPresignedUrl(fileKey, fileType, isPublic);
+
+    return { uploadUrl, fileKey };
+}
 
 export async function createPostAction(formData: FormData) {
     const session = await auth.api.getSession({
@@ -38,12 +57,7 @@ export async function createPostAction(formData: FormData) {
          throw new Error("Title is required");
     }
 
-    let fileUrl: string | null = null;
-    const zipFile = formData.get("file") as File | null;
-    if (zipFile && zipFile.size > 0) {
-        const buffer = Buffer.from(await zipFile.arrayBuffer());
-        fileUrl = `data:${zipFile.type || 'application/zip'};base64,${buffer.toString('base64')}`;
-    }
+    const fileUrl = formData.get("fileUrl") as string | null;
 
     await db.insert(postsTable).values({
         title,
@@ -114,10 +128,9 @@ export async function updatePostAction(formData: FormData) {
         references,
     };
 
-    const zipFile = formData.get("file") as File | null;
-    if (zipFile && zipFile.size > 0) {
-        const buffer = Buffer.from(await zipFile.arrayBuffer());
-        updateData.fileUrl = `data:${zipFile.type || 'application/zip'};base64,${buffer.toString('base64')}`;
+    const newFileUrl = formData.get("fileUrl") as string | null;
+    if (newFileUrl) {
+        updateData.fileUrl = newFileUrl;
     }
 
     await db.update(postsTable).set(updateData).where(eq(postsTable.id, id));
@@ -146,6 +159,7 @@ export async function getPostsAction() {
         url: postsTable.url,
         aspect: postsTable.aspect,
         imageUrl: postsTable.imageUrl,
+        fileUrl: postsTable.fileUrl,
         thumbnails: postsTable.thumbnails,
         activeThumbnailIndex: postsTable.activeThumbnailIndex,
         assetType: postsTable.assetType,
@@ -295,8 +309,23 @@ export async function getPostFileUrlAction(id: string) {
         }
     }
 
-    const posts = await db.select({ fileUrl: postsTable.fileUrl }).from(postsTable).where(eq(postsTable.id, id));
-    return posts[0]?.fileUrl || null;
+    const posts = await db.select({ fileUrl: postsTable.fileUrl, title: postsTable.title }).from(postsTable).where(eq(postsTable.id, id));
+    const fileUrl = posts[0]?.fileUrl;
+    if (!fileUrl) return null;
+
+    // If it is a legacy base64 URI, return it directly
+    if (fileUrl.startsWith("data:")) {
+        return fileUrl;
+    }
+
+    // Otherwise, it is an R2 key. Generate a temporary download URL.
+    try {
+        const signedUrl = await getDownloadPresignedUrl(fileUrl, `${posts[0].title || 'template'}.zip`);
+        return signedUrl;
+    } catch (error) {
+        console.error("Failed to generate download URL from R2:", error);
+        throw new Error("Failed to generate download link.");
+    }
 }
 
 export async function getMarketplaceStatsAction() {

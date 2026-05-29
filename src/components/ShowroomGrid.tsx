@@ -7,6 +7,8 @@ import Link from 'next/link';
 import Script from 'next/script';
 import { ContentRenderer } from "@/components/tiptap/ContentRenderer";
 
+import { getMediaUrl } from '@/lib/utils';
+
 type PaymentStatus = 'idle' | 'processing' | 'success' | 'failed';
 
 interface ShowroomGridProps {
@@ -108,7 +110,8 @@ export function ShowroomGrid({ posts, limit }: ShowroomGridProps) {
           const status = paymentStatus[post.id] || 'idle';
           const hasPaidPrice = post.price && parseFloat(post.price) > 0;
 
-          const screenshotUrl = post.imageUrl || `https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80`;
+          const activeThumbnail = post.thumbnails?.[post.activeThumbnailIndex || 0] || post.imageUrl;
+          const screenshotUrl = activeThumbnail ? getMediaUrl(activeThumbnail) : `https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80`;
 
           return (
             <motion.div 

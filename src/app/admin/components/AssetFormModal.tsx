@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, Edit3, Plus, X, Laptop, ImageIcon, CheckCircle2, Loader2, Link as LinkIcon, Trash2 } from "lucide-react";
-import { createPostAction, updatePostAction } from "../actions";
+import { createPostAction, updatePostAction, getUploadUrlAction } from "../actions";
 import { Input } from "@/components/ui/input";
+import { getMediaUrl } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,6 +13,14 @@ import { toast } from "sonner";
 import { AdminTagSelector } from "./AdminTagSelector";
 import { Editor } from "@/components/tiptap/Editor";
 import { ContentRenderer } from "@/components/tiptap/ContentRenderer";
+
+const getCleanFilename = (path: string) => {
+    const base = path.split("/").pop() || "Uploaded Archive";
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-/i.test(base)) {
+        return base.substring(37);
+    }
+    return base;
+};
 
 export function AssetFormModal({
     editingPost,
@@ -36,8 +45,13 @@ export function AssetFormModal({
     const [url, setUrl] = useState("");
     const [thumbnails, setThumbnails] = useState<string[]>([]);
     const [activeThumbnailIndex, setActiveThumbnailIndex] = useState<number>(0);
-    const [zipFile, setZipFile] = useState<File | null>(null);
+    const [zipFileKey, setZipFileKey] = useState<string | null>(null);
+    const [zipFileName, setZipFileName] = useState<string | null>(null);
+    const [zipFileSize, setZipFileSize] = useState<number | null>(null);
+    const [uploadingZipProgress, setUploadingZipProgress] = useState<number | null>(null);
+    const [uploadingImageProgress, setUploadingImageProgress] = useState<number | null>(null);
     const [tags, setTags] = useState<string[]>([]);
+    const [tempPostId, setTempPostId] = useState("");
     
     // Reference links state
     const [references, setReferences] = useState<{ label: string; url: string }[]>([]);
@@ -47,6 +61,7 @@ export function AssetFormModal({
     // Initialize states when modal opens or editingPost changes
     useEffect(() => {
         if (isOpen) {
+            setTempPostId(editingPost?.id || crypto.randomUUID());
             if (editingPost) {
                 setTitle(editingPost.title || "");
                 setDescription(editingPost.description || "");
@@ -59,6 +74,11 @@ export function AssetFormModal({
                 setActiveThumbnailIndex(editingPost.activeThumbnailIndex || 0);
                 setTags(editingPost.tags || []);
                 setReferences(editingPost.references || []);
+                setZipFileKey(editingPost.fileUrl || null);
+                setZipFileName(editingPost.fileUrl ? getCleanFilename(editingPost.fileUrl) : null);
+                setZipFileSize(null);
+                setUploadingZipProgress(null);
+                setUploadingImageProgress(null);
             } else {
                 setTitle("");
                 setDescription("");
@@ -71,10 +91,14 @@ export function AssetFormModal({
                 setActiveThumbnailIndex(0);
                 setTags([]);
                 setReferences([]);
+                setZipFileKey(null);
+                setZipFileName(null);
+                setZipFileSize(null);
+                setUploadingZipProgress(null);
+                setUploadingImageProgress(null);
             }
             setRefLabelInput("");
             setRefUrlInput("");
-            setZipFile(null);
         }
     }, [isOpen, editingPost]);
 
@@ -97,15 +121,114 @@ export function AssetFormModal({
         };
     }, [isOpen, onClose, isLoading]);
 
-    function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (file && thumbnails.length < 4) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setThumbnails(prev => [...prev, reader.result as string]);
-            };
-            reader.readAsDataURL(file);
+            setIsLoading(true);
+            setUploadingImageProgress(0);
+            try {
+                // Get the presigned upload URL and R2 key from server action (isPublic = true, postId = tempPostId)
+                const uploadData = await getUploadUrlAction(file.name, file.type || "image/png", true, tempPostId);
+                
+                // Upload directly to Cloudflare R2 public bucket using XHR to track progress
+                const xhr = new XMLHttpRequest();
+                xhr.open("PUT", uploadData.uploadUrl, true);
+                xhr.setRequestHeader("Content-Type", file.type || "image/png");
+                
+                xhr.upload.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        const percentComplete = Math.round((event.loaded / event.total) * 100);
+                        setUploadingImageProgress(percentComplete);
+                    }
+                };
+                
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        setThumbnails(prev => [...prev, uploadData.fileKey]);
+                        setUploadingImageProgress(null);
+                        toast.success("Image uploaded successfully!");
+                    } else {
+                        setUploadingImageProgress(null);
+                        toast.error("Failed to upload image.");
+                    }
+                };
+                
+                xhr.onerror = () => {
+                    setUploadingImageProgress(null);
+                    toast.error("An error occurred during image upload.");
+                };
+                
+                xhr.send(file);
+            } catch (err: any) {
+                setUploadingImageProgress(null);
+                toast.error(err.message || "Failed to start image upload.");
+            } finally {
+                setIsLoading(false);
+            }
         }
+    }
+
+    async function handleZipChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsLoading(true);
+        setUploadingZipProgress(0);
+        setZipFileName(file.name);
+        setZipFileSize(file.size);
+
+        try {
+            // Get the presigned upload URL and R2 key from server action (isPublic = false, postId = tempPostId)
+            const uploadData = await getUploadUrlAction(file.name, file.type || "application/zip", false, tempPostId);
+
+            // Upload directly to Cloudflare R2 private bucket using XHR to track progress
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", uploadData.uploadUrl, true);
+            xhr.setRequestHeader("Content-Type", file.type || "application/zip");
+
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const percentComplete = Math.round((event.loaded / event.total) * 100);
+                    setUploadingZipProgress(percentComplete);
+                }
+            };
+
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    setZipFileKey(uploadData.fileKey);
+                    setUploadingZipProgress(null);
+                    toast.success("ZIP archive uploaded successfully!");
+                } else {
+                    setUploadingZipProgress(null);
+                    setZipFileName(null);
+                    setZipFileSize(null);
+                    toast.error("Failed to upload ZIP archive.");
+                }
+            };
+
+            xhr.onerror = () => {
+                setUploadingZipProgress(null);
+                setZipFileName(null);
+                setZipFileSize(null);
+                toast.error("An error occurred during ZIP upload.");
+            };
+
+            xhr.send(file);
+        } catch (err: any) {
+            setUploadingZipProgress(null);
+            setZipFileName(null);
+            setZipFileSize(null);
+            toast.error(err.message || "Failed to start ZIP upload.");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    function removeZipFile() {
+        setZipFileKey(null);
+        setZipFileName(null);
+        setZipFileSize(null);
+        setUploadingZipProgress(null);
     }
 
     function removeThumbnail(index: number) {
@@ -152,8 +275,8 @@ export function AssetFormModal({
         formData.append("tags", JSON.stringify(tags));
         formData.append("references", JSON.stringify(references));
         
-        if (zipFile) {
-            formData.append("file", zipFile);
+        if (zipFileKey) {
+            formData.append("fileUrl", zipFileKey);
         }
         
         if (editingPost) formData.append("id", editingPost.id);
@@ -256,7 +379,7 @@ export function AssetFormModal({
                                                 key={idx} 
                                                 className={`relative rounded-xl overflow-hidden aspect-video border group/thumb transition-all duration-200 ${activeThumbnailIndex === idx ? 'border-amber-500 ring-2 ring-amber-500/30' : 'border-[#3E291F] hover:border-[#5C3E30]'}`}
                                             >
-                                                <img src={thumb} alt="thumb" className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300" />
+                                                <img src={getMediaUrl(thumb)} alt="thumb" className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300" />
                                                 <div className="absolute top-1 right-1 flex gap-1 z-30 opacity-0 group-hover/thumb:opacity-100 transition-opacity">
                                                     <button 
                                                         type="button" 
@@ -279,7 +402,13 @@ export function AssetFormModal({
                                                 </button>
                                             </div>
                                         ))}
-                                        {thumbnails.length < 4 && (
+                                        {uploadingImageProgress !== null && (
+                                            <div className="relative rounded-xl overflow-hidden aspect-video border border-[#3E291F] bg-[#130B09]/40 flex flex-col items-center justify-center animate-pulse">
+                                                <Loader2 className="w-4 h-4 animate-spin text-amber-500 mb-1" />
+                                                <span className="text-[9px] font-mono text-amber-400 font-bold">{uploadingImageProgress}%</span>
+                                            </div>
+                                        )}
+                                        {thumbnails.length < 4 && uploadingImageProgress === null && (
                                             <div className="relative rounded-xl border border-dashed border-[#3E291F] hover:border-amber-500/50 bg-[#130B09]/40 hover:bg-[#130B09]/80 flex flex-col items-center justify-center aspect-video cursor-pointer transition-all duration-200 group">
                                                 <input type="file" accept="image/*" onChange={handleImageChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
                                                 <Plus className="w-5 h-5 text-muted-foreground group-hover:text-amber-500 transition-colors" />
@@ -290,44 +419,68 @@ export function AssetFormModal({
                                 </div>
 
                                 {/* ZIP UPLOAD */}
-                                <div className="space-y-1">
-                                    {zipFile ? (
+                                <div className="space-y-2">
+                                    <div className="relative border border-dashed border-[#3E291F] hover:border-amber-500/50 bg-[#0E0907] hover:bg-[#130B09]/60 rounded-xl transition-all duration-200 cursor-pointer group">
+                                        <input
+                                            type="file"
+                                            disabled={uploadingZipProgress !== null}
+                                            accept={assetType === 'powerbi' ? ".zip,application/zip,.pbix" : ".zip,application/zip,.fig,.psd,.ai,.xd"}
+                                            onChange={handleZipChange}
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed"
+                                        />
+                                        <div className="flex items-center gap-3 px-3 py-2 pointer-events-none">
+                                            <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 group-hover:border-amber-500/35 flex items-center justify-center shrink-0 transition-all duration-200">
+                                                {uploadingZipProgress !== null ? (
+                                                    <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500" />
+                                                ) : (
+                                                    <Upload className="w-3.5 h-3.5 text-amber-500/70 group-hover:text-amber-400 transition-colors" />
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-[10px] font-semibold text-white/70 group-hover:text-white transition-colors leading-none">
+                                                    {zipFileKey ? "Replace ZIP Archive" : editingPost ? "Replace file (.zip, .pbix, etc)" : "Upload file (.zip, .pbix, etc)"}
+                                                </p>
+                                                <p className="text-[9px] text-white/30 mt-0.5">
+                                                    {uploadingZipProgress !== null ? `Uploading: ${uploadingZipProgress}%` : "Drag & drop, or click Browse"}
+                                                </p>
+                                            </div>
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 group-hover:bg-amber-500/20 group-hover:border-amber-500/40 text-[9px] font-semibold text-amber-400 group-hover:text-amber-300 transition-all duration-200 shrink-0">
+                                                Browse
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Upload Progress Bar */}
+                                    {uploadingZipProgress !== null && (
+                                        <div className="flex flex-col gap-1.5 bg-[#130B09]/40 border border-[#3E291F] rounded-xl px-3 py-2.5">
+                                            <div className="flex items-center justify-between text-[10px]">
+                                                <div className="flex items-center gap-2">
+                                                    <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500" />
+                                                    <span className="text-white/70 font-semibold truncate max-w-[200px]">{zipFileName}</span>
+                                                </div>
+                                                <span className="text-amber-400 font-bold font-mono">{uploadingZipProgress}%</span>
+                                            </div>
+                                            <div className="w-full bg-[#1F1613] h-1.5 rounded-full overflow-hidden">
+                                                <div className="bg-amber-500 h-full transition-all duration-150" style={{ width: `${uploadingZipProgress}%` }} />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Uploaded File indicator card */}
+                                    {zipFileKey && uploadingZipProgress === null && (
                                         <div className="flex items-center gap-2.5 bg-[#0D1F15] border border-emerald-500/25 rounded-xl px-3 py-2">
                                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-[10px] font-semibold text-emerald-300 truncate">{zipFile.name}</p>
-                                                <p className="text-[9px] text-emerald-500/50">{(zipFile.size / 1024).toFixed(0)} KB · ZIP Archive</p>
+                                                <p className="text-[10px] font-semibold text-emerald-300 truncate">{zipFileName}</p>
+                                                <p className="text-[9px] text-emerald-500/50">{zipFileSize ? `${(zipFileSize / 1024).toFixed(0)} KB · ` : ""}ZIP Archive ready</p>
                                             </div>
                                             <button
                                                 type="button"
-                                                onClick={() => setZipFile(null)}
+                                                onClick={removeZipFile}
                                                 className="w-5 h-5 rounded-md bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 flex items-center justify-center text-red-400 hover:text-red-300 transition-colors cursor-pointer shrink-0"
                                             >
-                                                <X className="w-3 h-3" />
+                                                <X className="w-3.5 h-3.5" />
                                             </button>
-                                        </div>
-                                    ) : (
-                                        <div className="relative border border-dashed border-[#3E291F] hover:border-amber-500/50 bg-[#0E0907] hover:bg-[#130B09]/60 rounded-xl transition-all duration-200 cursor-pointer group">
-                                            <input
-                                                type="file"
-                                                accept={assetType === 'powerbi' ? ".zip,application/zip,.pbix" : ".zip,application/zip,.fig,.psd,.ai,.xd"}
-                                                onChange={(e) => setZipFile(e.target.files?.[0] || null)}
-                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                            />
-                                            <div className="flex items-center gap-3 px-3 py-2 pointer-events-none">
-                                                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 group-hover:border-amber-500/35 flex items-center justify-center shrink-0 transition-all duration-200">
-                                                    <Upload className="w-3.5 h-3.5 text-amber-500/70 group-hover:text-amber-400 transition-colors" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-[10px] font-semibold text-white/70 group-hover:text-white transition-colors leading-none">
-                                                        {editingPost ? `Replace file (${assetType === 'powerbi' ? '.zip or .pbix' : '.zip, .fig, .psd, etc'})` : `Upload file (${assetType === 'powerbi' ? '.zip or .pbix' : '.zip, .fig, .psd, etc'})`}
-                                                    </p>
-                                                    <p className="text-[9px] text-white/30 mt-0.5">Drag & drop, or click Browse</p>
-                                                </div>
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 group-hover:bg-amber-500/20 group-hover:border-amber-500/40 text-[9px] font-semibold text-amber-400 group-hover:text-amber-300 transition-all duration-200 shrink-0">
-                                                    Browse
-                                                </span>
-                                            </div>
                                         </div>
                                     )}
                                 </div>

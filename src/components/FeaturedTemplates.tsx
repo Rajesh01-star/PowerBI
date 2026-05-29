@@ -6,6 +6,7 @@ import { ArrowRight, BarChart3, Sparkles, Monitor, Smartphone, Eye } from 'lucid
 import Link from 'next/link';
 import { getPublicPostsAction } from '@/app/admin/actions';
 import { useQuery } from '@tanstack/react-query';
+import { getMediaUrl } from '@/lib/utils';
 
 export function FeaturedTemplates() {
   const { data: posts = [] } = useQuery({
@@ -46,8 +47,8 @@ export function FeaturedTemplates() {
               >
                 <Link href={`/template/${post.id}`} className="block bg-card hover:bg-accent/40 border border-border hover:border-border/80 rounded-xl overflow-hidden group shadow-sm hover:shadow-md transition-all duration-300">
                   <div className="w-full aspect-video bg-muted/30 relative flex items-center justify-center border-b border-border overflow-hidden">
-                    {post.imageUrl ? (
-                      <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover opacity-75 dark:opacity-50 group-hover:opacity-100 dark:group-hover:opacity-75 transition-opacity duration-500" />
+                    {post.thumbnails?.length > 0 || post.imageUrl ? (
+                      <img src={getMediaUrl(post.thumbnails?.[post.activeThumbnailIndex || 0] || post.imageUrl)} alt={post.title} className="w-full h-full object-cover opacity-75 dark:opacity-50 group-hover:opacity-100 dark:group-hover:opacity-75 transition-opacity duration-500" />
                     ) : (
                       <BarChart3 className="w-8 h-8 text-muted-foreground/20" />
                     )}
