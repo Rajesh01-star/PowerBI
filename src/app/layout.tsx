@@ -9,8 +9,8 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 const garamond = EB_Garamond({ subsets: ['latin'], variable: '--font-serif' });
 
 export const metadata: Metadata = {
-  title: "Lumina - Premium Power BI Templates",
-  description: "High-end marketplace for Power BI Templates.",
+  title: "Gengraphs & Graphics | Premium Power BI & Graphic Design Services",
+  description: "High-end corporate Power BI templates, interactive executive dashboards, and professional graphic and UI/UX design solutions.",
 };
 
 import { Navbar } from "@/components/Navbar";

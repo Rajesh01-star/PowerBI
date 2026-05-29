@@ -24,7 +24,7 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-background/60 to-background" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full max-w-7xl mx-auto px-4 lg:px-8 relative z-20">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full max-w-7xl mx-auto px-4 lg:px-8 relative">
 
         {/* Left Column: Text & Actions */}
         <div className="flex flex-col justify-center order-2 lg:order-1 z-20 lg:pr-8">
@@ -74,7 +74,7 @@ export function Hero() {
         <div className="relative order-1 lg:order-2 flex items-center justify-end min-h-[550px] lg:min-h-[750px] w-full">
 
           {/* Orbiting Circles Container */}
-          <div className="absolute inset-y-0 right-0 flex items-center justify-center pointer-events-none w-full lg:w-[350px] max-w-[320px] lg:max-w-[350px] -translate-y-24 lg:-translate-y-46 lg:-translate-x-5">
+          <div className="absolute inset-y-0 right-0 flex items-center justify-center pointer-events-none w-full lg:w-[350px] max-w-[320px] lg:max-w-[350px] -translate-y-24 lg:-translate-y-46 lg:-translate-x-5 z-[60]">
 
             {/* Inner Orbit */}
             <OrbitingCircles
@@ -139,17 +139,19 @@ export function Hero() {
           </div>
 
           {/* Person Image */}
-          <div className="absolute inset-y-0 right-0 flex items-center justify-center w-full max-w-[320px] lg:max-w-[350px] pointer-events-none ">
+          <div className="absolute inset-y-0 right-0 flex items-center justify-center w-full max-w-[320px] lg:max-w-[380px] pointer-events-none z-[70]">
             <img
               src="/images/sample_nobg_cropped.png"
               alt="Power BI Creator"
               className="w-full object-contain object-bottom relative z-10 pointer-events-auto"
             />
+            {/* Fade the bottom of the subject image to blend with background */}
+            <div className="absolute inset-x-0 bottom-0 h-[200px] lg:h-[280px] bg-gradient-to-t from-background via-background/90 via-35% to-transparent z-20 pointer-events-none" />
           </div>
         </div>
 
       </div>
-      <div className="absolute w-[200vw] left-[-50vw] bottom-[-10px] h-[350px] bg-gradient-to-t from-background via-background/90 to-transparent pointer-events-none z-10" />
+      <div className="absolute w-[200vw] left-[-50vw] bottom-[-10px] h-[450px] lg:h-[520px] bg-gradient-to-t from-background via-background/90 via-35% to-transparent pointer-events-none z-10" />
     </div>
   );
 }
