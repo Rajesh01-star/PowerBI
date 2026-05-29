@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
 import { ShowroomFilter, SortOption } from './ShowroomFilter';
 import { ShowroomGrid, ShowroomGridSkeleton } from './ShowroomGrid';
 import { SidebarFilter } from './SidebarFilter';
+import { useUrlParam, useUrlArrayParam } from '@/lib/useUrlState';
 
 export function Showroom({ limit }: { limit?: number }) {
-  const [activeSort, setActiveSort] = useState<SortOption>('views');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [activeSort, setActiveSort] = useUrlParam('s', 'views');
+  const [selectedTags, setSelectedTags] = useUrlArrayParam('t');
 
   const { data: posts = [], isLoading, isFetching } = useQuery({
     queryKey: ['public-posts', activeSort, selectedTags],
@@ -34,7 +35,7 @@ export function Showroom({ limit }: { limit?: number }) {
       
       <div className='flex-1 space-y-4 w-full min-w-0'>
         {/* 1. Filter Sub-component */}
-        <ShowroomFilter activeSort={activeSort} setActiveSort={setActiveSort} />
+        <ShowroomFilter activeSort={activeSort as SortOption} setActiveSort={setActiveSort} />
 
         {/* 2. Grid Sub-component */}
         {isLoading ? (

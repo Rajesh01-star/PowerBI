@@ -6,7 +6,6 @@ import { Upload, Edit3, Plus, X, Laptop, ImageIcon, CheckCircle2, Loader2, Link 
 import { createPostAction, updatePostAction, getUploadUrlAction } from "../actions";
 import { Input } from "@/components/ui/input";
 import { getMediaUrl } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";

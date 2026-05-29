@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Maximize2, Sparkles, Smartphone, Monitor, Loader2, ShoppingCart, CheckCircle2, XCircle, Eye } from 'lucide-react';
+import { Maximize2, Sparkles, Loader2, ShoppingCart, CheckCircle2, XCircle, Eye } from 'lucide-react';
 import Link from 'next/link';
 import Script from 'next/script';
 import { ContentRenderer } from "@/components/tiptap/ContentRenderer";
-
-import { getMediaUrl } from '@/lib/utils';
-
-type PaymentStatus = 'idle' | 'processing' | 'success' | 'failed';
+import { AspectBadge } from '@/components/shared/AspectBadge';
+import { PriceBadge } from '@/components/shared/PriceBadge';
+import { getActiveThumbnail, hasPaidPrice } from '@/lib/utils';
+import { useRazorpay } from '@/lib/useRazorpay';
 
 interface ShowroomGridProps {
   posts: any[];
@@ -17,85 +17,13 @@ interface ShowroomGridProps {
 }
 
 export function ShowroomGrid({ posts, limit }: ShowroomGridProps) {
-  // Keep track of which card is currently active/hovered
-  const [activeIframeId, setActiveIframeId] = useState<string | null>(null);
-  // Track payment status per post
-  const [paymentStatus, setPaymentStatus] = useState<Record<string, PaymentStatus>>({});
+  const [activeIframeId, setActiveIframeId] = React.useState<string | null>(null);
+  const { initiatePurchase, getStatus } = useRazorpay();
 
-  const handlePurchase = async (e: React.MouseEvent, post: any) => {
+  const handlePurchase = (e: React.MouseEvent, post: any) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (!post || !post.price || parseFloat(post.price) <= 0) return;
-
-    const postId = post.id;
-    setPaymentStatus(prev => ({ ...prev, [postId]: 'processing' }));
-
-    try {
-      const res = await fetch("/api/razorpay/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setPaymentStatus(prev => ({ ...prev, [postId]: 'failed' }));
-        setTimeout(() => setPaymentStatus(prev => ({ ...prev, [postId]: 'idle' })), 3000);
-        return;
-      }
-
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: data.amount,
-        currency: data.currency,
-        name: "PowerBI Templates",
-        description: post.title,
-        order_id: data.orderId,
-        handler: async function (response: any) {
-          try {
-            const verifyRes = await fetch("/api/razorpay/verify-payment", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
-            });
-            const verifyData = await verifyRes.json();
-            if (verifyRes.ok && verifyData.success) {
-              setPaymentStatus(prev => ({ ...prev, [postId]: 'success' }));
-            } else {
-              setPaymentStatus(prev => ({ ...prev, [postId]: 'failed' }));
-              setTimeout(() => setPaymentStatus(prev => ({ ...prev, [postId]: 'idle' })), 3000);
-            }
-          } catch {
-            setPaymentStatus(prev => ({ ...prev, [postId]: 'failed' }));
-            setTimeout(() => setPaymentStatus(prev => ({ ...prev, [postId]: 'idle' })), 3000);
-          }
-        },
-        modal: {
-          ondismiss: function () {
-            setPaymentStatus(prev => ({ ...prev, [postId]: 'idle' }));
-          },
-        },
-        theme: {
-          color: "#6366f1",
-        },
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      rzp.on("payment.failed", function () {
-        setPaymentStatus(prev => ({ ...prev, [postId]: 'failed' }));
-        setTimeout(() => setPaymentStatus(prev => ({ ...prev, [postId]: 'idle' })), 3000);
-      });
-      rzp.open();
-    } catch {
-      setPaymentStatus(prev => ({ ...prev, [postId]: 'failed' }));
-      setTimeout(() => setPaymentStatus(prev => ({ ...prev, [postId]: 'idle' })), 3000);
-    }
+    initiatePurchase(post);
   };
 
   return (
@@ -107,11 +35,9 @@ export function ShowroomGrid({ posts, limit }: ShowroomGridProps) {
           const isVertical = post.aspect === 'vertical';
           const isEven = index % 2 === 0;
           const isLoaded = activeIframeId === post.id;
-          const status = paymentStatus[post.id] || 'idle';
-          const hasPaidPrice = post.price && parseFloat(post.price) > 0;
-
-          const activeThumbnail = post.thumbnails?.[post.activeThumbnailIndex || 0] || post.imageUrl;
-          const screenshotUrl = activeThumbnail ? getMediaUrl(activeThumbnail) : `https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80`;
+          const status = getStatus(post.id);
+          const isPaid = hasPaidPrice(post.price);
+          const screenshotUrl = getActiveThumbnail(post);
 
           return (
             <motion.div 
@@ -150,25 +76,16 @@ export function ShowroomGrid({ posts, limit }: ShowroomGridProps) {
 
                   {/* Badges Overlay */}
                   <div className="absolute top-3 left-3 flex gap-1.5 z-10 backdrop-blur-md bg-background/80 rounded-md p-0.5 border border-border">
-                    <span className="px-1.5 py-0.5 text-[9px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                      {isVertical ? <Smartphone className="w-2.5 h-2.5" /> : <Monitor className="w-2.5 h-2.5" />}
-                      {post.aspect}
-                    </span>
+                    <AspectBadge aspect={post.aspect} />
                     <span className="px-1.5 py-0.5 text-[9px] font-mono text-muted-foreground/60 flex items-center gap-1 border-l border-border">
                       <Eye className="w-2.5 h-2.5" />
                       {(post.views ?? 0).toLocaleString()}
                     </span>
                   </div>
 
-                 {hasPaidPrice ? (
-  <span className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-emerald-500 text-[10px] font-mono font-bold text-black z-30 shadow-[0_2px_10px_rgba(16,185,129,0.4)]">
-    ${parseFloat(post.price).toFixed(2)}
-  </span>
-) : (
-  <span className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-blue-500 text-[10px] font-mono font-bold text-white z-30 shadow-[0_2px_10px_rgba(59,130,246,0.4)]">
-    Free
-  </span>
-)}
+                  <div className="absolute top-3 right-3 z-30">
+                    <PriceBadge price={post.price} />
+                  </div>
                 </div>
 
                 {/* Card Title Info Block */}
@@ -185,7 +102,7 @@ export function ShowroomGrid({ posts, limit }: ShowroomGridProps) {
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     {/* Purchase Button */}
-                    {hasPaidPrice && (
+                    {isPaid && (
                       <button
                         onClick={(e) => handlePurchase(e, post)}
                         disabled={status === 'processing' || status === 'success'}

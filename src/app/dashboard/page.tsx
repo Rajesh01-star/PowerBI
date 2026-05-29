@@ -1,11 +1,10 @@
 "use client";
-
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, History, Package, Settings, LogOut, LayoutDashboard, ExternalLink, Loader2, Monitor, Smartphone, ShieldCheck, Calendar, CreditCard } from 'lucide-react';
+import { Download, Package, LogOut, LayoutDashboard, ExternalLink, Loader2, Monitor, Smartphone, ShieldCheck, Calendar, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { authClient } from '@/lib/auth-client';
-import { getMediaUrl } from '@/lib/utils';
+import { getInitials, formatDate, getActiveThumbnail } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
 
 interface Purchase {
   orderId: string;
@@ -25,46 +24,19 @@ interface Purchase {
 
 export default function UserDashboard() {
   const { data: sessionData, isPending: sessionLoading } = authClient.useSession();
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchPurchases = async () => {
-      try {
-        const res = await fetch('/api/user/purchases');
-        if (res.ok) {
-          const data = await res.json();
-          setPurchases(data.purchases || []);
-        }
-      } catch (err) {
-        console.error('Failed to fetch purchases:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (sessionData?.user) {
-      fetchPurchases();
-    } else if (!sessionLoading) {
-      setLoading(false);
-    }
-  }, [sessionData, sessionLoading]);
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
+  // Replaces custom fetch + state + useEffect with useQuery
+  const { data: purchases = [], isLoading: loading } = useQuery<Purchase[]>({
+    queryKey: ['user-purchases'],
+    queryFn: async () => {
+      const res = await fetch('/api/user/purchases');
+      if (!res.ok) throw new Error('Failed to fetch purchases');
+      const data = await res.json();
+      return data.purchases || [];
+    },
+    enabled: !!sessionData?.user,
+    staleTime: 30_000,
+  });
 
   // Redirect if not logged in
   if (!sessionLoading && !sessionData?.user) {
@@ -143,8 +115,7 @@ export default function UserDashboard() {
                 <AnimatePresence>
                   {purchases.map((item, i) => {
                     const isVertical = item.aspect === 'vertical';
-                    const activeThumb = item.thumbnails?.[item.activeThumbnailIndex || 0] || item.imageUrl;
-                    const screenshotUrl = activeThumb ? getMediaUrl(activeThumb) : `https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=200&q=60`;
+                    const screenshotUrl = getActiveThumbnail(item);
 
                     return (
                       <motion.div

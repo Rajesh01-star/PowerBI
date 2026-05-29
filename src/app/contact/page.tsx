@@ -1,5 +1,7 @@
 import { Mail, Phone, MapPin, Clock, ShieldCheck } from "lucide-react";
 import { ContactForm } from "./ContactForm";
+import { PageShell } from "@/components/shared/PageShell";
+
 export const metadata = {
   title: "Contact Us - GENGRAPHS & GRAPHICS",
   description: "Get in touch with GENGRAPHS AND GRAPHICS PVT. LTD., founded by Mohit Bhardwaj. Secure an analytics consultation or custom Power BI and design deployment.",
@@ -7,12 +9,7 @@ export const metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="relative w-full min-h-screen bg-transparent text-foreground overflow-x-hidden selection:bg-amber-500/30 flex flex-col justify-between">
-      {/* Background glow effects */}
-      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[50%] bg-amber-600/10 blur-[130px] rounded-full pointer-events-none" />
-      <div className="absolute top-[30%] right-[-10%] w-[50%] h-[50%] bg-amber-600/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[10%] left-[20%] w-[40%] h-[40%] bg-amber-600/5 blur-[110px] rounded-full pointer-events-none" />
-
+    <PageShell>
       <main className="relative z-10 flex-grow pt-32 sm:pt-40 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           
@@ -120,6 +117,6 @@ export default function ContactPage() {
 
         </div>
       </main>
-    </div>
+    </PageShell>
   );
 }

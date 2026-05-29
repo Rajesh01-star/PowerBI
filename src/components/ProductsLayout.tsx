@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { ChartColumn, Loader2, Search, Filter, Users, TrendingUp, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { ChartColumn, Loader2, Filter, Users, TrendingUp, Eye } from 'lucide-react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getPublicPostsAction, getPublicPostsByTypeAction, getMarketplaceStatsAction } from '@/app/admin/actions';
 import { ShowroomFilter, SortOption } from '@/components/ShowroomFilter';
 import { ShowroomGrid, ShowroomGridSkeleton } from '@/components/ShowroomGrid';
 import { GooeyInput } from '@/components/ui/gooey-input';
+import { PageShell } from '@/components/shared/PageShell';
+import { Pagination } from '@/components/shared/Pagination';
+import { useUrlParam, useUrlNumParam } from '@/lib/useUrlState';
+import { formatViews } from '@/lib/utils';
 
 interface ProductsLayoutProps {
   title: React.ReactNode;
@@ -18,60 +22,34 @@ interface ProductsLayoutProps {
 const ITEMS_PER_PAGE = 12;
 
 export function ProductsLayout({ title, description, statsLabel, assetType }: ProductsLayoutProps) {
-  const [activeSort, setActiveSort] = useState<SortOption>('views');
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  // URL-persisted state (shareable, bookmarkable, survives refresh)
+  const [activeSort, setActiveSort] = useUrlParam('s', 'views');
+  const [searchQuery, setSearchQuery] = useUrlParam('q', '');
+  const [activeCategory, setActiveCategory] = useUrlParam('c', 'All');
+  const [currentPage, setCurrentPage] = useUrlNumParam('p', 1);
 
-  // Reset to first page on filter change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeSort, searchQuery, activeCategory]);
+  // Ephemeral UI state (not persisted in URL)
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['public-posts', assetType, activeSort],
     queryFn: () => assetType 
       ? getPublicPostsByTypeAction(assetType, activeSort)
       : getPublicPostsAction(activeSort),
+    placeholderData: keepPreviousData,
   });
 
   const { data: stats = { templatesCount: 0, creatorsCount: 0, newMonthlyReports: 0, reportViews: 0 }, isLoading: isStatsLoading } = useQuery({
     queryKey: ['marketplace-stats'],
     queryFn: () => getMarketplaceStatsAction(),
+    staleTime: 5 * 60_000, // Stats change rarely
   });
 
-  const formatViews = (views: number) => {
-    if (views >= 1000000) return `${(views / 1000000).toFixed(0)}M+`;
-    if (views >= 1000) return `${(views / 1000).toFixed(0)}k+`;
-    return `${views}+`;
-  };
-
   const statsData = [
-    {
-      id: "templates",
-      value: stats.templatesCount,
-      label: statsLabel,
-      icon: <ChartColumn className="w-4.5 h-4.5" />,
-    },
-    {
-      id: "creators",
-      value: stats.creatorsCount,
-      label: "Active Creators",
-      icon: <Users className="w-4.5 h-4.5" />,
-    },
-    {
-      id: "new-reports",
-      value: stats.newMonthlyReports,
-      label: "New Reports (30d)",
-      icon: <TrendingUp className="w-4.5 h-4.5" />,
-    },
-    {
-      id: "views",
-      value: stats.reportViews,
-      label: "Total Views",
-      icon: <Eye className="w-4.5 h-4.5" />,
-    },
+    { id: "templates", value: stats.templatesCount, label: statsLabel, icon: <ChartColumn className="w-4.5 h-4.5" /> },
+    { id: "creators", value: stats.creatorsCount, label: "Active Creators", icon: <Users className="w-4.5 h-4.5" /> },
+    { id: "new-reports", value: stats.newMonthlyReports, label: "New Reports (30d)", icon: <TrendingUp className="w-4.5 h-4.5" /> },
+    { id: "views", value: stats.reportViews, label: "Total Views", icon: <Eye className="w-4.5 h-4.5" /> },
   ];
 
   // Filter posts based on client-side search query and active category dropdown selection
@@ -91,15 +69,17 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
 
   // Pagination logic
   const totalPages = Math.ceil(filteredPosts.length / ITEMS_PER_PAGE);
-  const paginatedPosts = filteredPosts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const safePage = Math.min(currentPage, totalPages || 1);
+  const paginatedPosts = filteredPosts.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
+
+  const clearFilters = () => {
+    setActiveCategory('All');
+    setSearchQuery('');
+    setCurrentPage(1);
+  };
 
   return (
-    <div className="relative w-full min-h-screen bg-transparent text-foreground overflow-x-hidden selection:bg-amber-500/30 flex flex-col justify-between">
-      {/* Background glow effects */}
-      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[50%] bg-amber-600/10 blur-[130px] rounded-full pointer-events-none" />
-      <div className="absolute top-[30%] right-[-10%] w-[50%] h-[50%] bg-amber-600/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[10%] left-[20%] w-[40%] h-[40%] bg-amber-600/5 blur-[110px] rounded-full pointer-events-none" />
-
+    <PageShell>
       <main className="relative z-10 flex-grow pt-32 sm:pt-40 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           
@@ -116,10 +96,7 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 max-w-5xl mx-auto text-left">
               {isStatsLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                  <div 
-                    key={i}
-                    className="bg-neutral-900/40 backdrop-blur-xl border border-neutral-800/80 rounded-2xl p-4 flex items-center gap-3.5 shadow-md shadow-amber-500/2 min-w-0 animate-pulse"
-                  >
+                  <div key={i} className="bg-neutral-900/40 backdrop-blur-xl border border-neutral-800/80 rounded-2xl p-4 flex items-center gap-3.5 shadow-md shadow-amber-500/2 min-w-0 animate-pulse">
                     <div className="w-10 h-10 rounded-full bg-neutral-800/80 shrink-0"></div>
                     <div className="space-y-1.5 min-w-0 flex-1">
                       <div className="h-4 sm:h-5 bg-neutral-800/80 rounded w-16"></div>
@@ -129,10 +106,7 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
                 ))
               ) : (
                 statsData.map((item) => (
-                  <div 
-                    key={item.id}
-                    className="bg-neutral-900/40 backdrop-blur-xl border border-neutral-800/80 rounded-2xl p-4 flex items-center gap-3.5 shadow-md shadow-amber-500/2 hover:border-neutral-700/60 transition-all duration-300 min-w-0"
-                  >
+                  <div key={item.id} className="bg-neutral-900/40 backdrop-blur-xl border border-neutral-800/80 rounded-2xl p-4 flex items-center gap-3.5 shadow-md shadow-amber-500/2 hover:border-neutral-700/60 transition-all duration-300 min-w-0">
                     <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
                       {item.icon}
                     </div>
@@ -152,18 +126,15 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
 
           {/* Integrated Search, Filter, and Sort Controls in a Single Row */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-3 border-b border-border/10 pb-3 z-30 relative w-full">
-            {/* Sorting controls on the left */}
             <div className="flex items-center">
-              <ShowroomFilter activeSort={activeSort} setActiveSort={setActiveSort} />
+              <ShowroomFilter activeSort={activeSort as SortOption} setActiveSort={(s) => { setActiveSort(s); setCurrentPage(1); }} />
             </div>
 
-            {/* Search and Category Filter on the right */}
             <div className="flex items-center gap-3 self-end md:self-auto">
-              {/* Gooey Search Input Container */}
               <div className="relative flex items-center justify-start min-w-[120px] z-30">
                 <GooeyInput 
                   value={searchQuery}
-                  onValueChange={setSearchQuery}
+                  onValueChange={(v) => { setSearchQuery(v); setCurrentPage(1); }}
                   placeholder="Search templates..." 
                   collapsedWidth={115}
                   expandedWidth={220}
@@ -172,7 +143,6 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
                 />
               </div>
 
-              {/* Categorical filter dropdown container */}
               <div className="relative z-30">
                 <button 
                   onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
@@ -185,7 +155,6 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
                   <Filter className="w-3.5 h-3.5" />
                 </button>
 
-                {/* Dropdown Menu Popup */}
                 {filterDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 rounded-xl bg-neutral-900 border border-neutral-800/80 backdrop-blur-2xl shadow-xl p-1.5 z-50 text-foreground animate-in fade-in zoom-in duration-200">
                     <div className="px-3 py-1.5 border-b border-neutral-850 mb-1">
@@ -197,6 +166,7 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
                           key={cat}
                           onClick={() => {
                             setActiveCategory(cat);
+                            setCurrentPage(1);
                             setFilterDropdownOpen(false);
                           }}
                           className={`w-full flex items-center px-3 py-1.5 text-xs rounded-lg transition-colors cursor-pointer text-left ${
@@ -222,7 +192,7 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
             </div>
           ) : (
             <div className="space-y-3 flex flex-col min-h-[500px]">
-              {/* Active Filter State Label (Shows only when not filtering All) */}
+              {/* Active Filter State Label */}
               {(activeCategory !== "All" || searchQuery) && (
                 <div className="flex items-center gap-2 flex-wrap text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-2">
                   <span>Filtered by:</span>
@@ -237,10 +207,7 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
                     </span>
                   )}
                   <button 
-                    onClick={() => {
-                      setActiveCategory("All");
-                      setSearchQuery("");
-                    }} 
+                    onClick={clearFilters} 
                     className="text-amber-500/80 hover:text-amber-500 underline transition-colors cursor-pointer normal-case text-[9px]"
                   >
                     Clear all filters
@@ -248,7 +215,7 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
                 </div>
               )}
 
-              {/* Showroom Grid rendering real filtered database templates */}
+              {/* Showroom Grid */}
               {paginatedPosts.length > 0 ? (
                 <div className="flex-1">
                   <ShowroomGrid posts={paginatedPosts} />
@@ -257,10 +224,7 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
                 <div className="w-full py-20 text-center rounded-3xl border border-dashed border-border/80 bg-card/20 backdrop-blur-xs flex-1 flex flex-col items-center justify-center">
                   <p className="text-xs text-muted-foreground font-mono">NO ACTIVE CONFIGURATIONS FOUND MATCHING SPECIFICATIONS</p>
                   <button 
-                    onClick={() => {
-                      setActiveCategory("All");
-                      setSearchQuery("");
-                    }} 
+                    onClick={clearFilters} 
                     className="mt-4 px-4 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-semibold uppercase tracking-wider hover:bg-amber-500/20 transition-all cursor-pointer"
                   >
                     Reset Active Filters
@@ -269,46 +233,16 @@ export function ProductsLayout({ title, description, statsLabel, assetType }: Pr
               )}
               
               {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-12 mb-4">
-                  <button
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-border bg-card/50 text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  
-                  <div className="flex items-center gap-1 mx-2">
-                    {Array.from({ length: totalPages }).map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentPage(i + 1)}
-                        className={`w-8 h-8 flex items-center justify-center rounded-lg text-[11px] font-medium transition-all ${
-                          currentPage === i + 1
-                            ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20 border border-amber-600'
-                            : 'bg-card/50 border border-border text-foreground hover:bg-accent'
-                        }`}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-border bg-card/50 text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
+              <Pagination 
+                currentPage={safePage} 
+                totalPages={totalPages} 
+                onPageChange={setCurrentPage} 
+              />
             </div>
           )}
 
         </div>
       </main>
-    </div>
+    </PageShell>
   );
 }

@@ -1,22 +1,54 @@
 "use server";
 
 import { db } from "@/db/drizzle";
-import { postsTable } from "@/db/schema";
+import { postsTable, ordersTable } from "@/db/schema";
+import { POST_SELECT_FIELDS, POST_PUBLIC_FIELDS, getOrderByClause } from "@/db/queries";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { eq, desc, asc, sql, arrayContains } from "drizzle-orm";
+import { eq, desc, sql, arrayContains, and } from "drizzle-orm";
 import { getUploadPresignedUrl, getDownloadPresignedUrl } from "@/lib/r2";
 import { v4 as uuidv4 } from "uuid";
 
-export async function getUploadUrlAction(fileName: string, fileType: string, isPublic = false, postId?: string) {
+async function requireAdmin() {
     const session = await auth.api.getSession({
         headers: await headers()
     });
-
     if (!session || !session.user || !session.user.isAdmin) {
         throw new Error("Unauthorized: Only admins can perform this action");
     }
+    return session;
+}
+
+async function requireAuth() {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
+    }
+    return session;
+}
+
+function parseFormFields(formData: FormData) {
+    return {
+        title: formData.get("title") as string,
+        description: formData.get("description") as string,
+        price: formData.get("price") as string,
+        url: formData.get("url") as string,
+        aspect: formData.get("aspect") as 'horizontal' | 'vertical',
+        activeThumbnailIndex: parseInt(formData.get("activeThumbnailIndex") as string || "0"),
+        assetType: (formData.get("assetType") as 'powerbi' | 'uiux') || 'powerbi',
+        sourceLink: formData.get("sourceLink") as string,
+        tags: JSON.parse(formData.get("tags") as string || "[]"),
+        thumbnails: JSON.parse(formData.get("thumbnails") as string || "[]"),
+        references: JSON.parse(formData.get("references") as string || "[]"),
+        fileUrl: formData.get("fileUrl") as string | null,
+    };
+}
+
+export async function getUploadUrlAction(fileName: string, fileType: string, isPublic = false, postId?: string) {
+    await requireAdmin();
 
     const folderId = postId || uuidv4();
     const subFolder = isPublic ? "images" : "zip";
@@ -27,51 +59,26 @@ export async function getUploadUrlAction(fileName: string, fileType: string, isP
 }
 
 export async function createPostAction(formData: FormData) {
-    const session = await auth.api.getSession({
-        headers: await headers()
-    });
+    const session = await requireAdmin();
+    const fields = parseFormFields(formData);
 
-    if (!session || !session.user || !session.user.isAdmin) {
-        throw new Error("Unauthorized: Only admins can perform this action");
-    }
-
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const price = formData.get("price") as string;
-    const url = formData.get("url") as string;
-    const aspect = formData.get("aspect") as 'horizontal' | 'vertical';
-    const activeThumbnailIndex = parseInt(formData.get("activeThumbnailIndex") as string || "0");
-    const assetType = (formData.get("assetType") as 'powerbi' | 'uiux') || 'powerbi';
-    const sourceLink = formData.get("sourceLink") as string;
-    
-    const tagsData = formData.get("tags") as string;
-    const tags = tagsData ? JSON.parse(tagsData) : [];
-
-    const thumbnailsData = formData.get("thumbnails") as string;
-    const thumbnails = thumbnailsData ? JSON.parse(thumbnailsData) : [];
-
-    const referencesData = formData.get("references") as string;
-    const references = referencesData ? JSON.parse(referencesData) : [];
-
-    if (!title) {
+    if (!fields.title) {
          throw new Error("Title is required");
     }
 
-    const fileUrl = formData.get("fileUrl") as string | null;
-
     await db.insert(postsTable).values({
-        title,
-        description: description || null,
-        price: price ? price : null,
-        url: url || null,
-        aspect: aspect || 'horizontal',
-        thumbnails,
-        activeThumbnailIndex,
-        assetType,
-        sourceLink: sourceLink || null,
-        tags,
-        fileUrl,
-        references,
+        title: fields.title,
+        description: fields.description || null,
+        price: fields.price ? fields.price : null,
+        url: fields.url || null,
+        aspect: fields.aspect || 'horizontal',
+        thumbnails: fields.thumbnails,
+        activeThumbnailIndex: fields.activeThumbnailIndex,
+        assetType: fields.assetType,
+        sourceLink: fields.sourceLink || null,
+        tags: fields.tags,
+        fileUrl: fields.fileUrl,
+        references: fields.references,
         userId: session.user.id
     });
 
@@ -83,54 +90,30 @@ export async function createPostAction(formData: FormData) {
 }
 
 export async function updatePostAction(formData: FormData) {
-    const session = await auth.api.getSession({
-        headers: await headers()
-    });
-
-    if (!session || !session.user || !session.user.isAdmin) {
-        throw new Error("Unauthorized: Only admins can perform this action");
-    }
-
+    await requireAdmin();
+    const fields = parseFormFields(formData);
     const id = formData.get("id") as string;
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const price = formData.get("price") as string;
-    const url = formData.get("url") as string;
-    const aspect = formData.get("aspect") as 'horizontal' | 'vertical';
-    const activeThumbnailIndex = parseInt(formData.get("activeThumbnailIndex") as string || "0");
-    const assetType = (formData.get("assetType") as 'powerbi' | 'uiux') || 'powerbi';
-    const sourceLink = formData.get("sourceLink") as string;
-    
-    const tagsData = formData.get("tags") as string;
-    const tags = tagsData ? JSON.parse(tagsData) : [];
 
-    const thumbnailsData = formData.get("thumbnails") as string;
-    const thumbnails = thumbnailsData ? JSON.parse(thumbnailsData) : [];
-
-    const referencesData = formData.get("references") as string;
-    const references = referencesData ? JSON.parse(referencesData) : [];
-
-    if (!id || !title) {
+    if (!id || !fields.title) {
          throw new Error("ID and Title are required");
     }
 
     const updateData: any = {
-        title,
-        description: description || null,
-        price: price ? price : null,
-        url: url || null,
-        aspect: aspect || 'horizontal',
-        thumbnails,
-        activeThumbnailIndex,
-        assetType,
-        sourceLink: sourceLink || null,
-        tags,
-        references,
+        title: fields.title,
+        description: fields.description || null,
+        price: fields.price ? fields.price : null,
+        url: fields.url || null,
+        aspect: fields.aspect || 'horizontal',
+        thumbnails: fields.thumbnails,
+        activeThumbnailIndex: fields.activeThumbnailIndex,
+        assetType: fields.assetType,
+        sourceLink: fields.sourceLink || null,
+        tags: fields.tags,
+        references: fields.references,
     };
 
-    const newFileUrl = formData.get("fileUrl") as string | null;
-    if (newFileUrl) {
-        updateData.fileUrl = newFileUrl;
+    if (fields.fileUrl) {
+        updateData.fileUrl = fields.fileUrl;
     }
 
     await db.update(postsTable).set(updateData).where(eq(postsTable.id, id));
@@ -143,152 +126,44 @@ export async function updatePostAction(formData: FormData) {
 }
 
 export async function getPostsAction() {
-    const session = await auth.api.getSession({
-        headers: await headers()
-    });
+    await requireAdmin();
 
-    if (!session || !session.user || !session.user.isAdmin) {
-        throw new Error("Unauthorized: Only admins can perform this action");
-    }
-
-    const posts = await db.select({
-        id: postsTable.id,
-        title: postsTable.title,
-        description: postsTable.description,
-        price: postsTable.price,
-        url: postsTable.url,
-        aspect: postsTable.aspect,
-        imageUrl: postsTable.imageUrl,
-        fileUrl: postsTable.fileUrl,
-        thumbnails: postsTable.thumbnails,
-        activeThumbnailIndex: postsTable.activeThumbnailIndex,
-        assetType: postsTable.assetType,
-        sourceLink: postsTable.sourceLink,
-        tags: postsTable.tags,
-        references: postsTable.references,
-        userId: postsTable.userId,
-        views: postsTable.views,
-        createdAt: postsTable.createdAt,
-        updatedAt: postsTable.updatedAt
-    }).from(postsTable).orderBy(desc(postsTable.createdAt));
+    const posts = await db.select(POST_SELECT_FIELDS)
+        .from(postsTable)
+        .orderBy(desc(postsTable.createdAt));
     return posts;
 }
 
 export async function getPublicPostsAction(sort: string = 'views', tags: string[] = []) {
-    let orderByClause;
-    switch (sort) {
-        case 'newest':
-            orderByClause = desc(postsTable.createdAt);
-            break;
-        case 'oldest':
-            orderByClause = asc(postsTable.createdAt);
-            break;
-        case 'atoz':
-            orderByClause = asc(postsTable.title);
-            break;
-        case 'views':
-        default:
-            orderByClause = desc(postsTable.views);
-            break;
-    }
-    
+    const orderByClause = getOrderByClause(sort);
     const whereClause = tags && tags.length > 0 ? arrayContains(postsTable.tags, tags) : undefined;
 
-    const posts = await db.select({
-        id: postsTable.id,
-        title: postsTable.title,
-        description: postsTable.description,
-        price: postsTable.price,
-        url: postsTable.url,
-        aspect: postsTable.aspect,
-        imageUrl: postsTable.imageUrl,
-        thumbnails: postsTable.thumbnails,
-        activeThumbnailIndex: postsTable.activeThumbnailIndex,
-        assetType: postsTable.assetType,
-        sourceLink: postsTable.sourceLink,
-        tags: postsTable.tags,
-        references: postsTable.references,
-        userId: postsTable.userId,
-        views: postsTable.views,
-        createdAt: postsTable.createdAt,
-        updatedAt: postsTable.updatedAt
-    }).from(postsTable).where(whereClause).orderBy(orderByClause);
+    const posts = await db.select(POST_PUBLIC_FIELDS)
+        .from(postsTable)
+        .where(whereClause)
+        .orderBy(orderByClause);
     return posts;
 }
 
 export async function getPublicPostsByTypeAction(type: 'powerbi' | 'uiux', sort: string = 'views') {
-    let orderByClause;
-    switch (sort) {
-        case 'newest':
-            orderByClause = desc(postsTable.createdAt);
-            break;
-        case 'oldest':
-            orderByClause = asc(postsTable.createdAt);
-            break;
-        case 'atoz':
-            orderByClause = asc(postsTable.title);
-            break;
-        case 'views':
-        default:
-            orderByClause = desc(postsTable.views);
-            break;
-    }
-    const posts = await db.select({
-        id: postsTable.id,
-        title: postsTable.title,
-        description: postsTable.description,
-        price: postsTable.price,
-        url: postsTable.url,
-        aspect: postsTable.aspect,
-        imageUrl: postsTable.imageUrl,
-        thumbnails: postsTable.thumbnails,
-        activeThumbnailIndex: postsTable.activeThumbnailIndex,
-        assetType: postsTable.assetType,
-        sourceLink: postsTable.sourceLink,
-        tags: postsTable.tags,
-        references: postsTable.references,
-        userId: postsTable.userId,
-        views: postsTable.views,
-        createdAt: postsTable.createdAt,
-        updatedAt: postsTable.updatedAt
-    }).from(postsTable).where(eq(postsTable.assetType, type)).orderBy(orderByClause);
+    const orderByClause = getOrderByClause(sort);
+
+    const posts = await db.select(POST_PUBLIC_FIELDS)
+        .from(postsTable)
+        .where(eq(postsTable.assetType, type))
+        .orderBy(orderByClause);
     return posts;
 }
 
 export async function getPublicPostByIdAction(id: string) {
-    const posts = await db.select({
-        id: postsTable.id,
-        title: postsTable.title,
-        description: postsTable.description,
-        price: postsTable.price,
-        url: postsTable.url,
-        aspect: postsTable.aspect,
-        imageUrl: postsTable.imageUrl,
-        thumbnails: postsTable.thumbnails,
-        activeThumbnailIndex: postsTable.activeThumbnailIndex,
-        assetType: postsTable.assetType,
-        sourceLink: postsTable.sourceLink,
-        tags: postsTable.tags,
-        references: postsTable.references,
-        userId: postsTable.userId,
-        views: postsTable.views,
-        createdAt: postsTable.createdAt,
-        updatedAt: postsTable.updatedAt
-    }).from(postsTable).where(eq(postsTable.id, id));
+    const posts = await db.select(POST_PUBLIC_FIELDS)
+        .from(postsTable)
+        .where(eq(postsTable.id, id));
     return posts[0] || null;
 }
 
-import { ordersTable } from "@/db/schema";
-import { and } from "drizzle-orm";
-
 export async function getPostFileUrlAction(id: string) {
-    const session = await auth.api.getSession({
-        headers: await headers()
-    });
-
-    if (!session || !session.user) {
-        throw new Error("Unauthorized");
-    }
+    const session = await requireAuth();
 
     if (!session.user.isAdmin) {
         const purchases = await db.select().from(ordersTable).where(
@@ -300,7 +175,7 @@ export async function getPostFileUrlAction(id: string) {
         );
 
         if (purchases.length === 0) {
-            // Also check if the post is free?
+            // Also check if the post is free
             const post = await db.select({ price: postsTable.price }).from(postsTable).where(eq(postsTable.id, id));
             const isFree = !post[0]?.price || parseFloat(post[0].price) <= 0;
             if (!isFree) {
@@ -366,4 +241,3 @@ export async function getMarketplaceStatsAction() {
         };
     }
 }
-

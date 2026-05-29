@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from 'recharts';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Filter, Download, Maximize2, Share2, MoreHorizontal } from 'lucide-react';
-import { useTheme } from '@/components/theme-provider';
+import { motion } from 'framer-motion';
+import { Filter, Download, Maximize2, Share2, MoreHorizontal } from 'lucide-react';
 
 const data = [
   { name: 'Jan', revenue: 4000, users: 2400, active: 2400 },
@@ -16,44 +15,16 @@ const data = [
   { name: 'Jul', revenue: 3490, users: 4300, active: 2100 },
 ];
 
+// Theme is hardcoded to dark — no need for mounted/theme detection
+const strokeColor = "rgba(255, 255, 255, 0.08)";
+const axisColor = "rgba(255, 255, 255, 0.4)";
+const tooltipBg = "#121214";
+const tooltipBorder = "#27272a";
+const tooltipText = "#f4f4f5";
+
 export default function InteractivePBI() {
-  const [loading, setLoading] = useState(true);
-  const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const isDark = mounted 
-    ? (theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches))
-    : true;
-
-  const strokeColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.08)";
-  const axisColor = isDark ? "rgba(255, 255, 255, 0.4)" : "rgba(0, 0, 0, 0.5)";
-  const tooltipBg = isDark ? "#121214" : "#ffffff";
-  const tooltipBorder = isDark ? "#27272a" : "#e4e4e7";
-  const tooltipText = isDark ? "#f4f4f5" : "#18181b";
-
   return (
     <div className="w-full h-full min-h-[500px] md:min-h-[700px] bg-card text-card-foreground rounded-2xl overflow-hidden relative border border-border flex flex-col shadow-lg">
-      <AnimatePresence>
-        {loading && (
-          <motion.div 
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 bg-background/80 backdrop-blur-md flex flex-col items-center justify-center"
-          >
-            <Loader2 className="w-12 h-12 text-amber-500 animate-spin mb-4" />
-            <h3 className="font-heading text-xl font-medium tracking-wide">Initializing Data Workspace</h3>
-            <p className="text-muted-foreground text-sm mt-2 font-mono">Loading model definitions...</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Toolbar */}
       <div className="h-14 border-b border-border flex items-center justify-between px-4 bg-muted/40">
@@ -89,7 +60,7 @@ export default function InteractivePBI() {
               key={i}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2.6 + (i * 0.1) }}
+              transition={{ delay: i * 0.1 }}
               className="bg-card border border-border/80 shadow-sm p-4 rounded-xl flex flex-col justify-between"
             >
               <p className="text-xs text-muted-foreground mb-1 font-medium">{kpi.label}</p>
@@ -108,7 +79,7 @@ export default function InteractivePBI() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 3 }}
+            transition={{ delay: 0.4 }}
             className="lg:col-span-2 bg-card border border-border/80 shadow-sm p-4 rounded-xl h-[300px]"
           >
             <h4 className="text-sm font-medium text-foreground mb-4">Revenue Overview</h4>
@@ -132,7 +103,7 @@ export default function InteractivePBI() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 3.2 }}
+            transition={{ delay: 0.6 }}
             className="bg-card border border-border/80 shadow-sm p-4 rounded-xl h-[300px]"
           >
             <h4 className="text-sm font-medium text-foreground mb-4">User Acquisition</h4>
@@ -141,7 +112,7 @@ export default function InteractivePBI() {
                 <CartesianGrid strokeDasharray="3 3" stroke={strokeColor} vertical={false} />
                 <XAxis dataKey="name" stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis stroke={axisColor} fontSize={11} tickLine={false} axisLine={false} />
-                <Tooltip cursor={{ fill: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: tooltipBg, borderColor: tooltipBorder, borderRadius: '8px', color: tooltipText }} />
+                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ backgroundColor: tooltipBg, borderColor: tooltipBorder, borderRadius: '8px', color: tooltipText }} />
                 <Bar dataKey="users" fill="#F97316" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

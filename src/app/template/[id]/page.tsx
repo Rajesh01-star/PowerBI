@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Check, DownloadCloud, Server, ShieldCheck, Database, LayoutDashboard, Smartphone, Monitor, Loader2, Eye, ImageIcon, X, BookOpen, ExternalLink } from 'lucide-react';
+import { ChevronLeft, DownloadCloud, LayoutDashboard, Smartphone, Monitor, Loader2, Eye, ImageIcon, X, BookOpen, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import InteractivePBI from '@/components/InteractivePBI';
@@ -11,77 +11,74 @@ import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { RegisterDialog } from '@/components/RegisterDialog';
 import { ContentRenderer } from '@/components/tiptap/ContentRenderer';
-import { getMediaUrl } from '@/lib/utils';
+import { getMediaUrl, formatPrice, hasPaidPrice } from '@/lib/utils';
+import { AspectBadge } from '@/components/shared/AspectBadge';
+import { useQuery } from '@tanstack/react-query';
+import { useRazorpay } from '@/lib/useRazorpay';
 
 export default function TemplateDetail() {
   const { data: sessionData } = authClient.useSession();
   const params = useParams();
-  const [isProcessing, setIsProcessing] = useState(false);
+  const postId = typeof params.id === 'string' ? params.id : '';
+
   const [isDownloading, setIsDownloading] = useState(false);
-  const [post, setPost] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [viewCount, setViewCount] = useState<number | null>(null);
-  const [hasPurchased, setHasPurchased] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [viewCount, setViewCount] = useState<number | null>(null);
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      if (typeof params.id === 'string') {
-        try {
-          const data = await getPublicPostByIdAction(params.id);
-          console.log(data)
-          setPost(data);
-        } catch (error) {
-          console.error("Failed to fetch post:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    fetchPost();
-  }, [params.id]);
+  // Fetch post data with caching
+  const { data: post, isLoading: loading } = useQuery({
+    queryKey: ['post-detail', postId],
+    queryFn: () => getPublicPostByIdAction(postId),
+    enabled: !!postId,
+    staleTime: 2 * 60_000,
+  });
+
+  // Razorpay hook
+  const { initiatePurchase, getStatus } = useRazorpay({
+    onSuccess: () => setHasPurchased(true),
+  });
 
   // Check if user has purchased this template
-  useEffect(() => {
-    const checkPurchase = async () => {
-      if (sessionData?.user && params.id && typeof params.id === 'string') {
-        try {
-          const res = await fetch('/api/user/purchases', { cache: 'no-store' });
-          const data = await res.json();
-          if (res.ok && data.purchases) {
-            const purchased = data.purchases.some((p: any) => p.postId === params.id);
-            setHasPurchased(purchased);
-          }
-        } catch (error) {
-          console.error("Failed to check purchases:", error);
-        }
+  const { data: purchaseData } = useQuery({
+    queryKey: ['user-purchases-check', postId],
+    queryFn: async () => {
+      const res = await fetch('/api/user/purchases', { cache: 'no-store' });
+      const data = await res.json();
+      if (res.ok && data.purchases) {
+        return data.purchases.some((p: any) => p.postId === postId);
       }
-    };
-    checkPurchase();
-  }, [sessionData, params.id]);
+      return false;
+    },
+    enabled: !!sessionData?.user && !!postId,
+    staleTime: 30_000,
+  });
+
+  useEffect(() => {
+    if (purchaseData !== undefined) setHasPurchased(purchaseData);
+  }, [purchaseData]);
 
   // Increment view count on page visit
   useEffect(() => {
+    if (!postId) return;
     const incrementViews = async () => {
-      if (typeof params.id === 'string') {
-        try {
-          const res = await fetch('/api/posts/views', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: params.id }),
-          });
-          const data = await res.json();
-          if (res.ok && data.success) {
-            setViewCount(data.views);
-          }
-        } catch (error) {
-          console.error('Failed to increment views:', error);
+      try {
+        const res = await fetch('/api/posts/views', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: postId }),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setViewCount(data.views);
         }
+      } catch {
+        // silent fail for view tracking
       }
     };
     incrementViews();
-  }, [params.id]);
+  }, [postId]);
 
   if (loading) {
     return (
@@ -106,83 +103,18 @@ export default function TemplateDetail() {
   }
 
   const isVertical = post.aspect === 'vertical';
-  const isFree = !post.price || parseFloat(post.price) <= 0;
-  const displayPrice = isFree ? "Free" : `$${parseFloat(post.price).toFixed(2)}`;
+  const isFree = !hasPaidPrice(post.price);
+  const displayPrice = formatPrice(post.price);
   const canDownload = hasPurchased || isFree;
+  const paymentStatus = getStatus(postId);
 
   const handlePurchase = async () => {
     if (!sessionData?.user) {
       setShowLoginDialog(true);
       return;
     }
-
-    if (!post || !post.price || parseFloat(post.price) <= 0) {
-      toast.warning("This template is free or has an invalid price.");
-      return;
-    }
-
-    try {
-      setIsProcessing(true);
-      const res = await fetch("/api/razorpay/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId: post.id }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.error || "Failed to create order");
-        setIsProcessing(false);
-        return;
-      }
-
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Use NEXT_PUBLIC_ for client-side
-        amount: data.amount,
-        currency: data.currency,
-        name: "PowerBI Templates",
-        description: post.title,
-        order_id: data.orderId,
-        handler: async function (response: any) {
-          try {
-            const verifyRes = await fetch("/api/razorpay/verify-payment", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
-            });
-            const verifyData = await verifyRes.json();
-            if (verifyRes.ok && verifyData.success) {
-              toast.success("Payment successful! You can now access your template.");
-              setHasPurchased(true);
-            } else {
-              toast.error("Payment verification failed.");
-            }
-          } catch (err) {
-            console.error("Verification error", err);
-            toast.error("Error verifying payment");
-          }
-        },
-        theme: {
-          color: "#6366f1",
-        },
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      rzp.on("payment.failed", function (response: any) {
-        toast.error(`Payment failed: ${response.error.description}`);
-      });
-      rzp.open();
-    } catch (err) {
-      console.error(err);
-      toast.error("An error occurred while initializing checkout");
-    } finally {
-      setIsProcessing(false);
-    }
+    if (isFree) return;
+    initiatePurchase(post);
   };
 
   const handleDownload = async () => {
@@ -193,7 +125,7 @@ export default function TemplateDetail() {
 
     try {
       setIsDownloading(true);
-      const fileUrl = await getPostFileUrlAction(params.id as string);
+      const fileUrl = await getPostFileUrlAction(postId);
       if (fileUrl) {
         const a = document.createElement('a');
         a.href = fileUrl;
@@ -232,9 +164,8 @@ export default function TemplateDetail() {
               
               {/* Metadata Badges */}
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border/50 text-[10px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-                  {isVertical ? <Smartphone className="w-3 h-3" /> : <Monitor className="w-3 h-3" />}
-                  {post.aspect} Target
+                <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border/50 shadow-sm">
+                  <AspectBadge aspect={post.aspect} className="text-[10px]" />
                 </span>
                 {viewCount !== null && (
                   <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border/50 text-[10px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
@@ -266,7 +197,7 @@ export default function TemplateDetail() {
               )}
             </div>
 
-            {/* Micro Dynamic Sandbox Aspect Ratio Iframe Frame Node */}
+            {/* Sandbox Production View */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
@@ -338,7 +269,7 @@ export default function TemplateDetail() {
                     let domain = "Resource File";
                     try {
                       domain = new URL(ref.url).hostname.replace("www.", "");
-                    } catch (e) {}
+                    } catch {}
 
                     return (
                       <a 
@@ -395,11 +326,11 @@ export default function TemplateDetail() {
                 ) : (
                   <button 
                     onClick={handlePurchase}
-                    disabled={isProcessing}
+                    disabled={paymentStatus === 'processing'}
                     className="w-full h-10 rounded-xl bg-gradient-to-r from-amber-500 to-black hover:opacity-90 disabled:opacity-50 text-xs text-white font-medium flex items-center justify-center gap-1.5 transition-all shadow-md shadow-amber-500/10 dark:shadow-amber-500/20"
                   >
-                    {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <DownloadCloud className="w-4 h-4" />}
-                    {isProcessing ? "Processing..." : "Initialize Asset Acquisition"}
+                    {paymentStatus === 'processing' ? <Loader2 className="w-4 h-4 animate-spin" /> : <DownloadCloud className="w-4 h-4" />}
+                    {paymentStatus === 'processing' ? "Processing..." : "Initialize Asset Acquisition"}
                   </button>
                 )}
                 <button className="w-full h-10 rounded-xl bg-muted hover:bg-accent hover:text-accent-foreground text-xs text-foreground border border-border transition-all">
