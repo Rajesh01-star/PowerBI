@@ -42,7 +42,7 @@ export default function ContactPage() {
                 <div className="space-y-4">
                   {/* Email */}
                   <a 
-                    href="mailto:connect@gengraphs.com" 
+                    href="mailto:info@gengraphsandgraphics.com" 
                     className="group flex gap-4 items-center p-3 rounded-2xl border border-transparent hover:border-border hover:bg-accent/30 transition-all duration-300"
                   >
                     <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
@@ -50,7 +50,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Secure Email</div>
-                      <div className="text-xs font-semibold text-foreground mt-0.5 group-hover:text-amber-500 transition-colors">connect@gengraphs.com</div>
+                      <div className="text-xs font-semibold text-foreground mt-0.5 group-hover:text-amber-500 transition-colors">info@gengraphsandgraphics.com</div>
                     </div>
                   </a>
  
